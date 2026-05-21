@@ -1,4 +1,4 @@
-package com.fudbalski_klub;
+package com.football_club;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
