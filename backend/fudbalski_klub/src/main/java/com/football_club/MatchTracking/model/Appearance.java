@@ -20,6 +20,10 @@ public class Appearance {
     @JoinColumn(name = "plays_for_id", nullable = false)
     private PlaysFor playsFor;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "game_id", nullable = false)
+    private Game game;
+
     @Column(name = "minutes_played", nullable = false)
     private int minutesPlayed = 0;
 

@@ -12,13 +12,13 @@ import lombok.*;
 public class Club {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int Id;
+    private int id;
 
     @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "location")
-    private String Location;
+    private String location;
 
     @Column(name = "wins", nullable = false)
     private int wins = 0;
