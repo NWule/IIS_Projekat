@@ -1,12 +1,17 @@
 package com.football_club.Auth.service.impl;
 
 
+import com.football_club.Auth.dto.RegisterDTO;
 import com.football_club.Auth.dto.UserDTO;
 import com.football_club.Auth.service.IUserService;
 import com.football_club.Auth.model.RoleEnum;
 import com.football_club.Auth.model.User;
 import com.football_club.Auth.repository.UserRepository;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,14 +21,22 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements IUserService {
+public class UserService implements IUserService, UserDetailsService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+    }
 
     @Override
     @Transactional
-    public UserDTO registerUser(UserDTO userDTO) {
+    public UserDTO registerUser(RegisterDTO userDTO) {
         if (userRepository.existsByUsername(userDTO.getUsername())) {
             throw new RuntimeException("Username is already taken!");
         }
@@ -42,8 +55,6 @@ public class UserService implements IUserService {
         return mapToDTO(savedUser);
     }
 
-
-
     @Override
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
@@ -56,6 +67,23 @@ public class UserService implements IUserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
         return mapToDTO(user);
+    }
+
+    @Override
+    public User getFullUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+    }
+
+    @Override
+    public User getFullUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+    }
+
+    @Override
+    public boolean isUserExists(String username, String email) {
+        return userRepository.existsByUsername(username) || userRepository.existsByEmail(email);
     }
 
     @Override
