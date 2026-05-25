@@ -28,4 +28,7 @@ public class Game {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "away_club_id", nullable = false)
     private Club awayClub;
+
+    @OneToOne(mappedBy = "game", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    TeamStatistic teamStatistic;
 }
