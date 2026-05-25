@@ -1,17 +1,25 @@
 package com.football_club.Auth.service;
 
+import com.football_club.Auth.dto.RegisterDTO;
 import com.football_club.Auth.dto.UserDTO;
 import com.football_club.Auth.model.RoleEnum;
+import com.football_club.Auth.model.User;
 
 import java.util.List;
 
 public interface IUserService {
 
-    UserDTO registerUser(UserDTO userDTO);
+    UserDTO registerUser(RegisterDTO userDTO);
 
     UserDTO getUserById(Long id);
 
     UserDTO getUserByUsername(String username);
+
+    User getFullUserById(Long id);
+
+    User getFullUserByUsername(String username);
+
+    boolean isUserExists(String username, String email);
 
     List<UserDTO> getAllUsers();
 

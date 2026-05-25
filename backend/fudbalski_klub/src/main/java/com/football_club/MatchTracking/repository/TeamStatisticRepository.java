@@ -1,5 +1,6 @@
 package com.football_club.MatchTracking.repository;
 
+import com.football_club.MatchTracking.model.Game;
 import com.football_club.MatchTracking.model.TeamStatistic;
 import org.springframework.data.jpa.repository.JpaRepository;
 
