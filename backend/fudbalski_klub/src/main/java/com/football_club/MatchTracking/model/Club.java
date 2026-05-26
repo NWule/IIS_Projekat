@@ -1,5 +1,6 @@
 package com.football_club.MatchTracking.model;
 
+import com.football_club.Scouting.model.League;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,10 @@ public class Club {
 
     @Column(name = "location")
     private String location;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "league_id")
+    private League league;
 
     @Column(name = "wins", nullable = false)
     private int wins = 0;

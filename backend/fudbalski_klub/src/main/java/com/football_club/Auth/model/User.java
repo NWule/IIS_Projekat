@@ -1,5 +1,6 @@
 package com.football_club.Auth.model;
 
+import com.football_club.Scouting.model.Report;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,6 +40,9 @@ public class User implements UserDetails {
 
     @Column(name = "club_id")
     private Integer clubId;
+
+    @OneToMany(mappedBy = "scout", cascade = CascadeType.ALL)
+    private List<Report> reports;
 
     @Override
     public boolean isEnabled() {
