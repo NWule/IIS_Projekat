@@ -32,4 +32,6 @@ public class UserDTO {
     private RoleEnum role;
 
     private boolean isActive;
+
+    private Integer clubId;
 }

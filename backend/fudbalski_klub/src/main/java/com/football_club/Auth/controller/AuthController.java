@@ -41,7 +41,7 @@ public class AuthController {
             
             SecurityContextHolder.getContext().setAuthentication(authentication);
             User user = (User) authentication.getPrincipal();
-            String jwt = tokenUtils.createToken(user.getUsername(), user.getRole(), user.getId());
+            String jwt = tokenUtils.createToken(user.getUsername(), user.getRole(), user.getId(), user.getClubId());
             
             return ResponseEntity.ok(new UserTokenState(jwt, tokenUtils.getExpiredIn()));
 
