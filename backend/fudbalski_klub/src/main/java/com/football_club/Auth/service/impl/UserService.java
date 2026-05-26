@@ -50,6 +50,7 @@ public class UserService implements IUserService, UserDetailsService {
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setRole(userDTO.getRole());
         user.setActive(true);
+        user.setClubId(userDTO.getClubId());
 
         User savedUser = userRepository.save(user);
         return mapToDTO(savedUser);
@@ -149,6 +150,7 @@ public class UserService implements IUserService, UserDetailsService {
                 .email(user.getEmail())
                 .role(user.getRole())
                 .isActive(user.isActive())
+                .clubId(user.getClubId())
                 .password(null)
                 .build();
     }

@@ -25,4 +25,6 @@ public class RegisterDTO {
 
     @NotNull(message = "Role is required")
     private RoleEnum role;
+
+    private Integer clubId;
 }

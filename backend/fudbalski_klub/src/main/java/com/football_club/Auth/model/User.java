@@ -37,6 +37,9 @@ public class User implements UserDetails {
     @Column(name = "role", nullable = false)
     private RoleEnum role;
 
+    @Column(name = "club_id")
+    private Integer clubId;
+
     @Override
     public boolean isEnabled() {
         return isActive;
