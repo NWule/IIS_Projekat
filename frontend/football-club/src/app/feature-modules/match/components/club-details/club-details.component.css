@@ -1,0 +1,187 @@
+.top-nav {
+  background-color: #0b133d;
+  padding: 10px 40px;
+  display: flex;
+  gap: 30px;
+}
+
+.top-nav a {
+  color: #ffffff;
+  text-decoration: none;
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
+.top-nav a.active {
+  font-weight: bold;
+}
+
+.page-container {
+  max-width: 1200px;
+  margin: 30px auto;
+  font-family: sans-serif;
+  padding: 0 20px;
+}
+
+.page-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 500;
+  margin-bottom: 40px;
+  color: #000;
+}
+
+.main-layout {
+  display: flex;
+  gap: 80px;
+  align-items: flex-start;
+}
+
+.club-stats-column {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.club-logo-placeholder {
+  width: 130px;
+  height: 130px;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.big-placeholder-icon {
+  width: 100%;
+  height: 100%;
+  color: #222;
+}
+
+.stats-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 15px;
+  color: #000;
+}
+
+.stat-value {
+  background-color: #e0e0e0;
+  color: #000;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 6px;
+  min-width: 25px;
+  text-align: center;
+}
+
+.players-column {
+  flex: 1;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 500;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #000;
+}
+
+.roster-scroll-container {
+  max-height: 500px; 
+  overflow-y: auto;
+  padding-right: 12px;
+}
+
+.roster-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.roster-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.roster-scroll-container::-webkit-scrollbar-thumb {
+  background: #0b133d;
+  border-radius: 10px;
+}
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.player-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.player-photo-placeholder {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.player-icon {
+  width: 100%;
+  height: 100%;
+  color: #888;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.jersey-number {
+  font-size: 12px;
+  font-weight: bold;
+  color: #0b133d;
+}
+
+.player-name {
+  font-size: 14px;
+  color: #222;
+  font-weight: 500;
+}
+
+.empty-roster {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  margin-top: 40px;
+}
+
+.loading-placeholder {
+  text-align: center;
+  margin-top: 100px;
+  font-size: 18px;
+  color: #555;
+}

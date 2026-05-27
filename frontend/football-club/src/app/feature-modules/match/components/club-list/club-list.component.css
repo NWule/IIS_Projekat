@@ -1,0 +1,126 @@
+.top-nav {
+  background-color: #0b133d;
+  padding: 10px 40px;
+  display: flex;
+  gap: 30px;
+}
+
+.top-nav a {
+  color: #ffffff;
+  text-decoration: none;
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
+.top-nav a.active {
+  font-weight: bold;
+}
+
+.page-container {
+  max-width: 1100px;
+  margin: 40px auto;
+  font-family: sans-serif;
+}
+
+.page-title {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 500;
+  margin-bottom: 25px;
+}
+
+.search-wrapper {
+  position: relative;
+  max-width: 450px;
+  margin: 0 auto 50px auto;
+}
+
+.search-wrapper input {
+  width: 100%;
+  padding: 8px 15px 8px 35px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-size: 14px;
+  background-color: #f9f9f9;
+  outline: none;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+  font-size: 14px;
+}
+
+.clubs-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 25px;
+  justify-content: center;
+}
+
+.club-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.club-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.image-placeholder {
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.placeholder-icon {
+  width: 100%;
+  height: 100%;
+  color: #888888;
+}
+
+.club-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #222;
+}
+
+.club-card.my-club-card {
+  background-color: #f2f5ff; 
+  border: 2px solid #0b133d;   
+}
+
+.club-card.my-club-card .placeholder-icon {
+}
+
+.club-card.my-club-card .club-name {
+  font-weight: bold;
+  color: #0b133d;
+}
+
+.badge-my {
+  position: absolute;
+  top: -10px;
+  background-color: #0b133d;
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
