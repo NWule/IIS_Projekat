@@ -1,0 +1,25 @@
+.page-container { max-width: 1000px; margin: 20px auto; font-family: sans-serif; }
+
+.tabs { display: flex; gap: 5px; margin-bottom: 20px; }
+.tabs button { padding: 10px 25px; border: none; background: #e2e8f0; cursor: pointer; border-radius: 4px; }
+.tabs button.active { background: #0b133d; color: white; }
+
+.stats-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.stats-table th, .stats-table td { padding: 12px; border: 1px solid #ddd; text-align: center; }
+
+.teams-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.team-section { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
+
+.player-row { padding: 8px; border-bottom: 1px solid #eee; font-size: 14px; }
+
+.btn-add {
+  margin-top: 15px;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+.btn-add:hover { background-color: #059669; }

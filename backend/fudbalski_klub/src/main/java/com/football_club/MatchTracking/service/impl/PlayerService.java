@@ -52,6 +52,7 @@ public class PlayerService implements IPlayerService {
         player.setName(playerDTO.getName());
         player.setSurname(playerDTO.getSurname());
         player.setDateOfBirth(playerDTO.getDateOfBirth());
+        player.setPosition(playerDTO.getPlayerPosition());
 
         Player updatedPlayer = playerRepository.save(player);
         return mapToDTO(updatedPlayer);
@@ -80,6 +81,7 @@ public class PlayerService implements IPlayerService {
                 .name(player.getName())
                 .surname(player.getSurname())
                 .dateOfBirth(player.getDateOfBirth())
+                .playerPosition(player.getPosition())
                 .build();
     }
 }

@@ -10,12 +10,14 @@ import { PlayerEditComponent } from './components/player-edit/player-edit.compon
 import { MatchEntryComponent } from './components/match-entry/match-entry.component';
 import { PlayerPerformanceEntryComponent } from './components/player-performance-entry/player-performance-entry.component';
 import { ClubListComponent } from './components/club-list/club-list.component';
+import { MatchListComponent } from './components/match-list/match-list.component';
 
 import { ClubService } from './services/club.service';
 import { PlayerService } from './services/player.service';
 import { ContractService } from './services/playsFor.service';
 import { PlayerDetailsComponent } from './components/player-details/player-details.component';
 import { ClubDetailsComponent } from './components/club-details/club-details.component';
+import { MatchPreparationComponent } from './components/match-preparation/match-preparation.component';
 
 
 
@@ -60,7 +62,9 @@ const routes: Routes = [
     PlayerPerformanceEntryComponent,
     ClubListComponent,
     ClubDetailsComponent,
-    PlayerDetailsComponent
+    PlayerDetailsComponent,
+    MatchPreparationComponent,
+    MatchListComponent
   ],
   imports: [
     CommonModule,

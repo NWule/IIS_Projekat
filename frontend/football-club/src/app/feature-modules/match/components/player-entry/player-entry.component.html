@@ -28,7 +28,10 @@
 
         <div class="input-group">
           <label for="pozicija">Pozicija</label>
-          <input id="pozicija" type="text" formControlName="pozicija" />
+          <select id="pozicija" formControlName="pozicija">
+            <option value="">Izaberite poziciju</option>
+            <option *ngFor="let pos of playerPositions" [value]="pos">{{ pos }}</option>
+          </select>
         </div>
       </div>
 

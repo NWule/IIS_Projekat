@@ -14,4 +14,5 @@ public class PlaysForDTO {
     private int jerseyNumber;
     private LocalDate contractStart;
     private LocalDate contractEnd;
+    private String position;
 }

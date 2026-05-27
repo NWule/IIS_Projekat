@@ -1,0 +1,75 @@
+<nav class="top-nav">
+  <a routerLink="/timovi">Timovi</a>
+  <a routerLink="/priprema-utakmice" class="active">Priprema utakmice</a>
+  <a routerLink="/utakmica-uzivo">Utakmica uzivo</a>
+</nav>
+
+<div class="page-container" *ngIf="!isLoading">
+  <h1 class="page-title">Priprema utakmice</h1>
+
+  <div class="layout-grid">
+    <div class="pitch-section">
+      <div class="formation-selector">
+        <label for="formation">Formacija:</label>
+        <select id="formation" [(ngModel)]="formation">
+          <option value="4-4-2">4-4-2</option>
+          <option value="4-3-3">4-3-3</option>
+        </select>
+        <button class="btn-save" (click)="saveMatchSquad()">Sačuvaj sastav</button>
+      </div>
+
+      <div class="pitch-container">
+        <h3>Prva postava ({{ startingLineup.length }}/11)</h3>
+        <div class="players-list">
+          <div class="player-card" *ngFor="let player of startingLineup">
+            <div class="player-info">
+              <span class="jersey">#{{ player.jerseyNumber }}</span>
+              <div class="name-pos">
+                <span class="name">{{ player.playerName }} {{ player.playerSurname }}</span>
+                <span class="position-badge">{{ player.position || 'N/A' }}</span>
+              </div>
+            </div>
+            <button class="action-btn remove" (click)="returnToRoster(player, 'lineup')">X</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="list-container roster">
+        <h3>Roster tima</h3>
+        <div class="players-list scrollable">
+          <div class="player-card" *ngFor="let player of roster">
+            <div class="player-info">
+              <span class="jersey">#{{ player.jerseyNumber }}</span>
+              <div class="name-pos">
+                <span class="name">{{ player.playerName }} {{ player.playerSurname }}</span>
+                <span class="position-badge">{{ player.position || 'N/A' }}</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="action-btn add-start" (click)="addToStartingLineup(player)">Ter</button>
+              <button class="action-btn add-bench" (click)="addToBench(player)">Klp</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="list-container bench">
+        <h3>Klupa</h3>
+        <div class="players-list scrollable">
+          <div class="player-card" *ngFor="let player of bench">
+            <div class="player-info">
+              <span class="jersey">#{{ player.jerseyNumber }}</span>
+              <div class="name-pos">
+                <span class="name">{{ player.playerName }} {{ player.playerSurname }}</span>
+                <span class="position-badge">{{ player.position || 'N/A' }}</span>
+              </div>
+            </div>
+            <button class="action-btn remove" (click)="returnToRoster(player, 'bench')">X</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

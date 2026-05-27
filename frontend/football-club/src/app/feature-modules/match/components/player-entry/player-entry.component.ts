@@ -15,6 +15,16 @@ export class PlayerEntryComponent implements OnInit {
   playerForm!: FormGroup;
   clubs: Club[] = []; 
 
+  // Lista mogućih pozicija igrača (ista kao u edit komponenti)
+  playerPositions: string[] = [
+    'Goalkeeper',
+    'Defender',
+    'Midfielder',
+    'Forward',
+    'Striker',
+    'Winger'
+  ];
+
   constructor(
     private fb: FormBuilder,
     private clubService: ClubService,
@@ -32,7 +42,7 @@ export class PlayerEntryComponent implements OnInit {
       ime: ['', Validators.required],
       prezime: ['', Validators.required],
       datumRodjenja: ['', Validators.required],
-      pozicija: [''],
+      pozicija: [''], 
       trenutniKlubId: [null], 
       brojNaDresu: [null, [Validators.min(1), Validators.max(99)]],
       contractStart: [''],
@@ -73,7 +83,8 @@ export class PlayerEntryComponent implements OnInit {
       const playerData = {
         name: formValue.ime,
         surname: formValue.prezime,
-        dateOfBirth: formValue.datumRodjenja
+        dateOfBirth: formValue.datumRodjenja,
+        position: formValue.pozicija 
       };
 
       console.log('1. Kreiram igrača:', playerData);

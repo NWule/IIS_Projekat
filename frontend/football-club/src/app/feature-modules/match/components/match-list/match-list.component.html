@@ -1,0 +1,24 @@
+<div class="page-container">
+  <h1>Raspored i pregled utakmica</h1>
+  
+  <table class="match-table">
+    <thead>
+      <tr>
+        <th>Datum i vreme</th>
+        <th>Domaćin</th>
+        <th>Gost</th>
+        <th>Akcija</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let match of matches">
+        <td>{{ match.dateTime | date:'dd.MM.yyyy HH:mm' }}</td>
+        <td>{{ match.homeClubName }}</td>
+        <td>{{ match.awayClubName }}</td>
+        <td>
+          <button (click)="viewMatchDetails(match.id)">Pregled detalja</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

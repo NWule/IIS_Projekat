@@ -103,6 +103,10 @@ public class PlaysForService implements IPlaysForService {
     }
 
     private PlaysForDTO mapToDTO(PlaysFor contract) {
+        String positionName = (contract.getPlayer().getPosition() != null)
+                ? contract.getPlayer().getPosition().toString()
+                : "N/A";
+
         return PlaysForDTO.builder()
                 .id(contract.getId())
                 .playerId(contract.getPlayer().getId())
@@ -113,6 +117,7 @@ public class PlaysForService implements IPlaysForService {
                 .jerseyNumber(contract.getJerseyNumber())
                 .contractStart(contract.getContractStart())
                 .contractEnd(contract.getContractEnd())
+                .position(positionName)
                 .build();
     }
 }
