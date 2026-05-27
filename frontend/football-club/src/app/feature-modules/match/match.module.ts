@@ -10,45 +10,17 @@ import { PlayerEditComponent } from './components/player-edit/player-edit.compon
 import { MatchEntryComponent } from './components/match-entry/match-entry.component';
 import { PlayerPerformanceEntryComponent } from './components/player-performance-entry/player-performance-entry.component';
 import { ClubListComponent } from './components/club-list/club-list.component';
+import { MatchListComponent } from './components/match-list/match-list.component';
+import { MatchDetailsComponent } from './components/match-details/match-details.component';
 
 import { ClubService } from './services/club.service';
 import { PlayerService } from './services/player.service';
 import { ContractService } from './services/playsFor.service';
 import { PlayerDetailsComponent } from './components/player-details/player-details.component';
 import { ClubDetailsComponent } from './components/club-details/club-details.component';
+import { MatchPreparationComponent } from './components/match-preparation/match-preparation.component';
 
 
-
-const routes: Routes = [
-  { 
-    path: 'unos-kluba', 
-    component: ClubEntryComponent 
-  },
-  { 
-    path: 'izmena-kluba/:id', 
-    component: ClubEditComponent 
-  },
-  { 
-    path: 'unos-igrača', 
-    component: PlayerEntryComponent 
-  },
-  { 
-    path: 'izmena-igrača/:id', 
-    component: PlayerEditComponent 
-  },
-  { 
-    path: 'unos-meca', 
-    component: MatchEntryComponent 
-  },
-  {
-    path: 'unos-performansi',
-    component: PlayerPerformanceEntryComponent
-  },
-  {
-    path: 'timovi',
-    component: ClubListComponent
-  }
-];
 
 @NgModule({
   declarations: [
@@ -60,13 +32,15 @@ const routes: Routes = [
     PlayerPerformanceEntryComponent,
     ClubListComponent,
     ClubDetailsComponent,
-    PlayerDetailsComponent
+    PlayerDetailsComponent,
+    MatchPreparationComponent,
+    MatchDetailsComponent,
+    MatchListComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule, 
-    RouterModule.forChild(routes)
+    ReactiveFormsModule
   ],
   exports: [
   ]

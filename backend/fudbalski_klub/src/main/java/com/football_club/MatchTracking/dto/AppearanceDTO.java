@@ -21,4 +21,5 @@ public class AppearanceDTO {
     private boolean redCard;
     private double rating;
     private double passingAccuracy;
+    private int clubId;
 }
