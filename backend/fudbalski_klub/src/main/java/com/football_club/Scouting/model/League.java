@@ -28,4 +28,14 @@ public class League {
 
     @OneToMany(mappedBy = "league", cascade = CascadeType.ALL)
     private List<Club> clubs;
+
+    public void addClub(Club club) {
+        this.clubs.add(club);
+        club.setLeague(this);
+    }
+
+    public void removeClub(Club club) {
+        this.clubs.remove(club);
+        club.setLeague(null);
+    }
 }

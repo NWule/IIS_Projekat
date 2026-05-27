@@ -4,10 +4,16 @@ import com.football_club.Auth.model.User;
 import com.football_club.MatchTracking.model.Player;
 import com.football_club.Scouting.model.enums.RequestStatus;
 import jakarta.persistence.*;
+import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "scout_requests")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ScoutRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +24,7 @@ public class ScoutRequest {
     private User director;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "scout_id", nullable = false)
+    @JoinColumn(name = "scout_id", nullable = true)
     private User scout;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,5 +41,6 @@ public class ScoutRequest {
     private LocalDateTime deadline;
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private RequestStatus status = RequestStatus.PENDING;
 }
