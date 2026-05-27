@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/env/environment';
-import { Club } from '../models/club.model'; // Prilagodi putanju do tvog modela
+import { Club } from '../models/club.model'; 
 
 @Injectable({
   providedIn: 'root'

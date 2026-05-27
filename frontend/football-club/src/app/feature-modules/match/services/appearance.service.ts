@@ -15,4 +15,8 @@ export class AppearanceService {
   createAppearance(appearance: Appearance): Observable<Appearance> {
     return this.http.post<Appearance>(this.apiUrl, appearance);
   }
+
+  getAppearancesByGame(gameId: number): Observable<Appearance[]> {
+    return this.http.get<Appearance[]>(`${this.apiUrl}/game/${gameId}`);
+  }
 }
