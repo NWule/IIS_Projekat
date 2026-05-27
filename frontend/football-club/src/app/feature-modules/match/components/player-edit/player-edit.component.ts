@@ -20,6 +20,15 @@ export class PlayerEditComponent implements OnInit {
   currentContractId: number | null = null; 
   isLoading = true;
 
+  playerPositions: string[] = [
+    'Goalkeeper',
+    'Defender',
+    'Midfielder',
+    'Forward',
+    'Striker',
+    'Winger'
+  ];
+
   constructor(
     private fb: FormBuilder,
     private clubService: ClubService,
@@ -88,7 +97,8 @@ export class PlayerEditComponent implements OnInit {
         this.playerForm.patchValue({
           ime: res.player.name,
           prezime: res.player.surname,
-          datumRodjenja: res.player.dateOfBirth
+          datumRodjenja: res.player.dateOfBirth,
+          pozicija: res.player.position || ''
         });
 
         if (res.contract) {
@@ -119,7 +129,8 @@ export class PlayerEditComponent implements OnInit {
         id: this.playerId,
         name: formValue.ime,
         surname: formValue.prezime,
-        dateOfBirth: formValue.datumRodjenja
+        dateOfBirth: formValue.datumRodjenja,
+        position: formValue.pozicija
       };
 
       this.playerService.updatePlayer(this.playerId, updatedPlayerData).pipe(

@@ -2,7 +2,8 @@ export interface Player {
   id?: number;
   name: string;
   surname: string;
-  dateOfBirth: string; 
+  dateOfBirth: string;
+  position?: string;
 }
 
 export interface PlaysFor {
@@ -15,4 +16,5 @@ export interface PlaysFor {
   jerseyNumber: number;
   contractStart: string;
   contractEnd: string;
+  position?: string;
 }
