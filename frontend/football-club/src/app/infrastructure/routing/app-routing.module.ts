@@ -1,7 +1,47 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-const routes: Routes = [];
+import { ClubEntryComponent } from '../../feature-modules/match/components/club-entry/club-entry.component';
+import { ClubEditComponent } from '../../feature-modules/match/components/club-edit/club-edit.component';
+import { ClubListComponent } from '../../feature-modules/match/components/club-list/club-list.component';
+import { ClubDetailsComponent } from '../../feature-modules/match/components/club-details/club-details.component';
+
+import { PlayerEntryComponent } from '../../feature-modules/match/components/player-entry/player-entry.component';
+import { PlayerEditComponent } from '../../feature-modules/match/components/player-edit/player-edit.component';
+import { PlayerDetailsComponent } from '../../feature-modules/match/components/player-details/player-details.component';
+
+import { MatchEntryComponent } from '../../feature-modules/match/components/match-entry/match-entry.component';
+import { MatchListComponent } from '../../feature-modules/match/components/match-list/match-list.component';
+import { MatchDetailsComponent } from '../../feature-modules/match/components/match-details/match-details.component';
+import { MatchPreparationComponent } from '../../feature-modules/match/components/match-preparation/match-preparation.component';
+
+import { PlayerPerformanceEntryComponent } from '../../feature-modules/match/components/player-performance-entry/player-performance-entry.component';
+
+const routes: Routes = [
+  { path: '',                     redirectTo: 'clubs', pathMatch: 'full' },
+
+  // Klubovi
+  { path: 'clubs',               component: ClubListComponent },
+  { path: 'add-club',           component: ClubEntryComponent },
+  { path: 'edit-club/:id',     component: ClubEditComponent },
+  { path: 'club-details/:id',      component: ClubDetailsComponent },
+
+  // Igrači
+  { path: 'add-player',          component: PlayerEntryComponent },
+  { path: 'edit-player/:id',    component: PlayerEditComponent },
+  { path: 'player-details/:id',    component: PlayerDetailsComponent },
+
+  // Mečevi
+  { path: 'matches',               component: MatchListComponent },
+  { path: 'add-match',            component: MatchEntryComponent },
+  { path: 'match-details/:id',      component: MatchDetailsComponent },
+  { path: 'match-preparation/:id',    component: MatchPreparationComponent },
+
+  // Performanse
+  { path: 'add-performance',     component: PlayerPerformanceEntryComponent },
+
+  { path: '**',                   redirectTo: 'clubs' }
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

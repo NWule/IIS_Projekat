@@ -112,6 +112,7 @@ public class AppearanceService implements IAppearanceService {
                 .redCard(appearance.isRedCard())
                 .rating(appearance.getRating())
                 .passingAccuracy(appearance.getPassingAccuracy())
+                .clubId(appearance.getPlaysFor().getClub().getId())
                 .build();
     }
 }
