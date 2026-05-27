@@ -23,4 +23,8 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     @Query("SELECT g FROM Game g JOIN FETCH g.homeClub JOIN FETCH g.awayClub WHERE g.matchDate BETWEEN :startDate AND :endDate")
     List<Game> findGamesWithClubsInPeriod(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT g FROM Game g JOIN FETCH g.homeClub JOIN FETCH g.awayClub " +
+            "WHERE g.matchDate >= :now ORDER BY g.matchDate ASC")
+    List<Game> findUpcomingGames(@Param("now") LocalDateTime now);
 }
