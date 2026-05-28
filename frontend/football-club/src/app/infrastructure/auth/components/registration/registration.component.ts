@@ -15,7 +15,8 @@ export class RegistrationComponent implements OnInit {
   registerForm: FormGroup;
   errorMessage: string = '';
   availableClubs: Club[] = [];
-  roles = Object.values(RoleEnum);
+  roles = Object.values(RoleEnum)
+    .filter(role => role !== RoleEnum.ROLE_ADMIN);
 
   constructor(
     private fb: FormBuilder,

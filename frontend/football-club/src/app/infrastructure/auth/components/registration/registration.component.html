@@ -1,50 +1,50 @@
 <div class="auth-container">
   <div class="auth-card">
-    <h2>Create an Account</h2>
-    <p>Enter your details to register.</p>
+    <h2>Kreirajte nalog</h2>
+    <p>Unesite vaše podatke kako biste se registrovali.</p>
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
 
       <div class="form-row">
         <div class="form-group">
-          <label for="name">Name</label>
-          <input type="text" id="name" formControlName="name" placeholder="John" />
+          <label for="name">Ime</label>
+          <input type="text" id="name" formControlName="name" placeholder="Marko" />
         </div>
         <div class="form-group">
-          <label for="surname">Surname</label>
-          <input type="text" id="surname" formControlName="surname" placeholder="Doe" />
+          <label for="surname">Prezime</label>
+          <input type="text" id="surname" formControlName="surname" placeholder="Marković" />
         </div>
       </div>
 
       <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" formControlName="email" placeholder="john@example.com" />
+        <label for="email">Email adresa</label>
+        <input type="email" id="email" formControlName="email" placeholder="marko.markovic@email.com" />
       </div>
 
       <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" formControlName="username" placeholder="Choose a username" />
+        <label for="username">Korisničko ime</label>
+        <input type="text" id="username" formControlName="username" placeholder="Unesite korisničko ime" />
       </div>
 
       <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" formControlName="password" placeholder="Create a password" />
+        <label for="password">Lozinka</label>
+        <input type="password" id="password" formControlName="password" placeholder="Kreirajte lozinku" />
       </div>
 
       <div class="form-group">
-        <label for="role">Select Role</label>
+        <label for="role">Izaberite ulogu</label>
         <select id="role" formControlName="role">
-          <option value="" disabled selected>Choose a role...</option>
+          <option value="" disabled selected>Izaberite ulogu...</option>
           <option *ngFor="let role of roles" [value]="role">
-            {{ role }}
+            {{ role.replace('ROLE_', '').replace('_', ' ') }}
           </option>
         </select>
       </div>
 
       <div class="form-group">
-        <label for="clubId">Select Club</label>
+        <label for="clubId">Izaberite klub</label>
         <select id="clubId" formControlName="clubId">
-          <option value="" disabled selected>Choose a club...</option>
+          <option value="" disabled selected>Izaberite klub...</option>
           <option *ngFor="let club of availableClubs" [value]="club.id">
             {{ club.name }}
           </option>
@@ -55,11 +55,11 @@
         {{ errorMessage }}
       </div>
 
-      <button type="submit" [disabled]="registerForm.invalid" class="btn-primary">Sign Up</button>
+      <button type="submit" [disabled]="registerForm.invalid" class="btn-primary">Registrujte se</button>
     </form>
 
     <div class="auth-footer">
-      Already have an account? <a routerLink="/login">Sign in</a>
+      Već imate nalog? <a routerLink="/login">Prijavite se</a>
     </div>
   </div>
 </div>

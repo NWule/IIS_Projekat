@@ -1,28 +1,28 @@
 <div class="auth-container">
   <div class="auth-card">
-    <h2>Welcome Back</h2>
-    <p>Please enter your details to sign in.</p>
+    <h2>Dobrodošli nazad!</h2>
+    <p>Unesite vaše podatke kako bi ste se ulogovali.</p>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" formControlName="username" placeholder="Enter your username" />
+        <label for="username">Korisničko Ime</label>
+        <input type="text" id="username" formControlName="username" placeholder="Unesite korisničko ime..." />
       </div>
 
       <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" formControlName="password" placeholder="Enter your password" />
+        <label for="password">Šifra</label>
+        <input type="password" id="password" formControlName="password" placeholder="Unesite vašu šifru..." />
       </div>
 
       <div *ngIf="errorMessage" class="error-message">
         {{ errorMessage }}
       </div>
 
-      <button type="submit" [disabled]="loginForm.invalid" class="btn-primary">Sign In</button>
+      <button type="submit" [disabled]="loginForm.invalid" class="btn-primary">Uloguj Se</button>
     </form>
 
     <div class="auth-footer">
-      Don't have an account? <a routerLink="/register">Sign up</a>
+      Nemate nalog? <a routerLink="/register">Registrujte se!</a>
     </div>
   </div>
 </div>
