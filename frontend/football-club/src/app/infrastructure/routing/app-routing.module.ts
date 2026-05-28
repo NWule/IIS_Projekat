@@ -1,6 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { LoginComponent } from '../auth/components/login/login.component';
+import { RegisterComponent } from '../auth/components/register/register.component';
+
 import { ClubEntryComponent } from '../../feature-modules/match/components/club-entry/club-entry.component';
 import { ClubEditComponent } from '../../feature-modules/match/components/club-edit/club-edit.component';
 import { ClubListComponent } from '../../feature-modules/match/components/club-list/club-list.component';
@@ -17,30 +20,62 @@ import { MatchPreparationComponent } from '../../feature-modules/match/component
 
 import { PlayerPerformanceEntryComponent } from '../../feature-modules/match/components/player-performance-entry/player-performance-entry.component';
 
+import { MatchSearchComponent } from '../../feature-modules/ticket-sales/components/match-search/match-search.component';
+import { StadiumMapComponent } from '../../feature-modules/ticket-sales/components/stadium-map/stadium-map.component';
+import { PurchaseFormComponent } from '../../feature-modules/ticket-sales/components/purchase-form/purchase-form.component';
+import { MyTicketsComponent } from '../../feature-modules/ticket-sales/components/my-tickets/my-tickets.component';
+
+import { ZoneListComponent } from '../../feature-modules/ticket-sales/components/zone-list/zone-list.component';
+import { ZoneFormComponent } from '../../feature-modules/ticket-sales/components/zone-form/zone-form.component';
+import { SeatListComponent } from '../../feature-modules/ticket-sales/components/seat-list/seat-list.component';
+import { TicketTypeListComponent } from '../../feature-modules/ticket-sales/components/ticket-type-list/ticket-type-list.component';
+import { TicketTypeFormComponent } from '../../feature-modules/ticket-sales/components/ticket-type-form/ticket-type-form.component';
+
 const routes: Routes = [
-  { path: '',                     redirectTo: 'clubs', pathMatch: 'full' },
+  { path: '',                        redirectTo: 'matches', pathMatch: 'full' },
+
+  // Auth
+  { path: 'login',                   component: LoginComponent },
+  { path: 'register',                component: RegisterComponent },
 
   // Klubovi
-  { path: 'clubs',               component: ClubListComponent },
-  { path: 'add-club',           component: ClubEntryComponent },
-  { path: 'edit-club/:id',     component: ClubEditComponent },
-  { path: 'club-details/:id',      component: ClubDetailsComponent },
+  { path: 'clubs',                   component: ClubListComponent },
+  { path: 'add-club',                component: ClubEntryComponent },
+  { path: 'edit-club/:id',           component: ClubEditComponent },
+  { path: 'club-details/:id',        component: ClubDetailsComponent },
 
   // Igrači
-  { path: 'add-player',          component: PlayerEntryComponent },
-  { path: 'edit-player/:id',    component: PlayerEditComponent },
-  { path: 'player-details/:id',    component: PlayerDetailsComponent },
+  { path: 'add-player',              component: PlayerEntryComponent },
+  { path: 'edit-player/:id',         component: PlayerEditComponent },
+  { path: 'player-details/:id',      component: PlayerDetailsComponent },
 
   // Mečevi
-  { path: 'matches',               component: MatchListComponent },
-  { path: 'add-match',            component: MatchEntryComponent },
-  { path: 'match-details/:id',      component: MatchDetailsComponent },
-  { path: 'match-preparation/:id',    component: MatchPreparationComponent },
+  { path: 'matches',                 component: MatchListComponent },
+  { path: 'add-match',               component: MatchEntryComponent },
+  { path: 'match-details/:id',       component: MatchDetailsComponent },
+  { path: 'match-preparation/:id',   component: MatchPreparationComponent },
 
   // Performanse
-  { path: 'add-performance',     component: PlayerPerformanceEntryComponent },
+  { path: 'add-performance',         component: PlayerPerformanceEntryComponent },
 
-  { path: '**',                   redirectTo: 'clubs' }
+  // Kupovina karata
+  { path: 'search-matches',          component: MatchSearchComponent },
+  { path: 'stadium-map/:gameId',     component: StadiumMapComponent },
+  { path: 'purchase/:gameId',        component: PurchaseFormComponent },
+  { path: 'my-tickets',              component: MyTicketsComponent },
+
+  // Admin — Zone
+  { path: 'zones',                   component: ZoneListComponent },
+  { path: 'add-zone',                component: ZoneFormComponent },
+  { path: 'edit-zone/:id',           component: ZoneFormComponent },
+  { path: 'zone-seats/:zoneId',      component: SeatListComponent },
+
+  // Admin — Tipovi karata
+  { path: 'ticket-types',            component: TicketTypeListComponent },
+  { path: 'add-ticket-type',         component: TicketTypeFormComponent },
+  { path: 'edit-ticket-type/:id',    component: TicketTypeFormComponent },
+
+  { path: '**',                      redirectTo: 'matches' }
 ];
 
 @NgModule({

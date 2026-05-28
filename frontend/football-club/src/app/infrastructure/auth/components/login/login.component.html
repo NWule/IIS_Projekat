@@ -1,0 +1,20 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>Prijava</h2>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-group">
+        <label>Korisničko ime</label>
+        <input type="text" formControlName="username" placeholder="Unesite korisničko ime" />
+      </div>
+      <div class="form-group">
+        <label>Lozinka</label>
+        <input type="password" formControlName="password" placeholder="Unesite lozinku" />
+      </div>
+      <div class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</div>
+      <button type="submit" [disabled]="loading || form.invalid">
+        {{ loading ? 'Prijavljivanje...' : 'Prijavi se' }}
+      </button>
+    </form>
+    <p class="auth-link">Nemate nalog? <a routerLink="/register">Registrujte se</a></p>
+  </div>
+</div>
