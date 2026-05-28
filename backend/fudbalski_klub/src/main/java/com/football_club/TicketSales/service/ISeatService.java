@@ -12,4 +12,5 @@ public interface ISeatService {
     List<SeatDTO> getAvailableSeatsByZone(Long zoneId);
     SeatDTO updateSeat(Long id, SeatDTO seatDTO);
     void deleteSeat(Long id);
+    List<SeatDTO> generateSeatsForZone(Long zoneId);
 }

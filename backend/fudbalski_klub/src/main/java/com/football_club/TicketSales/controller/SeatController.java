@@ -59,4 +59,10 @@ public class SeatController {
         seatService.deleteSeat(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/generate/{zoneId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<SeatDTO>> generateSeats(@PathVariable Long zoneId) {
+        return ResponseEntity.ok(seatService.generateSeatsForZone(zoneId));
+    }
 }

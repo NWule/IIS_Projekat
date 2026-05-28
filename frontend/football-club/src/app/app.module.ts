@@ -1,15 +1,23 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { JwtModule } from '@auth0/angular-jwt';
 
 import { AppRoutingModule } from './infrastructure/routing/app-routing.module';
 import { AppComponent } from './app.component';
 import { JwtInterceptor } from './infrastructure/auth/jwt/jwt.interceptor';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { MatchModule } from './feature-modules/match/match.module';
-import {AuthModule} from "./infrastructure/auth/components/auth.module";
-import {LayoutModule} from "./feature-modules/layout/layout.module";
+import { TicketSalesModule } from './feature-modules/ticket-sales/ticket-sales.module';
+
+import { CommonModule } from '@angular/common';
+import { AuthModule } from './infrastructure/auth/components/auth.module';
+import { LayoutModule } from './feature-modules/layout/layout.module';
+
+export function tokenGetter() {
+  return localStorage.getItem('access-token');
+}
 
 @NgModule({
   declarations: [
@@ -17,14 +25,21 @@ import {LayoutModule} from "./feature-modules/layout/layout.module";
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
     HttpClientModule,
     CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    AppRoutingModule,
     MatchModule,
+    TicketSalesModule,
     AuthModule,
-    LayoutModule
+    LayoutModule,
+    JwtModule.forRoot({
+      config: {
+        tokenGetter,
+        allowedDomains: ['localhost:8080']
+      }
+    })
   ],
   providers: [
     {
@@ -35,4 +50,4 @@ import {LayoutModule} from "./feature-modules/layout/layout.module";
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

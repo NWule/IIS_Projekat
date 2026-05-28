@@ -110,6 +110,28 @@ public class SeatService implements ISeatService {
         seatRepository.deleteById(id);
     }
 
+    @Override
+    @Transactional
+    public List<SeatDTO> generateSeatsForZone(Long zoneId) {
+        Zone zone = zoneRepository.findById(zoneId)
+                .orElseThrow(() -> new RuntimeException("Zone not found with id: " + zoneId));
+
+        List<SeatDTO> created = new java.util.ArrayList<>();
+        for (int row = 1; row <= zone.getNumberOfRows(); row++) {
+            for (int seat = 1; seat <= zone.getSeatsPerRow(); seat++) {
+                if (seatRepository.findByZoneIdAndRowNumberAndSeatNumber(zoneId, row, seat).isEmpty()) {
+                    Seat newSeat = new Seat();
+                    newSeat.setRowNumber(row);
+                    newSeat.setSeatNumber(seat);
+                    newSeat.setStatus(SeatStatus.AVAILABLE);
+                    newSeat.setZone(zone);
+                    created.add(mapToDTO(seatRepository.save(newSeat)));
+                }
+            }
+        }
+        return created;
+    }
+
     private SeatDTO mapToDTO(Seat seat) {
         return SeatDTO.builder()
                 .id(seat.getId())
