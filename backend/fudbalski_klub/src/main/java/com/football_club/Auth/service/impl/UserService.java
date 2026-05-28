@@ -46,6 +46,8 @@ public class UserService implements IUserService, UserDetailsService {
 
         User user = new User();
         user.setUsername(userDTO.getUsername());
+        user.setName(userDTO.getName());
+        user.setSurname(userDTO.getSurname());
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setRole(userDTO.getRole());
@@ -147,6 +149,8 @@ public class UserService implements IUserService, UserDetailsService {
         return UserDTO.builder()
                 .id(user.getId())
                 .username(user.getUsername())
+                .name(user.getName())
+                .surname(user.getSurname())
                 .email(user.getEmail())
                 .role(user.getRole())
                 .isActive(user.isActive())

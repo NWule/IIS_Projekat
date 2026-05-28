@@ -1,20 +1,2 @@
-<nav class="navbar">
-  <a class="navbar-brand" routerLink="/matches">⚽ FK Menadžer</a>
-  <div class="navbar-links">
-    <a routerLink="/matches" routerLinkActive="active">Utakmice</a>
-    <a routerLink="/search-matches" routerLinkActive="active">Kupovina karata</a>
-    <ng-container *ngIf="currentUser">
-      <a routerLink="/my-tickets" routerLinkActive="active">Moje karte</a>
-      <a routerLink="/zones" routerLinkActive="active">Zone</a>
-      <a routerLink="/ticket-types" routerLinkActive="active">Tipovi karata</a>
-      <span class="username">{{ currentUser?.username }}</span>
-      <button class="btn-logout" (click)="logout()">Odjava</button>
-    </ng-container>
-    <ng-container *ngIf="!currentUser">
-      <a routerLink="/login" routerLinkActive="active">Prijava</a>
-      <a routerLink="/register" routerLinkActive="active" class="btn-register">Registracija</a>
-    </ng-container>
-  </div>
-</nav>
-
+<app-navbar></app-navbar>
 <router-outlet></router-outlet>

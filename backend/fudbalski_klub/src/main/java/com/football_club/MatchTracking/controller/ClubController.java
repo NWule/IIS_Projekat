@@ -44,7 +44,6 @@ public class ClubController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
     public ResponseEntity<List<ClubDTO>> getAllClubs() {
         List<ClubDTO> clubs = clubService.getAllClubs();
         return ResponseEntity.ok(clubs);

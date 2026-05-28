@@ -1,8 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { AuthGuard } from '../auth/auth.guard';
 import { LoginComponent } from '../auth/components/login/login.component';
-import { RegisterComponent } from '../auth/components/register/register.component';
+import { RegistrationComponent } from '../auth/components/registration/registration.component';
 
 import { ClubEntryComponent } from '../../feature-modules/match/components/club-entry/club-entry.component';
 import { ClubEditComponent } from '../../feature-modules/match/components/club-edit/club-edit.component';
@@ -32,11 +33,11 @@ import { TicketTypeListComponent } from '../../feature-modules/ticket-sales/comp
 import { TicketTypeFormComponent } from '../../feature-modules/ticket-sales/components/ticket-type-form/ticket-type-form.component';
 
 const routes: Routes = [
-  { path: '',                        redirectTo: 'matches', pathMatch: 'full' },
+  { path: '',                     redirectTo: 'login', pathMatch: 'full' },
 
   // Auth
-  { path: 'login',                   component: LoginComponent },
-  { path: 'register',                component: RegisterComponent },
+  { path: 'login',               component: LoginComponent },
+  { path: 'register',            component: RegistrationComponent },
 
   // Klubovi
   { path: 'clubs',                   component: ClubListComponent },

@@ -59,6 +59,7 @@ public class WebSecurityConfig {
                 .authenticationEntryPoint(restAuthenticationEntryPoint));
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/clubs").permitAll()
 
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers(

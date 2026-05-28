@@ -11,8 +11,9 @@ import { JwtInterceptor } from './infrastructure/auth/jwt/jwt.interceptor';
 import { MatchModule } from './feature-modules/match/match.module';
 import { TicketSalesModule } from './feature-modules/ticket-sales/ticket-sales.module';
 
-import { LoginComponent } from './infrastructure/auth/components/login/login.component';
-import { RegisterComponent } from './infrastructure/auth/components/register/register.component';
+import { CommonModule } from '@angular/common';
+import { AuthModule } from './infrastructure/auth/components/auth.module';
+import { LayoutModule } from './feature-modules/layout/layout.module';
 
 export function tokenGetter() {
   return localStorage.getItem('access-token');
@@ -20,18 +21,19 @@ export function tokenGetter() {
 
 @NgModule({
   declarations: [
-    AppComponent,
-    LoginComponent,
-    RegisterComponent
+    AppComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     AppRoutingModule,
     MatchModule,
     TicketSalesModule,
+    AuthModule,
+    LayoutModule,
     JwtModule.forRoot({
       config: {
         tokenGetter,
@@ -40,7 +42,11 @@ export function tokenGetter() {
     })
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: JwtInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })
