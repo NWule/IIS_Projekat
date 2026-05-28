@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from 'src/env/environment';
 
-import { TokenStorage } from './jwt/token.service'; 
+import { TokenStorage } from './jwt/token.service';
 import { User, RoleEnum } from './model/user.model';
 import { Login } from './model/login.model';
 import { AuthenticationResponse } from './model/authentication-response.model';
@@ -28,21 +28,15 @@ export class AuthService {
       .post<AuthenticationResponse>(`${environment.apiHost}auth/login`, login)
       .pipe(
         tap((response) => {
-          this.tokenStorage.saveAccessToken(response.accessToken);
+          this.tokenStorage.saveAccessToken(response.token);
           this.setUser();
         })
       );
   }
 
-  register(registration: Registration): Observable<AuthenticationResponse> {
+  register(registration: Registration): Observable<string> {
     return this.http
-      .post<AuthenticationResponse>(`${environment.apiHost}auth/register`, registration)
-      .pipe(
-        tap((response) => {
-          this.tokenStorage.saveAccessToken(response.accessToken);
-          this.setUser();
-        })
-      );
+      .post(`${environment.apiHost}auth/signup`, registration, { responseType: 'text' });
   }
 
   logout(): void {
@@ -74,12 +68,12 @@ export class AuthService {
     const user: User = {
       id: Number(decodedToken.id),
       // Spring Security obično stavlja username u claim 'sub' (subject), ali fallback na 'username'
-      username: decodedToken.sub || decodedToken.username, 
-      email: decodedToken.email || '', 
+      username: decodedToken.sub || decodedToken.username,
+      email: decodedToken.email || '',
       isActive: true, // Čim ima validan token, aktivan je
       role: decodedToken.role as RoleEnum, // Bekend treba da upakuje ulogu pod 'role' claim
       // Izdvajamo clubId direktno iz tokena, ako postoji
-      clubId: decodedToken.clubId ? Number(decodedToken.clubId) : undefined 
+      clubId: decodedToken.clubId ? Number(decodedToken.clubId) : undefined
     };
 
     this.user$.next(user);

@@ -1,0 +1,20 @@
+<nav class="navbar">
+  <div class="navbar-brand" >
+    Fudbalski Klub
+  </div>
+
+  <div class="navbar-actions">
+    <ng-container *ngIf="(isLoggedIn && userRole === 'ROLE_SCOUT')">
+      <button class="nav-btn" (click)="onReportsClick()">Izveštaji</button>
+      <button class="nav-btn">Zahtevi</button>
+    </ng-container>
+
+    <ng-container *ngIf="isLoggedIn">
+      <button class="nav-btn logout-btn" (click)="onLogoutClick()">Izloguj Se</button>
+    </ng-container>
+
+    <ng-container *ngIf="!isLoggedIn">
+      <button class="nav-btn login-btn" (click)="onLoginClick()">Uloguj Se</button>
+    </ng-container>
+  </div>
+</nav>

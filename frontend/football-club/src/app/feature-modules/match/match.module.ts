@@ -43,6 +43,18 @@ import { MatchPreparationComponent } from './components/match-preparation/match-
     ReactiveFormsModule
   ],
   exports: [
+    ClubEntryComponent,
+    ClubEditComponent, 
+    PlayerEntryComponent,
+    PlayerEditComponent,
+    MatchEntryComponent,
+    PlayerPerformanceEntryComponent,
+    ClubListComponent,
+    ClubDetailsComponent,
+    PlayerDetailsComponent,
+    MatchPreparationComponent,
+    MatchDetailsComponent,
+    MatchListComponent
   ]
 })
 export class MatchModule { }
