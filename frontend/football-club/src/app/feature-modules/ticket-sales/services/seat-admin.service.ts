@@ -6,7 +6,7 @@ import { SeatAdminDTO } from '../models/admin.model';
 
 @Injectable({ providedIn: 'root' })
 export class SeatAdminService {
-  private baseUrl = `${environment.apiHost}api/seats`;
+  private baseUrl = `${environment.apiHost}seats`;
 
   constructor(private http: HttpClient) {}
 

@@ -6,7 +6,7 @@ import { PurchaseRequestDTO, PurchaseResponseDTO } from '../models/purchase.mode
 
 @Injectable({ providedIn: 'root' })
 export class PurchaseService {
-  private baseUrl = `${environment.apiHost}api/purchases`;
+  private baseUrl = `${environment.apiHost}purchases`;
 
   constructor(private http: HttpClient) {}
 

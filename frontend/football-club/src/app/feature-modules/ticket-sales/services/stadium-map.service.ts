@@ -6,8 +6,8 @@ import { StadiumMapDTO, PricePreviewDTO, TicketTypeDTO } from '../models/stadium
 
 @Injectable({ providedIn: 'root' })
 export class StadiumMapService {
-  private mapUrl = `${environment.apiHost}api/stadium`;
-  private ticketTypeUrl = `${environment.apiHost}api/ticket-types`;
+  private mapUrl = `${environment.apiHost}stadium`;
+  private ticketTypeUrl = `${environment.apiHost}ticket-types`;
 
   constructor(private http: HttpClient) {}
 

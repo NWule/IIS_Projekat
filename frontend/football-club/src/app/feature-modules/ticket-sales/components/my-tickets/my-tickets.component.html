@@ -18,7 +18,7 @@
       | Zona: {{ foundTicket.zoneName }}
       | Red {{ foundTicket.rowNumber }}, Sedište {{ foundTicket.seatNumber }}
       | Tip: {{ foundTicket.ticketTypeName }}
-      | Cena: {{ foundTicket.price | number:'1.2-2' }} €
+      | Cena: {{ foundTicket.price | number:'1.2-2' }} RSD
     </div>
   </div>
 
@@ -55,7 +55,7 @@
             </div>
             <div class="ticket-row">
               <span class="label">Cena</span>
-              <span><strong>{{ ticket.price | number:'1.2-2' }} €</strong></span>
+              <span><strong>{{ ticket.price | number:'1.2-2' }} RSD</strong></span>
             </div>
           </div>
           <div class="ticket-footer">

@@ -6,7 +6,7 @@ import { TicketTypeDTO } from '../models/stadium-map.model';
 
 @Injectable({ providedIn: 'root' })
 export class TicketTypeCrudService {
-  private baseUrl = `${environment.apiHost}api/ticket-types`;
+  private baseUrl = `${environment.apiHost}ticket-types`;
 
   constructor(private http: HttpClient) {}
 

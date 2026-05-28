@@ -6,7 +6,7 @@ import { TicketDTO } from '../models/purchase.model';
 
 @Injectable({ providedIn: 'root' })
 export class TicketService {
-  private baseUrl = `${environment.apiHost}api/tickets`;
+  private baseUrl = `${environment.apiHost}tickets`;
 
   constructor(private http: HttpClient) {}
 

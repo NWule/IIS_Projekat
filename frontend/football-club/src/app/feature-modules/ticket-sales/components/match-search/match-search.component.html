@@ -17,11 +17,11 @@
           <input type="date" formControlName="endDate" />
         </div>
         <div class="filter-group">
-          <label>Min. cena (€)</label>
+          <label>Min. cena (RSD)</label>
           <input type="number" formControlName="minPrice" placeholder="0" min="0" />
         </div>
         <div class="filter-group">
-          <label>Max. cena (€)</label>
+          <label>Max. cena (RSD)</label>
           <input type="number" formControlName="maxPrice" placeholder="9999" min="0" />
         </div>
       </div>
@@ -56,7 +56,7 @@
           <td>{{ match.homeClubName }}</td>
           <td>{{ match.awayClubName }}</td>
           <td>
-            <span *ngIf="match.lowestPrice !== null">{{ match.lowestPrice | number:'1.2-2' }} €</span>
+            <span *ngIf="match.lowestPrice !== null">{{ match.lowestPrice | number:'1.2-2' }} RSD</span>
             <span *ngIf="match.lowestPrice === null" class="no-price">–</span>
           </td>
           <td>

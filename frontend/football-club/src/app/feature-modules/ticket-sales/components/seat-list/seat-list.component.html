@@ -6,7 +6,7 @@
     </div>
     <div class="header-right">
       <div class="zone-badge" *ngIf="zone" [style.background]="zone.color">
-        {{ zone.name }} · {{ zone.basePrice | number:'1.2-2' }} €
+        {{ zone.name }} · {{ zone.basePrice | number:'1.2-2' }} RSD
       </div>
       <button class="btn-generate" (click)="generateSeats()" [disabled]="generating">
         {{ generating ? 'Generisanje...' : '⚡ Generiši sedišta' }}

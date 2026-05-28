@@ -32,6 +32,11 @@ export class StadiumMapComponent implements OnInit {
     this.stadiumMapService.getStadiumMap(this.gameId).subscribe({
       next: (map) => {
         this.stadiumMap = map;
+        this.stadiumMap.zones.forEach(zone => {
+          zone.seats.sort((a, b) =>
+            a.rowNumber !== b.rowNumber ? a.rowNumber - b.rowNumber : a.seatNumber - b.seatNumber
+          );
+        });
         this.loadTicketTypes();
       },
       error: () => {

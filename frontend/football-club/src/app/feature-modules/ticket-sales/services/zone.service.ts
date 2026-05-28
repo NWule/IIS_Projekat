@@ -6,7 +6,7 @@ import { ZoneDTO } from '../models/admin.model';
 
 @Injectable({ providedIn: 'root' })
 export class ZoneService {
-  private baseUrl = `${environment.apiHost}api/zones`;
+  private baseUrl = `${environment.apiHost}zones`;
 
   constructor(private http: HttpClient) {}
 

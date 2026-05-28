@@ -6,7 +6,7 @@ import { GameSearchResult, GameSearchParams } from '../models/game-search.model'
 
 @Injectable({ providedIn: 'root' })
 export class GameSearchService {
-  private baseUrl = `${environment.apiHost}api/games`;
+  private baseUrl = `${environment.apiHost}games`;
 
   constructor(private http: HttpClient) {}
 

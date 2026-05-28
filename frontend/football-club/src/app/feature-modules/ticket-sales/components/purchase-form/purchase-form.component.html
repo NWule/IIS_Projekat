@@ -26,7 +26,7 @@
       </tbody>
     </table>
     <div class="total-row">
-      Ukupno za naplatu: <strong>{{ totalAmount | number:'1.2-2' }} €</strong>
+      Ukupno za naplatu: <strong>{{ totalAmount | number:'1.2-2' }} RSD</strong>
     </div>
   </div>
 
@@ -101,7 +101,7 @@
         Nazad
       </button>
       <button type="submit" class="btn-primary" [disabled]="loading || form.invalid">
-        {{ loading ? 'Obrađivanje...' : 'Plati ' + (totalAmount | number:'1.2-2') + ' €' }}
+        {{ loading ? 'Obrađivanje...' : 'Plati ' + (totalAmount | number:'1.2-2') + ' RSD' }}
       </button>
     </div>
   </form>

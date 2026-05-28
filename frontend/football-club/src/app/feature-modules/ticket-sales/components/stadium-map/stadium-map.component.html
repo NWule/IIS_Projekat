@@ -11,7 +11,7 @@
     <div class="ticket-type-bar">
       <label><strong>Tip karte:</strong></label>
       <select [(ngModel)]="selectedTicketTypeId">
-        <option *ngFor="let tt of ticketTypes" [value]="tt.id">
+        <option *ngFor="let tt of ticketTypes" [ngValue]="tt.id">
           {{ tt.name }} (×{{ tt.priceModifier }})
         </option>
       </select>
@@ -32,7 +32,7 @@
       <div class="zone-card" *ngFor="let zone of stadiumMap.zones; trackBy: trackByZone">
         <div class="zone-header" [style.background]="zone.color">
           <span class="zone-name">{{ zone.name }}</span>
-          <span class="zone-price">{{ getSeatPrice(zone.basePrice) | number:'1.2-2' }} €</span>
+          <span class="zone-price">{{ getSeatPrice(zone.basePrice) | number:'1.2-2' }} RSD</span>
         </div>
         <div class="zone-info">{{ zone.numberOfRows }} reda × {{ zone.seatsPerRow }} sedišta</div>
 
@@ -65,13 +65,13 @@
             <td>{{ seat.zoneName }}</td>
             <td>{{ seat.rowNumber }}</td>
             <td>{{ seat.seatNumber }}</td>
-            <td>{{ getSeatPrice(seat.basePrice) | number:'1.2-2' }} €</td>
+            <td>{{ getSeatPrice(seat.basePrice) | number:'1.2-2' }} RSD</td>
           </tr>
         </tbody>
         <tfoot>
           <tr>
             <td colspan="3"><strong>Ukupno:</strong></td>
-            <td><strong>{{ getTotalAmount() | number:'1.2-2' }} €</strong></td>
+            <td><strong>{{ getTotalAmount() | number:'1.2-2' }} RSD</strong></td>
           </tr>
         </tfoot>
       </table>
