@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ACCESS_TOKEN , USER } from '../../../shared/constants';
+import { ACCESS_TOKEN , USER } from '../../../../shared/constants';
 
 @Injectable({
     providedIn: 'root',
