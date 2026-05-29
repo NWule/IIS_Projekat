@@ -1,20 +1,25 @@
-<nav class="top-nav">
-  <a routerLink="/timovi" class="active">Timovi</a>
-  <a routerLink="/priprema-utakmice">Priprema utakmice</a>
-  <a routerLink="/utakmica-uzivo">Utakmica uzivo</a>
-</nav>
+
 
 <div class="page-container">
   <h1 class="page-title">Timovi</h1>
 
-  <div class="search-wrapper">
-    <input 
-      type="text" 
-      placeholder="Pretraži klubove..." 
-      [(ngModel)]="searchQuery" 
-      (input)="onSearchChange(searchQuery)" 
-    />
-    <span class="search-icon">🔍</span>
+  <div class="actions-header">
+    <div class="search-wrapper">
+      <input 
+        type="text" 
+        placeholder="Pretraži klubove..." 
+        [(ngModel)]="searchQuery" 
+        (input)="onSearchChange(searchQuery)" 
+      />
+      <span class="search-icon">🔍</span>
+    </div>
+
+    <button 
+      *ngIf="isAssistantCoach" 
+      (click)="goToAddClub()"
+      class="btn-add-club">
+      + Dodaj klub
+    </button>
   </div>
 
   <div class="clubs-grid">
@@ -22,6 +27,7 @@
       class="club-card" 
       *ngFor="let club of clubs"
       [class.my-club-card]="club.id === myClubId"
+      (click)="goToClubDetails(club.id)"
     >
       <div class="image-placeholder">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" class="placeholder-icon">

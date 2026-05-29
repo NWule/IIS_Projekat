@@ -4,6 +4,22 @@
   </div>
 
   <div class="navbar-actions">
+    <ng-container *ngIf="isLoggedIn && (userRole === 'ROLE_HEAD_COACH' || userRole === 'ROLE_ASSISTANT_COACH')">
+      <button class="nav-btn" (click)="router.navigate(['/clubs'])">Klubovi</button>
+    </ng-container>
+
+    <ng-container *ngIf="isLoggedIn && (userRole === 'ROLE_HEAD_COACH' || userRole === 'ROLE_ASSISTANT_COACH' || userRole === 'ROLE_STATISTICIAN')">
+      <button class="nav-btn" (click)="router.navigate(['/matches'])">Mečevi</button>
+    </ng-container>
+
+    <ng-container *ngIf="isLoggedIn && (userRole === 'ROLE_HEAD_COACH')">
+      <button class="nav-btn" (click)="router.navigate(['/match-preparation'])">Priprema utakmice</button>
+    </ng-container>
+
+    <ng-container *ngIf="isLoggedIn && userRole === 'ROLE_ASSISTANT_COACH'">
+      <button class="nav-btn" (click)="router.navigate(['/add-player'])">Dodavanje igrača</button>
+    </ng-container>
+
     <ng-container *ngIf="(isLoggedIn && userRole === 'ROLE_SCOUT')">
       <button class="nav-btn" (click)="onReportsClick()">Izveštaji</button>
       <button class="nav-btn">Zahtevi</button>

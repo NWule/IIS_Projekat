@@ -8,6 +8,8 @@ import { Club } from '../../models/club.model';
 import { forkJoin, of } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 
+// ptre
+
 @Component({
   selector: 'app-player-edit',
   templateUrl: './player-edit.component.html',

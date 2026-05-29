@@ -16,5 +16,5 @@ export interface PlaysFor {
   jerseyNumber: number;
   contractStart: string;
   contractEnd: string;
-  position?: string;
+  playerPosition?: string;
 }

@@ -22,47 +22,32 @@ public class GameController {
     private final IGameService gameService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('HEAD_COACH', 'SPORTS_DIRECTOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'SPORTS_DIRECTOR', 'ADMIN')")
     public ResponseEntity<?> createGame(@RequestBody GameDTO gameDTO, @AuthenticationPrincipal User userDetails) {
-        if (!userDetails.getRole().equals("ROLE_ADMIN")) {
-            if (gameDTO.getHomeClubId() != userDetails.getClubId() && gameDTO.getAwayClubId() != userDetails.getClubId()) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("Nemate dozvolu da zakazujete utakmice za druge klubove!");
-            }
-        }
+
 
         GameDTO createdGame = gameService.createGame(gameDTO);
         return new ResponseEntity<>(createdGame, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('HEAD_COACH', 'SPORTS_DIRECTOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HEAD_COACH','ASSISTANT_COACH', 'SPORTS_DIRECTOR', 'ADMIN')")
     public ResponseEntity<?> updateGame(@PathVariable Long id, @RequestBody GameDTO gameDTO, @AuthenticationPrincipal User userDetails) {
-        if (!userDetails.getRole().equals("ROLE_ADMIN")) {
-            if (gameDTO.getHomeClubId() != userDetails.getClubId() && gameDTO.getAwayClubId() != userDetails.getClubId()) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("Nemate dozvolu da menjate utakmice drugih klubova!");
-            }
-        }
+
 
         GameDTO updatedGame = gameService.updateGame(id, gameDTO);
         return ResponseEntity.ok(updatedGame);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('HEAD_COACH', 'SPORTS_DIRECTOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'SPORTS_DIRECTOR', 'ADMIN')")
     public ResponseEntity<?> deleteGame(
             @PathVariable Long id,
             @AuthenticationPrincipal User userDetails) {
 
         GameDTO game = gameService.getGameById(id);
 
-        if (!userDetails.getRole().equals("ROLE_ADMIN")) {
-            if (game.getHomeClubId() != userDetails.getClubId() && game.getAwayClubId() != userDetails.getClubId()) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("Nemate dozvolu da obrišete utakmicu tuđih klubova!");
-            }
-        }
+
 
         gameService.deleteGame(id);
         return ResponseEntity.noContent().build();

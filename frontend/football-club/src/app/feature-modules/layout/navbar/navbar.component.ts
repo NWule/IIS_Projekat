@@ -25,6 +25,18 @@ export class NavbarComponent implements OnInit {
     });
   }
 
+  get isHeadCoach(): boolean {
+    return this.userRole === 'ROLE_HEAD_COACH';
+  }
+
+  get isAssistantCoach(): boolean {
+    return this.userRole === 'ROLE_ASSISTANT_COACH';
+  }
+
+  get isStatistician(): boolean {
+    return this.userRole === 'ROLE_STATISTICIAN';
+  }
+
   onReportsClick() {
     this.router.navigate(['/reports']);
   }

@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PlayerService } from '../../services/player.service';
 import { ContractService } from '../../services/playsFor.service';
 import { Player, PlaysFor } from '../../models/player.model';
+import { AuthService } from '../../../../infrastructure/auth/auth.service';
+
+// tre, ptre
 
 @Component({
   selector: 'app-player-details',
@@ -13,21 +16,40 @@ export class PlayerDetailsComponent implements OnInit {
   player: Player | null = null;
   currentContract: PlaysFor | null = null;
   isLoading: boolean = true;
+  isAssistantCoach: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private playerService: PlayerService,
-    private contractService: ContractService
+    private contractService: ContractService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     const playerId = Number(this.route.snapshot.paramMap.get('id'));
-    
+    this.checkUserRole();
     if (playerId) {
       this.loadPlayerData(playerId);
     } else {
       this.isLoading = false;
       console.error('ID igrača nije pronađen u URL ruti.');
+    }
+  }
+
+  private checkUserRole(): void {
+    this.authService.user$.subscribe(user => {
+      if (user) {
+        this.isAssistantCoach = user.role === 'ROLE_ASSISTANT_COACH';
+      } else {
+        this.isAssistantCoach = false;
+      }
+    });
+  }
+
+  goToEditPlayer(): void {
+    if (this.player && this.player.id) {
+      this.router.navigate(['/edit-player', this.player.id]);
     }
   }
 

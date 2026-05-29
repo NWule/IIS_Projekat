@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ClubService } from '../../services/club.service'; 
 import { Club } from '../../models/club.model';             
 
+// ptre
+
 @Component({
   selector: 'app-club-edit',
   templateUrl: './club-edit.component.html',

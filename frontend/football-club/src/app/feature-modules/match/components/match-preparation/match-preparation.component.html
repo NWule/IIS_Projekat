@@ -1,9 +1,3 @@
-<nav class="top-nav">
-  <a routerLink="/timovi">Timovi</a>
-  <a routerLink="/priprema-utakmice" class="active">Priprema utakmice</a>
-  <a routerLink="/utakmica-uzivo">Utakmica uzivo</a>
-</nav>
-
 <div class="page-container" *ngIf="!isLoading">
   <h1 class="page-title">Priprema utakmice</h1>
 
@@ -26,7 +20,7 @@
               <span class="jersey">#{{ player.jerseyNumber }}</span>
               <div class="name-pos">
                 <span class="name">{{ player.playerName }} {{ player.playerSurname }}</span>
-                <span class="position-badge">{{ player.position || 'N/A' }}</span>
+                <span class="position-badge">{{ player.playerPosition || 'N/A' }}</span>
               </div>
             </div>
             <button class="action-btn remove" (click)="returnToRoster(player, 'lineup')">X</button>
@@ -44,7 +38,7 @@
               <span class="jersey">#{{ player.jerseyNumber }}</span>
               <div class="name-pos">
                 <span class="name">{{ player.playerName }} {{ player.playerSurname }}</span>
-                <span class="position-badge">{{ player.position || 'N/A' }}</span>
+                <span class="position-badge">{{ player.playerPosition || 'N/A' }}</span>
               </div>
             </div>
             <div class="card-actions">
@@ -63,7 +57,7 @@
               <span class="jersey">#{{ player.jerseyNumber }}</span>
               <div class="name-pos">
                 <span class="name">{{ player.playerName }} {{ player.playerSurname }}</span>
-                <span class="position-badge">{{ player.position || 'N/A' }}</span>
+                <span class="position-badge">{{ player.playerPosition || 'N/A' }}</span>
               </div>
             </div>
             <button class="action-btn remove" (click)="returnToRoster(player, 'bench')">X</button>

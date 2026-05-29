@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ContractService } from '../../services/playsFor.service';
 import { PlaysFor } from '../../models/player.model';
 
+// tre
+
 @Component({
   selector: 'app-match-preparation',
   templateUrl: './match-preparation.component.html',

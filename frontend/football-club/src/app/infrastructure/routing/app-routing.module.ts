@@ -54,7 +54,7 @@ const routes: Routes = [
   { path: 'matches',                 component: MatchListComponent },
   { path: 'add-match',               component: MatchEntryComponent },
   { path: 'match-details/:id',       component: MatchDetailsComponent },
-  { path: 'match-preparation/:id',   component: MatchPreparationComponent },
+  { path: 'match-preparation',   component: MatchPreparationComponent },
 
   // Performanse
   { path: 'add-performance',         component: PlayerPerformanceEntryComponent },

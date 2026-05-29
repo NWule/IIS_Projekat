@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -9,12 +9,15 @@ import { AppearanceService } from '../../services/appearance.service';
 import { TeamStatisticService } from '../../services/team-statistic.service';
 import { ContractService } from '../../services/playsFor.service';
 import { ClubService } from '../../services/club.service';
+import { AuthService } from '../../../../infrastructure/auth/auth.service';
 
 import { Game } from '../../models/game.model';
 import { Appearance } from '../../models/appearance.model';
 import { TeamStatistic } from '../../models/team-statistic.model';
 import { PlaysFor } from '../../models/player.model';
 import { Club } from '../../models/club.model';
+
+// ptre, tre, stat
 
 @Component({
   selector: 'app-match-detail',
@@ -30,6 +33,7 @@ export class MatchDetailsComponent implements OnInit {
   myClub!: Club;
 
   isHomeClub = false;
+  isStatistician: boolean = true;
 
   statistike: TeamStatistic | null = null;
   statsForm!: FormGroup;
@@ -47,12 +51,14 @@ export class MatchDetailsComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private fb: FormBuilder,
     private gameService: GameService,
     private appearanceService: AppearanceService,
     private statisticService: TeamStatisticService,
     private contractService: ContractService,
-    private clubService: ClubService
+    private clubService: ClubService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -60,6 +66,13 @@ export class MatchDetailsComponent implements OnInit {
     this.initAddForma();
     this.initStatsForma();
     this.ucitajPodatke();
+    this.checkUserRole();
+  }
+
+  private checkUserRole(): void {
+    this.authService.user$.subscribe(user => {
+      this.isStatistician = user?.role === 'ROLE_STATISTICIAN';
+    });
   }
 
   private ucitajPodatke(): void {
@@ -101,9 +114,15 @@ export class MatchDetailsComponent implements OnInit {
         this.statistike = stat;
         this.statsForm.patchValue(stat);
         this.statsPostoji = true;
+        if (!this.isStatistician) {
+          this.statsForm.disable();
+        }
       },
       error: () => {
         this.statsPostoji = false;
+        if (!this.isStatistician) {
+          this.statsForm.disable();
+        }
       }
     });
   }
@@ -143,7 +162,7 @@ export class MatchDetailsComponent implements OnInit {
   }
 
   sacuvajStatistike(): void {
-    if (this.statsForm.invalid) return;
+    if (this.statsForm.invalid|| !this.isStatistician) return;
     const payload: TeamStatistic = { ...this.statsForm.value, gameId: this.gameId };
     this.statisticService.saveFinalStatistic(payload).subscribe({
       next: (saved) => {
@@ -195,5 +214,9 @@ export class MatchDetailsComponent implements OnInit {
         alert('Greška prilikom čuvanja performanse!');
       }
     });
+  }
+
+  goToAddPerformance(): void {
+    this.router.navigate(['/add-performance'], { queryParams: { gameId: this.gameId } });
   }
 }

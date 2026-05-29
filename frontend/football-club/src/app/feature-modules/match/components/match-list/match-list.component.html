@@ -1,5 +1,15 @@
 <div class="page-container">
-  <h1>Raspored i pregled utakmica</h1>
+  
+  <div class="header-row">
+    <h1>Raspored i pregled utakmica</h1>
+    
+    <button 
+      *ngIf="isStatistician" 
+      (click)="goToMatchEntry()"
+      class="btn-add">
+      ➕ Unesi novu utakmicu
+    </button>
+  </div>
   
   <table class="match-table">
     <thead>
@@ -7,7 +17,7 @@
         <th>Datum i vreme</th>
         <th>Domaćin</th>
         <th>Gost</th>
-        <th>Akcija</th>
+        <th *ngIf="canViewDetails">Akcija</th>
       </tr>
     </thead>
     <tbody>
@@ -15,8 +25,8 @@
         <td>{{ match.dateTime | date:'dd.MM.yyyy HH:mm' }}</td>
         <td>{{ match.homeClubName }}</td>
         <td>{{ match.awayClubName }}</td>
-        <td>
-          <button (click)="viewMatchDetails(match.id)">Pregled detalja</button>
+        <td *ngIf="canViewDetails">
+          <button class="btn-details" (click)="viewMatchDetails(match.id)">Pregled detalja</button>
         </td>
       </tr>
     </tbody>

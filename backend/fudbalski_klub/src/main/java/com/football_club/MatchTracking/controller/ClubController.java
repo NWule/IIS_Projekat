@@ -20,7 +20,7 @@ public class ClubController {
     private final ICLubService clubService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ASSISTANT_COACH')")
     public ResponseEntity<ClubDTO> createClub(@RequestBody ClubDTO clubDTO) {
         ClubDTO createdClub = clubService.createClub(clubDTO);
         return new ResponseEntity<>(createdClub, HttpStatus.CREATED);
@@ -50,26 +50,20 @@ public class ClubController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SPORTS_DIRECTOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SPORTS_DIRECTOR','ASSISTANT_COACH', 'ADMIN')")
     public ResponseEntity<?> updateClub(
             @PathVariable int id,
             @RequestBody ClubDTO clubDTO,
             @AuthenticationPrincipal User userDetails) {
 
-        // Bezbednosna provera: Sportski direktor može da menja samo SVOG kluba podatke
-        if (!userDetails.getRole().equals("ROLE_ADMIN")) {
-            if (userDetails.getClubId() == null || userDetails.getClubId() != id) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("Nemate dozvolu da menjate podatke tuđih klubova!");
-            }
-        }
+
 
         ClubDTO updatedClub = clubService.updateClub(id, clubDTO);
         return ResponseEntity.ok(updatedClub);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ASSISTANT_COACH')")
     public ResponseEntity<Void> deleteClub(@PathVariable int id) {
         clubService.deleteClub(id);
         return ResponseEntity.noContent().build();

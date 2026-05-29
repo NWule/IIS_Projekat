@@ -1,13 +1,14 @@
 <div class="page-container" *ngIf="!loading; else loadingTpl">
 
-  <div style="display:flex;align-items:center;justify-content:center;gap:32px;padding:20px 0 8px;">
-    <div style="flex:1;text-align:right;font-size:1.2rem;font-weight:700;">{{ homeClub?.name }}</div>
-    <div style="font-size:2rem;font-weight:900;color:#0b133d;min-width:100px;text-align:center;">
+  <div class="score-header">
+    <div class="team-name home">{{ homeClub?.name }}</div>
+    <div class="score-display">
       {{ statistike?.homeGoals ?? '–' }} : {{ statistike?.awayGoals ?? '–' }}
     </div>
-    <div style="flex:1;text-align:left;font-size:1.2rem;font-weight:700;">{{ awayClub?.name }}</div>
+    <div class="team-name away">{{ awayClub?.name }}</div>
   </div>
-  <div style="text-align:center;color:#999;font-size:13px;margin-bottom:20px;">
+  
+  <div class="match-date">
     {{ game.dateTime | date: 'dd.MM.yyyy HH:mm' }}
   </div>
 
@@ -41,15 +42,15 @@
             { naziv: 'Ofsajdi',               home: 'homeOffsides',       away: 'awayOffsides'      },
             { naziv: 'Tačnost dodavanja (%)', home: 'homePassAccuracy',   away: 'awayPassAccuracy'  }
           ]">
-            <td><input type="number" [formControlName]="red.home" min="0" style="width:80px;padding:4px;text-align:center;border:1px solid #ddd;border-radius:4px;" /></td>
+            <td><input type="number" [formControlName]="red.home" min="0" class="stat-input" /></td>
             <td>{{ red.naziv }}</td>
-            <td><input type="number" [formControlName]="red.away" min="0" style="width:80px;padding:4px;text-align:center;border:1px solid #ddd;border-radius:4px;" /></td>
+            <td><input type="number" [formControlName]="red.away" min="0" class="stat-input" /></td>
           </tr>
         </tbody>
       </table>
-      <div style="text-align:center;margin-top:16px;">
-        <button type="submit" [disabled]="statsForm.invalid"
-                style="background:#0b133d;color:white;border:none;padding:10px 50px;border-radius:4px;cursor:pointer;">
+      
+      <div class="submit-container">
+        <button type="submit" [disabled]="statsForm.invalid" class="btn-submit">
           {{ statsPostoji ? 'Ažuriraj statistike' : 'Sačuvaj statistike' }}
         </button>
       </div>
@@ -60,7 +61,7 @@
     <div class="teams-container">
 
       <div class="team-section">
-        <h3 style="margin:0 0 12px;">{{ homeClub?.name }}</h3>
+        <h3>{{ homeClub?.name }}</h3>
 
         <div class="player-row" *ngFor="let p of homePerformanse">
           <strong>{{ p.playerName }} {{ p.playerSurname }}</strong> &nbsp;|&nbsp;
@@ -70,21 +71,17 @@
           <span *ngIf="p.redCard"> &nbsp; 🟥</span>
           &nbsp; | &nbsp; {{ p.passingAccuracy }}% dodavanja
         </div>
-        <p *ngIf="homePerformanse.length === 0" style="color:#999;font-size:13px;font-style:italic;margin:8px 0;">
+        <p *ngIf="homePerformanse.length === 0" class="empty-message">
           Nema unetih performansi.
         </p>
 
-        <ng-container *ngIf="isHomeClub">
-          <ng-container *ngTemplateOutlet="addFormaTemplate"></ng-container>
-          <button class="btn-add" (click)="toggleAddForma()">
-            {{ showAddForma ? '✕ Odustani' : '+ Dodaj performansu' }}
-          </button>
-        </ng-container>
+        <button class="btn-add" *ngIf="isStatistician && isHomeClub" (click)="goToAddPerformance()">
+          + Dodaj performansu
+        </button>
       </div>
 
-      <!-- AWAY TIM -->
       <div class="team-section">
-        <h3 style="margin:0 0 12px;">{{ awayClub?.name }}</h3>
+        <h3>{{ awayClub?.name }}</h3>
 
         <div class="player-row" *ngFor="let p of awayPerformanse">
           <strong>{{ p.playerName }} {{ p.playerSurname }}</strong> &nbsp;|&nbsp;
@@ -94,71 +91,19 @@
           <span *ngIf="p.redCard"> &nbsp; 🟥</span>
           &nbsp; | &nbsp; {{ p.passingAccuracy }}% dodavanja
         </div>
-        <p *ngIf="awayPerformanse.length === 0" style="color:#999;font-size:13px;font-style:italic;margin:8px 0;">
+        <p *ngIf="awayPerformanse.length === 0" class="empty-message">
           Nema unetih performansi.
         </p>
 
-        <ng-container *ngIf="!isHomeClub">
-          <ng-container *ngTemplateOutlet="addFormaTemplate"></ng-container>
-          <button class="btn-add" (click)="toggleAddForma()">
-            {{ showAddForma ? '✕ Odustani' : '+ Dodaj performansu' }}
-          </button>
-        </ng-container>
+        <button class="btn-add" *ngIf="isStatistician && !isHomeClub" (click)="goToAddPerformance()">
+          + Dodaj performansu
+        </button>
       </div>
 
     </div>
   </div>
 </div>
 
-<ng-template #addFormaTemplate>
-  <div *ngIf="showAddForma" style="margin-bottom:10px;padding:14px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;">
-    <form [formGroup]="addForma" (ngSubmit)="sacuvajPerformansu()">
-      <table class="stats-table">
-        <tbody>
-          <tr>
-            <td style="text-align:right;width:45%;">Igrač</td>
-            <td>
-              <select formControlName="playsForId" style="width:100%;padding:5px;border:1px solid #ddd;border-radius:4px;">
-                <option [value]="null">Izaberite igrača</option>
-                <option *ngFor="let p of mojRoster" [value]="p.id">
-                  #{{ p.jerseyNumber }} {{ p.playerName }} {{ p.playerSurname }}
-                </option>
-              </select>
-            </td>
-          </tr>
-          <tr *ngFor="let polje of [
-            { label: 'Minuti',                 control: 'minutesPlayed'   },
-            { label: 'Golovi',                 control: 'goals'           },
-            { label: 'Asistencije',            control: 'assists'         },
-            { label: 'Tačnost dodavanja (%)',  control: 'passingAccuracy' },
-            { label: 'Faulovi',                control: 'fouls'           }
-          ]">
-            <td style="text-align:right;">{{ polje.label }}</td>
-            <td>
-              <input type="number" [formControlName]="polje.control"
-                     style="width:100%;padding:5px;border:1px solid #ddd;border-radius:4px;box-sizing:border-box;" />
-            </td>
-          </tr>
-          <tr>
-            <td style="text-align:right;">Žuti karton</td>
-            <td><input type="checkbox" formControlName="yellowCardCheckbox" style="width:16px;height:16px;accent-color:#0b133d;" /></td>
-          </tr>
-          <tr>
-            <td style="text-align:right;">Crveni karton</td>
-            <td><input type="checkbox" formControlName="redCard" style="width:16px;height:16px;accent-color:#0b133d;" /></td>
-          </tr>
-        </tbody>
-      </table>
-      <div style="text-align:center;margin-top:10px;">
-        <button type="submit" [disabled]="addForma.invalid"
-                style="background:#0b133d;color:white;border:none;padding:8px 40px;border-radius:4px;cursor:pointer;">
-          Potvrdi
-        </button>
-      </div>
-    </form>
-  </div>
-</ng-template>
-
 <ng-template #loadingTpl>
-  <div style="text-align:center;padding:60px;color:#999;font-family:sans-serif;">Učitavanje...</div>
+  <div class="loading-container">Učitavanje...</div>
 </ng-template>
