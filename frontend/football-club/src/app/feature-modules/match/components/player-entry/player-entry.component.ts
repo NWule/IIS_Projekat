@@ -6,6 +6,8 @@ import { ContractService } from '../../services/playsFor.service';
 import { Club } from '../../models/club.model';
 import { switchMap, of } from 'rxjs'; 
 
+// ptre
+
 @Component({
   selector: 'app-player-entry',
   templateUrl: './player-entry.component.html',
@@ -15,15 +17,17 @@ export class PlayerEntryComponent implements OnInit {
   playerForm!: FormGroup;
   clubs: Club[] = []; 
 
-  // Lista mogućih pozicija igrača (ista kao u edit komponenti)
   playerPositions: string[] = [
-    'Goalkeeper',
-    'Defender',
-    'Midfielder',
-    'Forward',
-    'Striker',
-    'Winger'
-  ];
+  'GOALKEEPER',
+  'CENTER_BACK',
+  'WING_BACK',
+  'DEFENSIVE_MIDFIELDER',
+  'CENTRAL_MIDFIELDER',
+  'ATTACKING_MIDFIELDER',
+  'WIDE_MIDFIELDER',
+  'STRIKER',
+  'WINGER'
+];
 
   constructor(
     private fb: FormBuilder,
@@ -42,7 +46,7 @@ export class PlayerEntryComponent implements OnInit {
       ime: ['', Validators.required],
       prezime: ['', Validators.required],
       datumRodjenja: ['', Validators.required],
-      pozicija: [''], 
+      pozicija: [null], 
       trenutniKlubId: [null], 
       brojNaDresu: [null, [Validators.min(1), Validators.max(99)]],
       contractStart: [''],
@@ -84,7 +88,7 @@ export class PlayerEntryComponent implements OnInit {
         name: formValue.ime,
         surname: formValue.prezime,
         dateOfBirth: formValue.datumRodjenja,
-        position: formValue.pozicija 
+        playerPosition: formValue.pozicija 
       };
 
       console.log('1. Kreiram igrača:', playerData);

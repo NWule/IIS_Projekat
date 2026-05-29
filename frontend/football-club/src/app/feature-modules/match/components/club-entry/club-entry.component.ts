@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClubService } from '../../services/club.service';
 import { Club } from '../../models/club.model'; 
 
+// ptre
+
 @Component({
   selector: 'app-club-entry',
   templateUrl: './club-entry.component.html',

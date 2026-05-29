@@ -20,16 +20,12 @@ public class PlaysForController {
     private final IPlaysForService playsForService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SPORTS_DIRECTOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SPORTS_DIRECTOR', 'ASSISTANT_COACH', 'ADMIN')")
     public ResponseEntity<?> createContract(
             @RequestBody PlaysForDTO playsForDTO,
             @AuthenticationPrincipal User user) {
 
-        if (!user.getRole().name().equals("ROLE_ADMIN")) {
-            if (user.getClubId() == null || user.getClubId() != playsForDTO.getClubId()) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-        }
+
 
         PlaysForDTO createdContract = playsForService.createContract(playsForDTO);
         return new ResponseEntity<>(createdContract, HttpStatus.CREATED);
@@ -43,7 +39,7 @@ public class PlaysForController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SPORTS_DIRECTOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SPORTS_DIRECTOR', 'ASSISTANT_COACH', 'ADMIN')")
     public ResponseEntity<?> updateContract(
             @PathVariable Long id,
             @RequestBody PlaysForDTO playsForDTO,
@@ -60,7 +56,7 @@ public class PlaysForController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ASSISTANT_COACH')")
     public ResponseEntity<Void> deleteContract(@PathVariable Long id) {
         playsForService.deleteContract(id);
         return ResponseEntity.noContent().build();
@@ -79,11 +75,6 @@ public class PlaysForController {
             @PathVariable int clubId,
             @AuthenticationPrincipal User user) {
 
-        if (!user.getRole().name().equals("ROLE_ADMIN")) {
-            if (user.getClubId() == null || user.getClubId() != clubId) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-        }
 
         List<PlaysForDTO> history = playsForService.getClubHistory(clubId);
         return ResponseEntity.ok(history);
@@ -102,11 +93,7 @@ public class PlaysForController {
             @PathVariable int clubId,
             @AuthenticationPrincipal User user) {
 
-        if (!user.getRole().name().equals("ROLE_ADMIN")) {
-            if (user.getClubId() == null || user.getClubId() != clubId) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-        }
+
 
         List<PlaysForDTO> roster = playsForService.getCurrentRoster(clubId);
         return ResponseEntity.ok(roster);

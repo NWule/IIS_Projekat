@@ -3,6 +3,8 @@ import { ClubService } from '../../services/club.service';
 import { Club } from '../../models/club.model'; 
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../../infrastructure/auth/auth.service';
 
 @Component({
   selector: 'app-club-list',
@@ -15,11 +17,44 @@ export class ClubListComponent implements OnInit {
   searchQuery: string = '';
   private searchSubject = new Subject<string>();
 
-  constructor(private clubService: ClubService) {}
+  isAssistantCoach: boolean = false;
+  isHeadCoach: boolean = false;
+  isCoach: boolean = false; 
+
+  constructor(private clubService: ClubService, private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
+    this.checkUserRole(); 
     this.loadMyClubAndAllClubs();
     this.setupSearch();
+  }
+
+  private checkUserRole(): void {
+    this.authService.user$.subscribe(user => {
+      if (user) {
+        this.isAssistantCoach = user.role === 'ROLE_ASSISTANT_COACH';
+        this.isHeadCoach = user.role === 'ROLE_HEAD_COACH';
+        this.isCoach = this.isAssistantCoach || this.isHeadCoach;
+      } else {
+        this.isAssistantCoach = false;
+        this.isHeadCoach = false;
+        this.isCoach = false;
+      }
+    });
+  }
+
+  goToClubDetails(clubId: number | undefined): void {
+    if (clubId && this.isCoach) {
+      this.router.navigate(['/club-details', clubId]);
+    }
+  }
+
+  goToAddClub(): void {
+    if (!this.isAssistantCoach) {
+      alert('Samo pomoćni trener ima prava za dodavanje novog kluba!');
+      return;
+    }
+    this.router.navigate(['/add-club']);
   }
 
   loadMyClubAndAllClubs(): void {

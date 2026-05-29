@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ClubDTO {
-    private int id;
+    private Integer id;
     private String name;
     private String location;
     private int wins;

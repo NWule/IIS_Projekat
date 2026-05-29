@@ -12,15 +12,13 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: #1a1a1a;
-}
-
-.navbar-brand:hover {
   cursor: pointer;
 }
 
 .navbar-actions {
   display: flex;
   gap: 1rem;
+  align-items: center;
 }
 
 .nav-btn {
@@ -39,20 +37,18 @@
   background-color: #e2e8f0;
 }
 
-/* Specific styling for the logout button to make it distinct */
 .logout-btn {
   color: #ffffff;
-  background-color: #ef4444; /* Modern red */
+  background-color: #ef4444; 
 }
 
 .logout-btn:hover {
   background-color: #dc2626;
 }
 
-/* Styling for the login button */
 .login-btn {
   color: #ffffff;
-  background-color: #3b82f6; /* Modern Blue */
+  background-color: #3b82f6; 
 }
 
 .login-btn:hover {

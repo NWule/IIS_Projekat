@@ -6,6 +6,8 @@ import { TeamStatisticService } from '../../services/team-statistic.service';
 import { Club } from '../../models/club.model';
 import { switchMap } from 'rxjs/operators';
 
+// stat
+
 @Component({
   selector: 'app-match-entry',
   templateUrl: './match-entry.component.html',

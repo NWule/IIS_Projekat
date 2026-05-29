@@ -1,25 +1,170 @@
-.page-container { max-width: 1000px; margin: 20px auto; font-family: sans-serif; }
+.page-container { 
+  max-width: 1000px; 
+  margin: 20px auto; 
+  font-family: sans-serif; 
+}
 
-.tabs { display: flex; gap: 5px; margin-bottom: 20px; }
-.tabs button { padding: 10px 25px; border: none; background: #e2e8f0; cursor: pointer; border-radius: 4px; }
-.tabs button.active { background: #0b133d; color: white; }
+/* ==================== ZAGLAVLJE MEČA ==================== */
+.score-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 20px 0 8px;
+}
 
-.stats-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-.stats-table th, .stats-table td { padding: 12px; border: 1px solid #ddd; text-align: center; }
+.team-name {
+  flex: 1;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
 
-.teams-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.team-section { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
+.team-name.home {
+  text-align: right;
+}
 
-.player-row { padding: 8px; border-bottom: 1px solid #eee; font-size: 14px; }
+.team-name.away {
+  text-align: left;
+}
 
-.btn-add {
-  margin-top: 15px;
-  background-color: #10b981;
+.score-display {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #0b133d;
+  min-width: 100px;
+  text-align: center;
+}
+
+.match-date {
+  text-align: center;
+  color: #999;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+/* ==================== TABOVI ==================== */
+.tabs { 
+  display: flex; 
+  gap: 5px; 
+  margin-bottom: 20px; 
+}
+
+.tabs button { 
+  padding: 10px 25px; 
+  border: none; 
+  background: #e2e8f0; 
+  cursor: pointer; 
+  border-radius: 4px; 
+  font-weight: 600;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.tabs button.active { 
+  background: #0b133d; 
+  color: white; 
+}
+
+/* ==================== STATISTIKA ==================== */
+.stats-table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  margin-top: 10px; 
+}
+
+.stats-table th, .stats-table td { 
+  padding: 12px; 
+  border: 1px solid #ddd; 
+  text-align: center; 
+}
+
+.stat-input {
+  width: 80px;
+  padding: 4px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.submit-container {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.btn-submit {
+  background: #0b133d;
   color: white;
   border: none;
-  padding: 8px 15px;
+  padding: 10px 50px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.btn-submit:hover:not([disabled]) {
+  background: #1e293b;
+}
+
+.btn-submit[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ==================== PERFORMANSE ==================== */
+.teams-container { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 20px; 
+}
+
+.team-section { 
+  background: #f8fafc; 
+  padding: 15px; 
+  border-radius: 8px; 
+  border: 1px solid #e2e8f0; 
+}
+
+.team-section h3 {
+  margin: 0 0 12px;
+  color: #0b133d;
+}
+
+.player-row { 
+  padding: 8px; 
+  border-bottom: 1px solid #eee; 
+  font-size: 14px; 
+}
+
+.empty-message {
+  color: #999;
+  font-size: 13px;
+  font-style: italic;
+  margin: 8px 0;
+}
+
+/* Prilagođeno da izgleda kao inline stil koji si napisao */
+.btn-add {
+  margin-top: 10px;
+  background-color: #0b133d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
   width: 100%;
+  font-weight: bold;
+  transition: background-color 0.2s;
 }
-.btn-add:hover { background-color: #059669; }
+
+.btn-add:hover { 
+  background-color: #1e293b; 
+}
+
+/* ==================== UČITAVANJE ==================== */
+.loading-container {
+  text-align: center;
+  padding: 60px;
+  color: #999;
+  font-family: sans-serif;
+  font-size: 1.2rem;
+}

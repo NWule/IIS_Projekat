@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { PlayerService } from '../../services/player.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AppearanceService } from '../../services/appearance.service';
-import { Player } from '../../models/player.model';
+import { ContractService } from '../../services/playsFor.service';
+import { ClubService } from '../../services/club.service';
+import { PlaysFor } from '../../models/player.model';
 
 @Component({
   selector: 'app-player-performance-entry',
@@ -11,38 +13,48 @@ import { Player } from '../../models/player.model';
 })
 export class PlayerPerformanceEntryComponent implements OnInit {
   performanceForm!: FormGroup;
-  players: Player[] = [];
-  
-  temporaryGameId: number = 1; 
+  roster: PlaysFor[] = [];
+  gameId!: number;
 
   constructor(
     private fb: FormBuilder,
-    private playerService: PlayerService,
-    private appearanceService: AppearanceService
+    private appearanceService: AppearanceService,
+    private contractService: ContractService,
+    private clubService: ClubService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.initForm();
-    this.loadPlayers();
+
+    this.route.queryParams.subscribe(params => {
+      if (params['gameId']) {
+        this.gameId = Number(params['gameId']);
+      }
+    });
+
+    this.clubService.getMyClub().subscribe({
+      next: (club) => {
+        this.contractService.getCurrentRoster(club.id!).subscribe({
+          next: (data) => this.roster = data,
+          error: (err) => console.error('Greška pri učitavanju rostera:', err)
+        });
+      },
+      error: (err) => console.error('Greška pri učitavanju kluba:', err)
+    });
   }
 
   private initForm(): void {
     this.performanceForm = this.fb.group({
-      playsForId: [null, Validators.required],
-      minutesPlayed: [0, [Validators.required, Validators.min(0), Validators.max(120)]],
-      goals: [0, [Validators.required, Validators.min(0)]],
-      assists: [0, [Validators.required, Validators.min(0)]],
-      passingAccuracy: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
-      fouls: [0, [Validators.required, Validators.min(0)]],
+      playsForId:      [null, Validators.required],
+      minutesPlayed:   [0,    [Validators.required, Validators.min(0), Validators.max(120)]],
+      goals:           [0,    [Validators.required, Validators.min(0)]],
+      assists:         [0,    [Validators.required, Validators.min(0)]],
+      passingAccuracy: [0,    [Validators.required, Validators.min(0), Validators.max(100)]],
+      fouls:           [0,    [Validators.required, Validators.min(0)]],
       yellowCardCheckbox: [false],
-      redCard: [false]
-    });
-  }
-
-  private loadPlayers(): void {
-    this.playerService.getAllPlayers().subscribe({
-      next: (data) => this.players = data,
-      error: (err) => console.error('Greška pri učitavanju igrača:', err)
+      redCard:         [false]
     });
   }
 
@@ -50,44 +62,31 @@ export class PlayerPerformanceEntryComponent implements OnInit {
     if (this.performanceForm.valid) {
       const formValue = this.performanceForm.value;
 
-      const appearancePayload: any = {
-        gameId: this.temporaryGameId,
-        playsForId: Number(formValue.playsForId),
-        minutesPlayed: Number(formValue.minutesPlayed),
-        goals: Number(formValue.goals),
-        assists: Number(formValue.assists),
+      const appearancePayload = {
+        gameId:          this.gameId,
+        playsForId:      Number(formValue.playsForId),
+        minutesPlayed:   Number(formValue.minutesPlayed),
+        goals:           Number(formValue.goals),
+        assists:         Number(formValue.assists),
         passingAccuracy: Number(formValue.passingAccuracy),
-        fouls: Number(formValue.fouls),
-        yellowCards: formValue.yellowCardCheckbox ? 1 : 0, 
-        redCard: formValue.redCard,
-        rating: 0.0 
+        fouls:           Number(formValue.fouls),
+        yellowCards:     formValue.yellowCardCheckbox ? 1 : 0,
+        redCard:         formValue.redCard,
+        rating:          0.0
       };
 
       this.appearanceService.createAppearance(appearancePayload).subscribe({
-        next: (response) => {
-          alert('Performanse igrača su uspešno sačuvane u bazu!');
-          this.resetFormAfterSubmit();
+        next: () => {
+          alert('Performanse igrača su uspešno sačuvane!');
+          this.router.navigate(['/match-details', this.gameId]);
         },
         error: (err) => {
           console.error('Greška sa servera:', err);
-          alert('Greška prilikom slanja! Proveri konzolu i poklapanje tipova podataka.');
+          alert(err.error?.message || 'Greška prilikom slanja!');
         }
       });
     } else {
       this.performanceForm.markAllAsTouched();
     }
-  }
-
-  private resetFormAfterSubmit(): void {
-    this.performanceForm.reset({
-      playsForId: null,
-      minutesPlayed: 0,
-      goals: 0,
-      assists: 0,
-      passingAccuracy: 0,
-      fouls: 0,
-      yellowCardCheckbox: false,
-      redCard: false
-    });
   }
 }

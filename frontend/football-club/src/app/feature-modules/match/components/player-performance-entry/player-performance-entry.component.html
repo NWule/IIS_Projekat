@@ -1,8 +1,3 @@
-<nav class="top-nav">
-  <a routerLink="/unos-timova">Unesi tim</a>
-  <a routerLink="/unos-igraca">Unesi igraca</a>
-  <a routerLink="/performanse-igraca" class="active">Unesi performanese igraca</a>
-</nav>
 
 <div class="form-container">
   <h1 class="page-title">Unos performansi sa odigrane utakmice</h1>
@@ -12,15 +7,12 @@
       
       <div class="fields-column">
         
-        <div class="input-row">
-          <label for="igrac">Igrač</label>
-          <select id="igrac" formControlName="playsForId">
-            <option [value]="null">Izaberite igrača</option>
-            <option *ngFor="let player of players" [value]="player.id">
-              {{ player.name }} {{ player.surname }}
-            </option>
-          </select>
-        </div>
+        <select id="igrac" formControlName="playsForId">
+  <option [value]="null">Izaberite igrača</option>
+  <option *ngFor="let p of roster" [value]="p.id">
+    #{{ p.jerseyNumber }} {{ p.playerName }} {{ p.playerSurname }}
+  </option>
+</select>
 
         <div class="input-row">
           <label for="minuti">Minuti</label>

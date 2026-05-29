@@ -32,6 +32,13 @@ export class LoginComponent {
             || this.authService.user$.value.role === RoleEnum.ROLE_SPORTS_DIRECTOR)) {
             this.router.navigate(['/clubs']);
             }
+            else if (
+              this.authService.user$.value?.role === 'ROLE_HEAD_COACH' ||
+              this.authService.user$.value?.role === 'ROLE_ASSISTANT_COACH' ||
+              this.authService.user$.value?.role === 'ROLE_STATISTICIAN'
+            ) {
+              this.router.navigate(['/matches']);
+            }
           else {
             this.router.navigate(['/']); // Redirect to home or dashboard on success
           }
