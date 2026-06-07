@@ -22,8 +22,8 @@ public class WishlistController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('SPORTS_DIRECTOR', 'ADMIN')")
-    public ResponseEntity<WishlistDTO> createWishlist(@RequestBody WishlistSaveDTO dto) {
-        WishlistDTO created = wishlistService.createWishList(dto);
+    public ResponseEntity<WishlistDTO> createWishlist(@AuthenticationPrincipal User user, @RequestBody WishlistSaveDTO dto) {
+        WishlistDTO created = wishlistService.createWishList(user.getId(), dto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
@@ -46,6 +46,24 @@ public class WishlistController {
     public ResponseEntity<Void> deleteWishlist(@PathVariable Long id) {
         wishlistService.deleteWishList(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{wishlistId}/players/{playerId}")
+    @PreAuthorize("hasAnyRole('SPORTS_DIRECTOR', 'ADMIN')")
+    public ResponseEntity<WishlistDTO> addPlayerToWishlist(
+            @PathVariable Long wishlistId,
+            @PathVariable Long playerId) {
+        WishlistDTO updated = wishlistService.addPlayerToWishlist(playerId, wishlistId);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/{wishlistId}/players/{playerId}")
+    @PreAuthorize("hasAnyRole('SPORTS_DIRECTOR', 'ADMIN')")
+    public ResponseEntity<WishlistDTO> removePlayerFromWishlist(
+            @PathVariable Long wishlistId,
+            @PathVariable Long playerId) {
+        WishlistDTO updated = wishlistService.removePlayerFromWishlist(playerId, wishlistId);
+        return ResponseEntity.ok(updated);
     }
 
     @GetMapping("/my")
