@@ -40,4 +40,8 @@ export class ReportService {
   getMyReports(): Observable<Report[]> {
     return this.http.get<Report[]>(`${this.baseReportsUrl}/my`);
   }
+
+  getReportsByPlayer(playerId: number): Observable<Report[]> {
+    return this.http.get<Report[]>(`${this.baseReportsUrl}/player/${playerId}`);
+  }
 }

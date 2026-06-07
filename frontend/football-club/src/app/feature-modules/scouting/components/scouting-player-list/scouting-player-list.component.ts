@@ -57,7 +57,7 @@ export class ScoutingPlayerListComponent implements OnInit {
 
   viewDetails(id: number | undefined): void {
     if (id === undefined) return;
-    this.router.navigate(['/players', id]);
+    this.router.navigate(['/view-player', id]);
   }
 
   formatPosition(position: string | undefined): string {

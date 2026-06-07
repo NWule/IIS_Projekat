@@ -3,7 +3,7 @@ export interface Player {
   name: string;
   surname: string;
   dateOfBirth: string;
-  position?: string;
+  playerPosition?: string;
 }
 
 export interface PlaysFor {

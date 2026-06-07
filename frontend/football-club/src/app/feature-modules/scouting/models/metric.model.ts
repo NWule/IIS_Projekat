@@ -4,8 +4,14 @@ export interface Metric {
   category: string;
 }
 
-export interface ValuedMetricSave {
-  reportId: number;
+export interface GameMetric {
+  id: number;
+  gameId: number;
+  homeClubName: string;
+  awayClubName: string;
+  matchDate: string;
+  playerId: number;
   metricId: number;
-  value: number;
+  metricName: string;
+  recordedValue: number;
 }

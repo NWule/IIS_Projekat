@@ -100,7 +100,7 @@ export class PlayerEditComponent implements OnInit {
           ime: res.player.name,
           prezime: res.player.surname,
           datumRodjenja: res.player.dateOfBirth,
-          pozicija: res.player.position || ''
+          pozicija: res.player.playerPosition || ''
         });
 
         if (res.contract) {

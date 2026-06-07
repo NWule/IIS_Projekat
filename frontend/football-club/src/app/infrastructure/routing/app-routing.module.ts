@@ -37,6 +37,7 @@ import { CreateReportComponent } from '../../feature-modules/scouting/components
 import { MyReportsComponent } from 'src/app/feature-modules/scouting/components/my-reports/my-reports.component';
 import { EditReportComponent } from 'src/app/feature-modules/scouting/components/edit-report/edit-report.component';
 import { ViewReportComponent } from 'src/app/feature-modules/scouting/components/view-report/view-report.component';
+import { ViewPlayerComponent } from 'src/app/feature-modules/scouting/components/player-details/view-player.component';
 
 const routes: Routes = [
   { path: '',                     redirectTo: 'login', pathMatch: 'full' },
@@ -90,6 +91,7 @@ const routes: Routes = [
   { path: 'edit-report/:id',         component: EditReportComponent },
   { path: 'my-reports',              component: MyReportsComponent },
   { path: 'report/:id',              component: ViewReportComponent },
+  { path: 'view-player/:id',      component: ViewPlayerComponent },
 
   { path: '**',                      redirectTo: 'matches' }
 ];

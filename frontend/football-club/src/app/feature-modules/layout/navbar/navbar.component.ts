@@ -49,4 +49,20 @@ export class NavbarComponent implements OnInit {
   onLoginClick() {
     this.router.navigate(['/login']);
   }
+
+  onLogoClicked() {
+    if (this.isLoggedIn) {
+      if (this.userRole === 'ROLE_SCOUT' || this.userRole === 'ROLE_SPORTS_DIRECTOR') {
+        this.router.navigate(['/scouting-dashboard']);
+      } else if (
+        this.userRole === 'ROLE_HEAD_COACH' ||
+        this.userRole === 'ROLE_ASSISTANT_COACH' ||
+        this.userRole === 'ROLE_STATISTICIAN'
+      ) {
+        this.router.navigate(['/matches']);
+      } else {
+        this.router.navigate(['/']);
+      }
+    }
+  }
 }

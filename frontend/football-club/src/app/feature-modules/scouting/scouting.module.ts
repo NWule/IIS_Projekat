@@ -4,10 +4,12 @@ import { ScoutingPlayerListComponent } from './components/scouting-player-list/s
 import { MetricsComponent } from './components/metrics/metrics.component';
 import { RouterModule } from '@angular/router';
 import { CreateReportComponent } from './components/create-report/create-report.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EditReportComponent } from './components/edit-report/edit-report.component';
 import { MyReportsComponent } from './components/my-reports/my-reports.component';
 import { ViewReportComponent } from './components/view-report/view-report.component';
+import { ScoutRequestModalComponent } from './components/scout-request-modal/scout-request-modal.component';
+import { ViewPlayerComponent } from './components/player-details/view-player.component';
 
 
 
@@ -18,12 +20,15 @@ import { ViewReportComponent } from './components/view-report/view-report.compon
     CreateReportComponent,
     EditReportComponent,
     MyReportsComponent,
-    ViewReportComponent
+    ViewReportComponent,
+    ScoutRequestModalComponent,
+    ViewPlayerComponent
   ],
   imports: [
     CommonModule,
     RouterModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FormsModule
   ]
 })
 export class ScoutingModule { }
