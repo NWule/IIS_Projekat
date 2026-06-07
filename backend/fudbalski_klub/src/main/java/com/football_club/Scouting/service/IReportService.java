@@ -13,4 +13,5 @@ public interface IReportService {
     void deleteReport(Long id);
     List<ReportDTO> getReportsByScout(Long scoutId);
     List<ReportDTO> getReportsByPlayer(Long playerId);
+    ReportDTO getLatestReportByPlayer(Long playerId);
 }

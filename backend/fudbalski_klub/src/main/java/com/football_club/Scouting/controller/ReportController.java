@@ -102,4 +102,10 @@ public class ReportController {
         List<ReportDTO> reports = reportService.getReportsByPlayer(playerId);
         return ResponseEntity.ok(reports);
     }
+
+    @GetMapping("/player/{playerId}/latest")
+    public ResponseEntity<ReportDTO> getLatestReportForPlayer(@PathVariable Long playerId) {
+        ReportDTO report = reportService.getLatestReportByPlayer(playerId);
+        return ResponseEntity.ok(report);
+    }
 }

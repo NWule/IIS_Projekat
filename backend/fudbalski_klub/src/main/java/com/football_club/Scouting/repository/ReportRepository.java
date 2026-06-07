@@ -14,4 +14,6 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     List<Report> findByPlayerId(Long playerId);
     @Query("SELECT r FROM Report r LEFT JOIN FETCH r.valuedMetrics WHERE r.player.id = :playerId")
     List<Report> findByPlayerIdWithMetrics(@Param("playerId") Long playerId);
+    @Query("SELECT r FROM Report r LEFT JOIN FETCH r.valuedMetrics WHERE r.player.id = :playerId ORDER BY r.createdAt DESC LIMIT 1")
+    Report findLatestReportByPlayerId(Long playerId);
 }
