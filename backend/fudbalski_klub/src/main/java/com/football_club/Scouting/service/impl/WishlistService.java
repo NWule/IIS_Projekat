@@ -71,6 +71,9 @@ public class WishlistService implements IWishlistService {
     public WishlistDTO addPlayerToWishlist(Long playerId, Long wishlistId) {
         Wishlist wishlist = wishlistRepository.findById(wishlistId).orElseThrow(() -> new RuntimeException("Wishlist not found with id: " + wishlistId));
         Player player = playerRepository.findById(playerId).orElseThrow(() -> new RuntimeException("Player not found with id: " + playerId));
+        if (wishlist.getPlayers().contains(player)) {
+            throw new RuntimeException("Player is already in the wishlist");
+        }
         wishlist.getPlayers().add(player);
         return mapToDTO(wishlistRepository.save(wishlist));
     }
