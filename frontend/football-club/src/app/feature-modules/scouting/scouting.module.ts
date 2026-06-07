@@ -11,6 +11,7 @@ import { ViewReportComponent } from './components/view-report/view-report.compon
 import { ScoutRequestModalComponent } from './components/scout-request-modal/scout-request-modal.component';
 import { ViewPlayerComponent } from './components/player-details/view-player.component';
 import { MetricsDashboardComponent } from './components/metrics-dashboard/metrics-dashboard.component';
+import { WishlistsComponent } from './components/wishlists/wishlists.component';
 
 
 
@@ -24,7 +25,8 @@ import { MetricsDashboardComponent } from './components/metrics-dashboard/metric
     ViewReportComponent,
     ScoutRequestModalComponent,
     ViewPlayerComponent,
-    MetricsDashboardComponent
+    MetricsDashboardComponent,
+    WishlistsComponent
   ],
   imports: [
     CommonModule,

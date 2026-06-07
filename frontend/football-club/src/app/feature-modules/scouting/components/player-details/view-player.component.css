@@ -155,3 +155,97 @@
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Stilovi za modal izbora liste želja */
+.wishlist-selection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+  max-height: 250px;
+  overflow-y: hidden;
+}
+
+.wishlist-option-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.wishlist-option-item:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+}
+
+.wishlist-option-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wishlist-option-name {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.wishlist-option-count {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.arrow-indicator {
+  color: #94a3b8;
+  font-weight: bold;
+}
+
+.wishlist-option-item:hover .arrow-indicator {
+  color: #3b82f6;
+}
+
+.empty-modal-state {
+  text-align: center;
+  color: #64748b;
+  font-style: italic;
+  padding: 1rem 0;
+}
+
+.modal-loading {
+  text-align: center;
+  color: #64748b;
+  padding: 1.5rem 0;
+}
+
+.modal-overlay {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex; justify-content: center; align-items: center; z-index: 1000;
+}
+.modal-content {
+  background: white; padding: 2rem; border-radius: 12px; width: 100%; max-width: 500px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;
+}
+.modal-header h3 { margin: 0; color: #0f172a; }
+.close-btn {
+  background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b;
+}
+.form-group { margin-bottom: 1.5rem; }
+label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; }
+.form-control {
+  width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;
+}
+.modal-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
+.btn { padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; border: none; }
+.btn-secondary { background: #f1f5f9; color: #475569; }
+.btn-primary { background: #2563eb; color: white; }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }

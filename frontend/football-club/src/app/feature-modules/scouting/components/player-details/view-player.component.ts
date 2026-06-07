@@ -5,10 +5,12 @@ import { PlayerService } from '../../../match/services/player.service';
 import { ContractService } from '../../../match/services/playsFor.service';
 import { ReportService } from '../../services/report.service';
 import { MetricService } from '../../services/metric.service';
+import { WishlistService } from '../../services/wishlist.service'; // NOVO
 
 import { Player, PlaysFor } from '../../../match/models/player.model';
 import { Report } from '../../models/report.model';
 import { Metric, GameMetric } from '../../models/metric.model';
+import { Wishlist } from '../../models/wishlist.model'; // NOVO
 import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 
 interface GroupedGame {
@@ -33,6 +35,7 @@ export class ViewPlayerComponent implements OnInit {
   activeTab: 'reports' | 'stats' = 'reports';
   showHistoryModal = false;
   showScoutRequestModal = false;
+  showWishlistModal = false; // NOVO
 
   reports: Report[] = [];
   selectedReportId: number | null = null;
@@ -43,8 +46,10 @@ export class ViewPlayerComponent implements OnInit {
   allMetrics: Metric[] = [];
 
   gameStats: GroupedGame[] = [];
+  myWishlists: Wishlist[] = []; // NOVO
 
   isLoading = true;
+  isWishlistLoading = false; // NOVO
 
   constructor(
     private route: ActivatedRoute,
@@ -52,6 +57,7 @@ export class ViewPlayerComponent implements OnInit {
     private contractService: ContractService,
     private reportService: ReportService,
     private metricService: MetricService,
+    private wishlistService: WishlistService, // NOVO
     private authService: AuthService
   ) {}
 
@@ -179,8 +185,32 @@ export class ViewPlayerComponent implements OnInit {
   }
 
   addToWishlist(): void {
-    console.log(`Dodavanje igrača ID: ${this.playerId} na wishlistu. Ovo je placeholder.`);
-    alert('Igrač je dodat na wishlistu! (Placeholder)');
+    console.log('Otvaranje modala za dodavanje u listu želja');
+    this.showWishlistModal = true;
+    this.isWishlistLoading = true;
+    this.wishlistService.getMyWishlists().subscribe({
+      next: (data) => {
+        this.myWishlists = data;
+        this.isWishlistLoading = false;
+      },
+      error: (err) => {
+        console.error('Greška pri dobavljanju lista želja', err);
+        this.isWishlistLoading = false;
+      }
+    });
+  }
+
+  selectWishlist(wishlistId: number, wishlistName: string): void {
+    this.wishlistService.addPlayerToWishlist(wishlistId, this.playerId).subscribe({
+      next: () => {
+        alert(`Igrač ${this.player.name} ${this.player.surname} uspešno dodat u listu "${wishlistName}".`);
+        this.showWishlistModal = false;
+      },
+      error: (err) => {
+        console.error('Greška pri dodavanju igrača na listu želja', err);
+        alert('Došlo je do greške. ' + err.error.message);
+      }
+    });
   }
 
   formatPosition(position: string | undefined): string {

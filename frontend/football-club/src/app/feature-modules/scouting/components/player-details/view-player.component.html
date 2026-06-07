@@ -125,3 +125,37 @@
   [isOpen]="showScoutRequestModal" 
   (close)="showScoutRequestModal = false">
 </app-scout-request-modal>
+
+<div class="modal-overlay" *ngIf="showWishlistModal">
+  <div class="modal-content text-left">
+    <div class="modal-header">
+      <h3>Izaberi listu želja</h3>
+      <button class="close-btn" (click)="showWishlistModal = false">&times;</button>
+    </div>
+    
+    <div *ngIf="isWishlistLoading" class="modal-loading">
+      <p>Učitavanje listi želja...</p>
+    </div>
+
+    <div *ngIf="!isWishlistLoading" class="wishlist-selection-list">
+      <div 
+        class="wishlist-option-item" 
+        *ngFor="let wishlist of myWishlists" 
+        (click)="selectWishlist(wishlist.id, wishlist.name)">
+        <div class="wishlist-option-info">
+          <span class="wishlist-option-name">⭐ {{ wishlist.name }}</span>
+          <span class="wishlist-option-count">({{ wishlist.players?.length || 0 }} igrača)</span>
+        </div>
+        <span class="arrow-indicator">&rarr;</span>
+      </div>
+
+      <div *ngIf="myWishlists.length === 0" class="empty-modal-state">
+        <p>Trenutno nemate kreiranih listi želja.</p>
+      </div>
+    </div>
+    
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" (click)="showWishlistModal = false">Zatvori</button>
+    </div>
+  </div>
+</div>

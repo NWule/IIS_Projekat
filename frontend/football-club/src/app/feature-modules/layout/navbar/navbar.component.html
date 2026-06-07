@@ -27,6 +27,7 @@
 
     <ng-container *ngIf="(isLoggedIn && userRole === 'ROLE_SPORTS_DIRECTOR')">
       <button class="nav-btn" (click)="onMetricsClick()">Metrike</button>
+      <button class="nav-btn" (click)="onWishlistsClick()">Lista Želja</button>
     </ng-container>
 
     <ng-container *ngIf="isLoggedIn">

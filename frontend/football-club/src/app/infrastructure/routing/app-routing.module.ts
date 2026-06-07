@@ -39,6 +39,7 @@ import { EditReportComponent } from 'src/app/feature-modules/scouting/components
 import { ViewReportComponent } from 'src/app/feature-modules/scouting/components/view-report/view-report.component';
 import { ViewPlayerComponent } from 'src/app/feature-modules/scouting/components/player-details/view-player.component';
 import { MetricsDashboardComponent } from 'src/app/feature-modules/scouting/components/metrics-dashboard/metrics-dashboard.component';
+import { WishlistsComponent } from 'src/app/feature-modules/scouting/components/wishlists/wishlists.component';
 
 const routes: Routes = [
   { path: '',                     redirectTo: 'login', pathMatch: 'full' },
@@ -85,15 +86,18 @@ const routes: Routes = [
   { path: 'edit-ticket-type/:id',    component: TicketTypeFormComponent },
 
   // Skaut/Direktor
-  { path: 'scouting-dashboard',          component: ScoutingPlayerListComponent },
+  { path: 'scouting-dashboard',       component: ScoutingPlayerListComponent },
+  { path: 'view-player/:id',          component: ViewPlayerComponent },
 
   // Skaut
   { path: 'create-report',           component: CreateReportComponent },
   { path: 'edit-report/:id',         component: EditReportComponent },
   { path: 'my-reports',              component: MyReportsComponent },
   { path: 'report/:id',              component: ViewReportComponent },
-  { path: 'view-player/:id',      component: ViewPlayerComponent },
-  { path: 'metrics-dashboard', component: MetricsDashboardComponent },
+
+  // Direktor
+  { path: 'metrics-dashboard',      component: MetricsDashboardComponent },
+  { path: 'wishlists',              component: WishlistsComponent },
 
   { path: '**',                      redirectTo: 'matches' }
 ];

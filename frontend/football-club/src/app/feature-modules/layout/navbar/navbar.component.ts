@@ -69,4 +69,8 @@ export class NavbarComponent implements OnInit {
   onMetricsClick() {
     this.router.navigate(['/metrics-dashboard']);
   }
+
+  onWishlistsClick() {
+    this.router.navigate(['/wishlists']);
+  }
 }
