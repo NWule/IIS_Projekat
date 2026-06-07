@@ -23,7 +23,7 @@ public class ScoutRequest {
     @JoinColumn(name = "director_id", nullable = false)
     private User director;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "scout_id", nullable = true)
     private User scout;
 

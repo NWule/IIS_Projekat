@@ -34,6 +34,6 @@ public class PlaysFor {
     @Column(name = "contract_start")
     private LocalDate contractStart;
 
-    @Column(name = "contract_end")
+    @Column(name = "contract_end", nullable = true)
     private LocalDate contractEnd;
 }
