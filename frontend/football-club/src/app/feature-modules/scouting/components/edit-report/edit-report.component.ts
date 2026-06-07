@@ -1,0 +1,201 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription, forkJoin } from 'rxjs';
+import { switchMap, map, catchError } from 'rxjs/operators';
+import { PlayerService } from '../../../match/services/player.service';
+import { ReportService } from '../../services/report.service';
+import { Player, PlaysFor } from '../../../match/models/player.model';
+import { ContractService } from 'src/app/feature-modules/match/services/playsFor.service';
+import { MetricService } from '../../services/metric.service';
+import { Metric } from '../../models/metric.model';
+import { ReportSave, ValuedMetricSave } from '../../models/report.model';
+
+@Component({
+  selector: 'app-edit-report',
+  templateUrl: './edit-report.component.html',
+  styleUrls: ['./edit-report.component.css'] // You can reuse the exact same CSS file
+})
+export class EditReportComponent implements OnInit, OnDestroy {
+  reportForm!: FormGroup;
+  reportId!: number;
+  
+  players: Player[] = [];
+  playerHistory: PlaysFor[] = [];
+  metricsByCategory: { [category: string]: Metric[] } = {};
+  categories: string[] = [];
+  
+  isLoading = true;
+  isSubmitting = false;
+  successMessage = '';
+  errorMessage = '';
+  
+  private playerSub!: Subscription;
+
+  constructor(
+    private fb: FormBuilder,
+    private playerService: PlayerService,
+    private reportService: ReportService,
+    private contractService: ContractService,
+    private metricService: MetricService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    // 1. Get ID from the route path (e.g., /scouting/edit/5)
+    this.reportId = +this.route.snapshot.paramMap.get('id')!;
+    
+    this.initForm();
+    this.setupPlayerSelectionListener();
+    this.loadData();
+  }
+
+  ngOnDestroy(): void {
+    if (this.playerSub) this.playerSub.unsubscribe();
+  }
+
+  private initForm(): void {
+    this.reportForm = this.fb.group({
+      playerId: ['', Validators.required],
+      clubAtTimeId: ['', Validators.required],
+      overallCommentary: ['', [Validators.required, Validators.minLength(10)]],
+      metrics: this.fb.group({}) 
+    });
+  }
+
+  private loadData(): void {
+    // Fetch base dependencies and the report in parallel
+    forkJoin({
+      report: this.reportService.getReportById(this.reportId),
+      players: this.playerService.getAllPlayers(),
+      metrics: this.metricService.getAllMetrics()
+    }).pipe(
+      switchMap(data => {
+        this.players = data.players;
+        this.processMetrics(data.metrics);
+        
+        // Once we have the report, fetch the history for that specific player
+        return this.contractService.getPlayerHistory(data.report.playerId).pipe(
+          map(history => ({ ...data, history }))
+        );
+      })
+    ).subscribe({
+      next: (data) => {
+        this.playerHistory = data.history;
+
+        // Populate the base form fields. 
+        // emitEvent: false prevents triggering the setupPlayerSelectionListener again
+        this.reportForm.patchValue({
+          playerId: data.report.playerId,
+          clubAtTimeId: data.report.clubAtTimeId,
+          overallCommentary: data.report.overallCommentary
+        }, { emitEvent: false });
+
+        // Populate the dynamic metrics form group
+        if (data.report.valuedMetrics) {
+          data.report.valuedMetrics.forEach((vm: any) => {
+            const control = this.reportForm.get(`metrics.${vm.metricId}`);
+            if (control) {
+              control.setValue(vm.value);
+            }
+          });
+        }
+
+        this.isLoading = false;
+      },
+      error: () => {
+        this.errorMessage = 'Failed to load report data for editing.';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  private processMetrics(metrics: Metric[]): void {
+    const metricsFormGroup = this.reportForm.get('metrics') as FormGroup;
+
+    metrics.forEach(metric => {
+      metricsFormGroup.addControl(
+        metric.id.toString(), 
+        this.fb.control('', [Validators.required, Validators.min(0), Validators.max(100)])
+      );
+
+      const cat = metric.category || 'UNCATEGORIZED';
+      if (!this.metricsByCategory[cat]) {
+        this.metricsByCategory[cat] = [];
+        this.categories.push(cat);
+      }
+      this.metricsByCategory[cat].push(metric);
+    });
+  }
+
+  private setupPlayerSelectionListener(): void {
+    this.playerSub = this.reportForm.get('playerId')!.valueChanges.subscribe(selectedId => {
+      this.reportForm.get('clubAtTimeId')?.setValue('');
+      this.playerHistory = [];
+
+      if (selectedId) {
+        this.contractService.getPlayerHistory(+selectedId).subscribe({
+          next: (history) => this.playerHistory = history,
+          error: () => this.errorMessage = 'Could not load career history for this player.'
+        });
+      }
+    });
+  }
+
+  formatCategoryName(category: string): string {
+    return category
+      .toLowerCase()
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  onSubmit(): void {
+    if (this.reportForm.invalid) {
+      this.reportForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    const formValues = this.reportForm.value;
+
+    const reportUpdateDTO: ReportSave = {
+      playerId: +formValues.playerId,
+      overallCommentary: formValues.overallCommentary,
+      clubAtTimeId: +formValues.clubAtTimeId,
+      leagueMultiplierAtTime: 1.0 
+    };
+
+    // Update the report, then update the metrics using the existing report ID
+    this.reportService.updateReport(this.reportId, reportUpdateDTO).pipe(
+      switchMap(() => {
+        const metricsData = formValues.metrics;
+        
+        const valuedMetricsPayload: ValuedMetricSave[] = Object.keys(metricsData).map(metricIdStr => ({
+          reportId: this.reportId, // Use the existing ID
+          metricId: +metricIdStr,
+          value: +metricsData[metricIdStr]
+        }));
+
+        return this.reportService.updateValuedMetrics(valuedMetricsPayload);
+      }),
+      catchError((error) => {
+        console.error(error);
+        throw new Error('Transaction failed');
+      })
+    ).subscribe({
+      next: () => {
+        this.successMessage = 'Scouting report updated successfully!';
+        setTimeout(() => this.router.navigate(['/scouting']), 2000);
+      },
+      error: () => {
+        this.errorMessage = 'Failed to update the report. Please try again.';
+        this.isSubmitting = false;
+      }
+    });
+  }
+}

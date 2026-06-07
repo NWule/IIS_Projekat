@@ -1,16 +1,20 @@
 <div class="scout-form-container">
   <div class="form-header">
-    <h2>Draft Skauting Izveštaja</h2>
-    <p>Napravi novu evaluacioni profil perfomansi igrača.</p>
+    <h2>Uredi izveštaj skauta</h2>
+    <p>Ažuriraj profil evaluacije performansi #{{ reportId }}.</p>
   </div>
 
   <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
   <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
-  <form [formGroup]="reportForm" (ngSubmit)="onSubmit()">
+  <div *ngIf="isLoading" class="loading-state">
+    <p>Dobavljanje podataka...</p>
+  </div>
+
+  <form *ngIf="!isLoading" [formGroup]="reportForm" (ngSubmit)="onSubmit()">
     
     <div class="form-group primary-selection">
-      <label for="playerId">Za Igrača</label>
+      <label for="playerId">Izaberi igrača</label>
       <select id="playerId" formControlName="playerId" class="form-control">
         <option value="" disabled>-- Izaberi igrača --</option>
         <option *ngFor="let p of players" [value]="p.id">
@@ -57,7 +61,6 @@
           
           <div class="metrics-grid">
             <div class="metric-input-card" *ngFor="let metric of metricsByCategory[category]">
-              
               <label [for]="'metric-' + metric.id">{{ metric.name }}</label>
               <input 
                 type="number" 
@@ -73,9 +76,9 @@
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn btn-secondary" routerLink="/scouting">Odustani</button>
+        <button type="button" class="btn btn-secondary" routerLink="/scouting">Cancel</button>
         <button type="submit" class="btn btn-primary" [disabled]="reportForm.invalid || isSubmitting">
-          {{ isSubmitting ? 'Prenosim podatke...' : 'Podnesi izveštaj' }}
+          {{ isSubmitting ? 'Saving Changes...' : 'Update Report' }}
         </button>
       </div>
 

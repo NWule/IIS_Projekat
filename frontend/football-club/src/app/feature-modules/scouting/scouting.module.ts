@@ -3,17 +3,23 @@ import { CommonModule } from '@angular/common';
 import { ScoutingPlayerListComponent } from './components/scouting-player-list/scouting-player-list.component';
 import { MetricsComponent } from './components/metrics/metrics.component';
 import { RouterModule } from '@angular/router';
+import { CreateReportComponent } from './components/create-report/create-report.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { EditReportComponent } from './components/edit-report/edit-report.component';
 
 
 
 @NgModule({
   declarations: [
     ScoutingPlayerListComponent,
-    MetricsComponent
+    MetricsComponent,
+    CreateReportComponent,
+    EditReportComponent
   ],
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+    ReactiveFormsModule
   ]
 })
 export class ScoutingModule { }

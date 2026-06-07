@@ -23,6 +23,19 @@ export interface Report {
   valuedMetrics: ValuedMetric[];
 }
 
+export interface ReportSave {
+  playerId: number;
+  overallCommentary: string;
+  clubAtTimeId: number;
+  leagueMultiplierAtTime: number; 
+}
+
 export interface PlayerWithReport extends Player {
   latestReport?: Report | null;
+}
+
+export interface ValuedMetricSave {
+  reportId: number;
+  metricId: number;
+  value: number;
 }
