@@ -54,6 +54,8 @@ public class ValuedMetricController {
         return ResponseEntity.ok(updated);
     }
 
+    @PutMapping("/bulk")
+    @PreAuthorize("hasAnyRole('SCOUT', 'ADMIN')")
     public ResponseEntity<List<ValuedMetricDTO>> updateValuedMetrics(@RequestBody List<ValuedMetricUpdateDTO> dtos) {
         List<ValuedMetricDTO> updated = valuedMetricService.updateValuedMetrics(dtos);
         return ResponseEntity.ok(updated);
