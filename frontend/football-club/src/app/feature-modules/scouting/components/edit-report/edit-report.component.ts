@@ -14,7 +14,7 @@ import { ReportSave, ValuedMetricSave } from '../../models/report.model';
 @Component({
   selector: 'app-edit-report',
   templateUrl: './edit-report.component.html',
-  styleUrls: ['./edit-report.component.css'] // You can reuse the exact same CSS file
+  styleUrls: ['./edit-report.component.css']
 })
 export class EditReportComponent implements OnInit, OnDestroy {
   reportForm!: FormGroup;
@@ -43,7 +43,6 @@ export class EditReportComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // 1. Get ID from the route path (e.g., /scouting/edit/5)
     this.reportId = +this.route.snapshot.paramMap.get('id')!;
     
     this.initForm();
@@ -65,7 +64,6 @@ export class EditReportComponent implements OnInit, OnDestroy {
   }
 
   private loadData(): void {
-    // Fetch base dependencies and the report in parallel
     forkJoin({
       report: this.reportService.getReportById(this.reportId),
       players: this.playerService.getAllPlayers(),
@@ -75,7 +73,6 @@ export class EditReportComponent implements OnInit, OnDestroy {
         this.players = data.players;
         this.processMetrics(data.metrics);
         
-        // Once we have the report, fetch the history for that specific player
         return this.contractService.getPlayerHistory(data.report.playerId).pipe(
           map(history => ({ ...data, history }))
         );
@@ -84,15 +81,12 @@ export class EditReportComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.playerHistory = data.history;
 
-        // Populate the base form fields. 
-        // emitEvent: false prevents triggering the setupPlayerSelectionListener again
         this.reportForm.patchValue({
           playerId: data.report.playerId,
           clubAtTimeId: data.report.clubAtTimeId,
           overallCommentary: data.report.overallCommentary
         }, { emitEvent: false });
 
-        // Populate the dynamic metrics form group
         if (data.report.valuedMetrics) {
           data.report.valuedMetrics.forEach((vm: any) => {
             const control = this.reportForm.get(`metrics.${vm.metricId}`);
@@ -170,7 +164,6 @@ export class EditReportComponent implements OnInit, OnDestroy {
       leagueMultiplierAtTime: 1.0 
     };
 
-    // Update the report, then update the metrics using the existing report ID
     this.reportService.updateReport(this.reportId, reportUpdateDTO).pipe(
       switchMap(() => {
         const metricsData = formValues.metrics;

@@ -33,6 +33,8 @@ import { TicketTypeListComponent } from '../../feature-modules/ticket-sales/comp
 import { TicketTypeFormComponent } from '../../feature-modules/ticket-sales/components/ticket-type-form/ticket-type-form.component';
 import { ScoutingPlayerListComponent } from '../../feature-modules/scouting/components/scouting-player-list/scouting-player-list.component';
 import { CreateReportComponent } from '../../feature-modules/scouting/components/create-report/create-report.component';
+import { MyReportsComponent } from 'src/app/feature-modules/scouting/components/my-reports/my-reports.component';
+import { EditReportComponent } from 'src/app/feature-modules/scouting/components/edit-report/edit-report.component';
 
 const routes: Routes = [
   { path: '',                     redirectTo: 'login', pathMatch: 'full' },
@@ -83,6 +85,8 @@ const routes: Routes = [
 
   // Skaut
   { path: 'create-report',           component: CreateReportComponent },
+  { path: 'edit-report/:id',         component: EditReportComponent },
+  { path: 'my-reports',              component: MyReportsComponent },
 
   { path: '**',                      redirectTo: 'matches' }
 ];

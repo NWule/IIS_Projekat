@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { CreateReportComponent } from './components/create-report/create-report.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EditReportComponent } from './components/edit-report/edit-report.component';
+import { MyReportsComponent } from './components/my-reports/my-reports.component';
 
 
 
@@ -14,7 +15,8 @@ import { EditReportComponent } from './components/edit-report/edit-report.compon
     ScoutingPlayerListComponent,
     MetricsComponent,
     CreateReportComponent,
-    EditReportComponent
+    EditReportComponent,
+    MyReportsComponent
   ],
   imports: [
     CommonModule,

@@ -34,6 +34,10 @@ export class ReportService {
   }
 
   updateValuedMetrics(dtos: ValuedMetricSave[]): Observable<ValuedMetric[]> {
-  return this.http.put<ValuedMetric[]>(`${this.baseValuedMetricsUrl}/bulk`, dtos); 
-}
+    return this.http.put<ValuedMetric[]>(`${this.baseValuedMetricsUrl}/bulk`, dtos); 
+  }
+
+  getMyReports(): Observable<Report[]> {
+    return this.http.get<Report[]>(`${this.baseReportsUrl}/my`);
+  }
 }

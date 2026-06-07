@@ -38,7 +38,7 @@ export class NavbarComponent implements OnInit {
   }
 
   onReportsClick() {
-    this.router.navigate(['/reports']);
+    this.router.navigate(['/my-reports']);
   }
 
   onLogoutClick() {

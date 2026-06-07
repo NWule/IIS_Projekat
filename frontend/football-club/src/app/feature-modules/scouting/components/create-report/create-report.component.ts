@@ -21,7 +21,6 @@ export class CreateReportComponent implements OnInit, OnDestroy {
   players: Player[] = [];
   playerHistory: PlaysFor[] = [];
   
-  // Dictionary to hold metrics organized by category for the HTML template
   metricsByCategory: { [category: string]: Metric[] } = {};
   categories: string[] = [];
   
@@ -54,7 +53,6 @@ export class CreateReportComponent implements OnInit, OnDestroy {
       playerId: ['', Validators.required],
       clubAtTimeId: ['', Validators.required],
       overallCommentary: ['', [Validators.required, Validators.minLength(10)]],
-      // We will dynamically add FormControls to this nested group based on metric IDs
       metrics: this.fb.group({}) 
     });
   }
@@ -75,13 +73,11 @@ export class CreateReportComponent implements OnInit, OnDestroy {
     const metricsFormGroup = this.reportForm.get('metrics') as FormGroup;
 
     metrics.forEach(metric => {
-      // 1. Add a form control for every metric using its ID as the key
       metricsFormGroup.addControl(
         metric.id.toString(), 
         this.fb.control('', [Validators.required, Validators.min(0), Validators.max(100)])
       );
 
-      // 2. Group the metric by category for the UI rendering
       const cat = metric.category || 'UNCATEGORIZED';
       if (!this.metricsByCategory[cat]) {
         this.metricsByCategory[cat] = [];
@@ -92,9 +88,7 @@ export class CreateReportComponent implements OnInit, OnDestroy {
   }
 
   private setupPlayerSelectionListener(): void {
-    // Listen to changes on the player selection
     this.playerSub = this.reportForm.get('playerId')!.valueChanges.subscribe(selectedId => {
-      // Reset the club selection when the player changes
       this.reportForm.get('clubAtTimeId')?.setValue('');
       this.playerHistory = [];
 
@@ -107,7 +101,6 @@ export class CreateReportComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Helper for formatting the category titles (e.g. "TECHNICAL_SKILLS" -> "Technical Skills")
   formatCategoryName(category: string): string {
     return category
       .toLowerCase()
@@ -132,16 +125,13 @@ export class CreateReportComponent implements OnInit, OnDestroy {
       playerId: +formValues.playerId,
       overallCommentary: formValues.overallCommentary,
       clubAtTimeId: +formValues.clubAtTimeId,
-      leagueMultiplierAtTime: 1.0 // Ignored for now per requirements
+      leagueMultiplierAtTime: 1.0
     };
 
-    // Sequential Submission: First save the report, then use the new ID to save metrics
     this.reportService.createReport(reportSaveDTO).pipe(
       switchMap((createdReport) => {
-        // Extract the values from the dynamic metrics FormGroup
         const metricsData = formValues.metrics;
         
-        // Map the dictionary of form values into the array of ValuedMetricSaveDTO
         const valuedMetricsPayload: ValuedMetricSave[] = Object.keys(metricsData).map(metricIdStr => ({
           reportId: createdReport.id,
           metricId: +metricIdStr,
