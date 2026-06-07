@@ -65,4 +65,8 @@ export class NavbarComponent implements OnInit {
       }
     }
   }
+
+  onMetricsClick() {
+    this.router.navigate(['/metrics-dashboard']);
+  }
 }

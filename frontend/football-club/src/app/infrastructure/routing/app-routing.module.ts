@@ -38,6 +38,7 @@ import { MyReportsComponent } from 'src/app/feature-modules/scouting/components/
 import { EditReportComponent } from 'src/app/feature-modules/scouting/components/edit-report/edit-report.component';
 import { ViewReportComponent } from 'src/app/feature-modules/scouting/components/view-report/view-report.component';
 import { ViewPlayerComponent } from 'src/app/feature-modules/scouting/components/player-details/view-player.component';
+import { MetricsDashboardComponent } from 'src/app/feature-modules/scouting/components/metrics-dashboard/metrics-dashboard.component';
 
 const routes: Routes = [
   { path: '',                     redirectTo: 'login', pathMatch: 'full' },
@@ -92,6 +93,7 @@ const routes: Routes = [
   { path: 'my-reports',              component: MyReportsComponent },
   { path: 'report/:id',              component: ViewReportComponent },
   { path: 'view-player/:id',      component: ViewPlayerComponent },
+  { path: 'metrics-dashboard', component: MetricsDashboardComponent },
 
   { path: '**',                      redirectTo: 'matches' }
 ];

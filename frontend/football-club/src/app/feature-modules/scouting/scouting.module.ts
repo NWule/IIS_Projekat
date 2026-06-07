@@ -10,6 +10,7 @@ import { MyReportsComponent } from './components/my-reports/my-reports.component
 import { ViewReportComponent } from './components/view-report/view-report.component';
 import { ScoutRequestModalComponent } from './components/scout-request-modal/scout-request-modal.component';
 import { ViewPlayerComponent } from './components/player-details/view-player.component';
+import { MetricsDashboardComponent } from './components/metrics-dashboard/metrics-dashboard.component';
 
 
 
@@ -22,7 +23,8 @@ import { ViewPlayerComponent } from './components/player-details/view-player.com
     MyReportsComponent,
     ViewReportComponent,
     ScoutRequestModalComponent,
-    ViewPlayerComponent
+    ViewPlayerComponent,
+    MetricsDashboardComponent
   ],
   imports: [
     CommonModule,

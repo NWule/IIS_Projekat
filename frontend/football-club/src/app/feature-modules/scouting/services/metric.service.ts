@@ -17,6 +17,14 @@ export class MetricService {
     return this.http.get<Metric[]>(`${this.baseMetricsUrl}`);
   }
 
+  createMetric(metric: { name: string; category: string }): Observable<Metric> {
+    return this.http.post<Metric>(`${this.baseMetricsUrl}`, metric);
+  }
+
+  updateMetric(id: number, metric: { name: string; category: string }): Observable<Metric> {
+    return this.http.put<Metric>(`${this.baseMetricsUrl}/${id}`, metric);
+  }
+
   getLastFiveGamesMetrics(playerId: number): Observable<GameMetric[]> {
     return this.http.get<GameMetric[]>(`${this.baseGameMetricsUrl}/player/${playerId}/recent`);
   }
