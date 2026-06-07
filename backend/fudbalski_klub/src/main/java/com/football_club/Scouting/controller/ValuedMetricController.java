@@ -25,6 +25,13 @@ public class ValuedMetricController {
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
+    @PostMapping("/bulk")
+    @PreAuthorize("hasAnyRole('SCOUT', 'ADMIN')")
+    public ResponseEntity<List<ValuedMetricDTO>> createValuedMetrics(@RequestBody List<ValuedMetricSaveDTO> dtos) {
+        List<ValuedMetricDTO> created = valuedMetricService.createValuedMetrics(dtos);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
     public ResponseEntity<ValuedMetricDTO> getValuedMetricById(@PathVariable Long id) {

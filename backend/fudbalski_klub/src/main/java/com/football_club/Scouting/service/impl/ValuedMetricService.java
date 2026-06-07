@@ -47,6 +47,12 @@ public class ValuedMetricService implements IValuedMetricService {
         return mapToDTO(saved);
     }
 
+    public List<ValuedMetricDTO> createValuedMetrics(List<ValuedMetricSaveDTO> dtos) {
+        return dtos.stream()
+                .map(this::createValuedMetric)
+                .collect(Collectors.toList());
+    }
+
     @Override
     @Transactional(readOnly = true)
     public ValuedMetricDTO getValuedMetricById(Long id) {
