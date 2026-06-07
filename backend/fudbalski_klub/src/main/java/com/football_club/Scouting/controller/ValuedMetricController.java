@@ -2,6 +2,7 @@ package com.football_club.Scouting.controller;
 
 import com.football_club.Scouting.dto.ValuedMetricDTO;
 import com.football_club.Scouting.dto.ValuedMetricSaveDTO;
+import com.football_club.Scouting.dto.ValuedMetricUpdateDTO;
 import com.football_club.Scouting.service.IValuedMetricService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -50,6 +51,11 @@ public class ValuedMetricController {
     @PreAuthorize("hasAnyRole('SCOUT', 'ADMIN')")
     public ResponseEntity<ValuedMetricDTO> updateValuedMetric(@PathVariable Long id, @RequestBody ValuedMetricSaveDTO dto) {
         ValuedMetricDTO updated = valuedMetricService.updateValuedMetric(id, dto);
+        return ResponseEntity.ok(updated);
+    }
+
+    public ResponseEntity<List<ValuedMetricDTO>> updateValuedMetrics(@RequestBody List<ValuedMetricUpdateDTO> dtos) {
+        List<ValuedMetricDTO> updated = valuedMetricService.updateValuedMetrics(dtos);
         return ResponseEntity.ok(updated);
     }
 

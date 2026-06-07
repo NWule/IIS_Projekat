@@ -2,6 +2,7 @@ package com.football_club.Scouting.service.impl;
 
 import com.football_club.Scouting.dto.ValuedMetricDTO;
 import com.football_club.Scouting.dto.ValuedMetricSaveDTO;
+import com.football_club.Scouting.dto.ValuedMetricUpdateDTO;
 import com.football_club.Scouting.model.Metric;
 import com.football_club.Scouting.model.Report;
 import com.football_club.Scouting.model.ValuedMetric;
@@ -87,6 +88,14 @@ public class ValuedMetricService implements IValuedMetricService {
 
         ValuedMetric updated = valuedMetricRepository.save(valuedMetric);
         return mapToDTO(updated);
+    }
+
+    @Override
+    @Transactional
+    public List<ValuedMetricDTO> updateValuedMetrics(List<ValuedMetricUpdateDTO> dtos) {
+        return dtos.stream()
+                .map(dto -> updateValuedMetric(dto.getId(), new ValuedMetricSaveDTO(dto.getReportId(), dto.getMetricId(), dto.getValue())))
+                .collect(Collectors.toList());
     }
 
     @Override

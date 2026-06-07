@@ -2,6 +2,7 @@ package com.football_club.Scouting.service;
 
 import com.football_club.Scouting.dto.ValuedMetricDTO;
 import com.football_club.Scouting.dto.ValuedMetricSaveDTO;
+import com.football_club.Scouting.dto.ValuedMetricUpdateDTO;
 
 import java.util.List;
 
@@ -14,4 +15,5 @@ public interface IValuedMetricService {
     List<ValuedMetricDTO> getValuedMetricsByReportId(Long reportId);
     ValuedMetricDTO updateValueByReportAndMetric(Long reportId, Long metricId, double newValue);
     List<ValuedMetricDTO> createValuedMetrics(List<ValuedMetricSaveDTO> dtos);
+    List<ValuedMetricDTO> updateValuedMetrics(List<ValuedMetricUpdateDTO> dtos);
 }
