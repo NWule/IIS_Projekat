@@ -1,7 +1,12 @@
 <div class="reports-dashboard">
   <div class="header-section">
-    <h2>Moji izveštaji</h2>
-    <p>Pregled svih skauting izveštaja koje ste do sada kreirali.</p>
+    <div class="header-titles">
+      <h2>Moji izveštaji</h2>
+      <p>Pregled svih skauting izveštaja koje ste do sada kreirali.</p>
+    </div>
+    <button class="btn btn-primary header-btn" routerLink="/create-report">
+      + Kreiraj izveštaj
+    </button>
   </div>
 
   <div *ngIf="isLoading" class="state-container loading">
@@ -14,7 +19,7 @@
 
   <div *ngIf="!isLoading && !errorMessage && reports.length === 0" class="state-container empty">
     <p>Niste kreirali nijedan izveštaj do sada.</p>
-    <button class="btn btn-primary" routerLink="/scouting/create">Kreiraj novi izveštaj</button>
+    <button class="btn btn-primary" routerLink="/create-report">Kreiraj novi izveštaj</button>
   </div>
 
   <div *ngIf="!isLoading && reports.length > 0" class="cards-grid">

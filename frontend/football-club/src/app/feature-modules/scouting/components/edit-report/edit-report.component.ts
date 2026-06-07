@@ -31,6 +31,7 @@ export class EditReportComponent implements OnInit, OnDestroy {
   errorMessage = '';
   
   private playerSub!: Subscription;
+  private valuedMetricIdMap = new Map<number, number>();
 
   constructor(
     private fb: FormBuilder,
@@ -89,6 +90,9 @@ export class EditReportComponent implements OnInit, OnDestroy {
 
         if (data.report.valuedMetrics) {
           data.report.valuedMetrics.forEach((vm: any) => {
+            if (vm.id) {
+              this.valuedMetricIdMap.set(vm.metricId, vm.id);
+            }
             const control = this.reportForm.get(`metrics.${vm.metricId}`);
             if (control) {
               control.setValue(vm.value);
@@ -168,11 +172,15 @@ export class EditReportComponent implements OnInit, OnDestroy {
       switchMap(() => {
         const metricsData = formValues.metrics;
         
-        const valuedMetricsPayload: ValuedMetricSave[] = Object.keys(metricsData).map(metricIdStr => ({
-          reportId: this.reportId, // Use the existing ID
-          metricId: +metricIdStr,
-          value: +metricsData[metricIdStr]
-        }));
+        const valuedMetricsPayload: ValuedMetricSave[] = Object.keys(metricsData).map(metricIdStr => {
+          const metricIdNum = +metricIdStr;
+          return {
+            id: this.valuedMetricIdMap.get(metricIdNum),
+            reportId: this.reportId,
+            metricId: metricIdNum,
+            value: +metricsData[metricIdStr]
+          };
+        });
 
         return this.reportService.updateValuedMetrics(valuedMetricsPayload);
       }),
@@ -183,7 +191,7 @@ export class EditReportComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: () => {
         this.successMessage = 'Scouting report updated successfully!';
-        setTimeout(() => this.router.navigate(['/scouting']), 2000);
+        setTimeout(() => this.router.navigate(['/my-reports']), 2000);
       },
       error: () => {
         this.errorMessage = 'Failed to update the report. Please try again.';

@@ -37,6 +37,6 @@ export class MyReportsComponent implements OnInit {
   }
 
   viewReport(reportId: number): void {
-    this.router.navigate(['/scouting/view', reportId]);
+    this.router.navigate(['/report', reportId]);
   }
 }

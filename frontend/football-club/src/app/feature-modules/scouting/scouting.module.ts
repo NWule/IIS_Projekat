@@ -7,6 +7,7 @@ import { CreateReportComponent } from './components/create-report/create-report.
 import { ReactiveFormsModule } from '@angular/forms';
 import { EditReportComponent } from './components/edit-report/edit-report.component';
 import { MyReportsComponent } from './components/my-reports/my-reports.component';
+import { ViewReportComponent } from './components/view-report/view-report.component';
 
 
 
@@ -16,7 +17,8 @@ import { MyReportsComponent } from './components/my-reports/my-reports.component
     MetricsComponent,
     CreateReportComponent,
     EditReportComponent,
-    MyReportsComponent
+    MyReportsComponent,
+    ViewReportComponent
   ],
   imports: [
     CommonModule,

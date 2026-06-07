@@ -147,7 +147,7 @@ export class CreateReportComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: () => {
         this.successMessage = 'Scouting report submitted successfully!';
-        setTimeout(() => this.router.navigate(['/scouting']), 2000);
+        setTimeout(() => this.router.navigate(['/my-reports']), 2000);
       },
       error: () => {
         this.errorMessage = 'Failed to submit the report. Please try again.';

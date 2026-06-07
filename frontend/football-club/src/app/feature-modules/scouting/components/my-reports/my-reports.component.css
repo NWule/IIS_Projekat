@@ -158,3 +158,37 @@
 .btn-primary:hover {
   background-color: #1d4ed8;
 }
+
+.header-section {
+  display: flex;
+  justify-content: space-between; /* Pushes the titles left and button right */
+  align-items: center; /* Vertically centers the button with the text block */
+  margin-bottom: 2.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 1rem;
+  flex-wrap: wrap; /* Ensures it looks good on mobile screens */
+  gap: 1rem;
+}
+
+.header-titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-titles h2 {
+  margin: 0 0 0.5rem 0;
+  color: #0f172a;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.header-titles p {
+  margin: 0;
+  color: #64748b;
+  font-size: 1rem;
+}
+
+/* Optional: Ensures the button stays properly sized if the screen shrinks */
+.header-btn {
+  white-space: nowrap;
+}
