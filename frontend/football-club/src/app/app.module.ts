@@ -14,6 +14,7 @@ import { TicketSalesModule } from './feature-modules/ticket-sales/ticket-sales.m
 import { CommonModule } from '@angular/common';
 import { AuthModule } from './infrastructure/auth/components/auth.module';
 import { LayoutModule } from './feature-modules/layout/layout.module';
+import { ScoutingPlayerListComponent } from './feature-modules/scouting/scouting-player-list/scouting-player-list.component';
 
 export function tokenGetter() {
   return localStorage.getItem('access-token');
@@ -21,7 +22,8 @@ export function tokenGetter() {
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ScoutingPlayerListComponent
   ],
   imports: [
     BrowserModule,

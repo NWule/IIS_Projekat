@@ -31,6 +31,7 @@ import { ZoneFormComponent } from '../../feature-modules/ticket-sales/components
 import { SeatListComponent } from '../../feature-modules/ticket-sales/components/seat-list/seat-list.component';
 import { TicketTypeListComponent } from '../../feature-modules/ticket-sales/components/ticket-type-list/ticket-type-list.component';
 import { TicketTypeFormComponent } from '../../feature-modules/ticket-sales/components/ticket-type-form/ticket-type-form.component';
+import { ScoutingPlayerListComponent } from '../../feature-modules/scouting/scouting-player-list/scouting-player-list.component';
 
 const routes: Routes = [
   { path: '',                     redirectTo: 'login', pathMatch: 'full' },
@@ -75,6 +76,9 @@ const routes: Routes = [
   { path: 'ticket-types',            component: TicketTypeListComponent },
   { path: 'add-ticket-type',         component: TicketTypeFormComponent },
   { path: 'edit-ticket-type/:id',    component: TicketTypeFormComponent },
+
+  // Skaut/Direktor
+  { path: 'scouting-dashboard',          component: ScoutingPlayerListComponent },
 
   { path: '**',                      redirectTo: 'matches' }
 ];

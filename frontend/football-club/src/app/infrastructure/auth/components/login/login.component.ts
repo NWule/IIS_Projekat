@@ -30,7 +30,7 @@ export class LoginComponent {
         next: () => {
           if (this.authService.user$.value !== null && (this.authService.user$.value?.role === RoleEnum.ROLE_SCOUT
             || this.authService.user$.value.role === RoleEnum.ROLE_SPORTS_DIRECTOR)) {
-            this.router.navigate(['/clubs']);
+            this.router.navigate(['/scouting-dashboard']);
             }
             else if (
               this.authService.user$.value?.role === 'ROLE_HEAD_COACH' ||
