@@ -1,0 +1,59 @@
+<div class="dashboard-container">
+  <div class="header-section">
+    <h2>Spisak svih igrača</h2>
+    <span class="player-count" *ngIf="!isLoading">Ukupno igrača: {{ players.length }}</span>
+  </div>
+  
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    Prikupljanje podataka...
+  </div>
+
+  <div class="player-grid" *ngIf="!isLoading">
+    <div 
+      class="player-card" 
+      *ngFor="let player of players" 
+      (click)="viewDetails(player.id)"
+      tabindex="0"
+      (keydown.enter)="viewDetails(player.id)">
+      
+      <div>
+        <div class="card-header">
+          <h3>{{ player.surname }}, {{ player.name }}</h3>
+          <span class="position-badge" [ngClass]="player.position?.toLowerCase()">
+            {{ formatPosition(player.position) }}
+          </span>
+        </div>
+        
+        <div class="card-body">
+          <div class="info-row">
+            <span class="label">Rođen:</span>
+            <span class="value">{{ player.dateOfBirth | date:'mediumDate' }}</span>
+          </div>
+
+          <div class="metrics-section">
+            <h4>Najnovije Skauting Metrike:</h4>
+            
+            <div *ngIf="player.latestReport && player.latestReport.valuedMetrics.length; else noMetrics" class="metrics-list">
+              <div class="metric-item" *ngFor="let metric of player.latestReport.valuedMetrics">
+                <span class="metric-name">{{ metric.metricName }}</span>
+                <span class="metric-val-chip">{{ metric.value | number:'1.1-2' }}</span>
+              </div>
+            </div>
+
+            <ng-template #noMetrics>
+              <p class="empty-metrics">Nema registrovanih metrika za procenu.</p>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card-footer">
+        <span class="action-link">Detaljan pregled →</span>
+      </div>
+    </div>
+  </div>
+</div>

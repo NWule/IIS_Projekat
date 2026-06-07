@@ -31,7 +31,7 @@ import { ZoneFormComponent } from '../../feature-modules/ticket-sales/components
 import { SeatListComponent } from '../../feature-modules/ticket-sales/components/seat-list/seat-list.component';
 import { TicketTypeListComponent } from '../../feature-modules/ticket-sales/components/ticket-type-list/ticket-type-list.component';
 import { TicketTypeFormComponent } from '../../feature-modules/ticket-sales/components/ticket-type-form/ticket-type-form.component';
-import { ScoutingPlayerListComponent } from '../../feature-modules/scouting/scouting-player-list/scouting-player-list.component';
+import { ScoutingPlayerListComponent } from '../../feature-modules/scouting/components/scouting-player-list/scouting-player-list.component';
 
 const routes: Routes = [
   { path: '',                     redirectTo: 'login', pathMatch: 'full' },

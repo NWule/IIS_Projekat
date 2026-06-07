@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ScoutingPlayerListComponent } from './scouting-player-list/scouting-player-list.component';
-import { MetricsComponent } from './metrics/metrics.component';
+import { ScoutingPlayerListComponent } from './components/scouting-player-list/scouting-player-list.component';
+import { MetricsComponent } from './components/metrics/metrics.component';
 import { RouterModule } from '@angular/router';
 
 
