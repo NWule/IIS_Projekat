@@ -39,7 +39,7 @@
             
             <div *ngIf="player.latestReport && player.latestReport.valuedMetrics.length; else noMetrics" class="metrics-list">
               <div class="metric-item" *ngFor="let metric of player.latestReport.valuedMetrics">
-                <span class="metric-name">{{ metric.metricName }}</span>
+                <span class="metric-name"><b>{{ metric.metricName }}: </b></span>
                 <span class="metric-val-chip">{{ metric.value | number:'1.1-2' }}</span>
               </div>
             </div>

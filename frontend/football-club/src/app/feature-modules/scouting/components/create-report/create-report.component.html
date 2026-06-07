@@ -1,0 +1,84 @@
+<div class="scout-form-container">
+  <div class="form-header">
+    <h2>Draft Scouting Report</h2>
+    <p>Compile a new performance evaluation profile.</p>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+  <form [formGroup]="reportForm" (ngSubmit)="onSubmit()">
+    
+    <div class="form-group primary-selection">
+      <label for="playerId">Target Player</label>
+      <select id="playerId" formControlName="playerId" class="form-control">
+        <option value="" disabled>-- Select a Player --</option>
+        <option *ngFor="let p of players" [value]="p.id">
+          {{ p.surname }}, {{ p.name }}
+        </option>
+      </select>
+    </div>
+
+    <div *ngIf="reportForm.get('playerId')?.value" class="fade-in-section">
+      
+      <div class="form-group">
+        <label for="clubAtTimeId">Represented Club (During Scouted Match)</label>
+        <select id="clubAtTimeId" formControlName="clubAtTimeId" class="form-control">
+          <option value="" disabled>-- Select Club --</option>
+          <option *ngFor="let history of playerHistory" [value]="history.clubId">
+            {{ history.clubName }} ({{ history.contractStart | date:'yyyy' }} - {{ history.contractEnd ? (history.contractEnd | date:'yyyy') : 'Present' }})
+          </option>
+        </select>
+        <small class="hint-text" *ngIf="playerHistory.length === 0">
+          Fetching career history or no records exist...
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="overallCommentary">Overall Tactical Commentary</label>
+        <textarea 
+          id="overallCommentary" 
+          formControlName="overallCommentary" 
+          class="form-control textarea-large" 
+          placeholder="Provide comprehensive details on positioning, decision making, physical presence, etc...">
+        </textarea>
+        <small class="error-text" *ngIf="reportForm.get('overallCommentary')?.touched && reportForm.get('overallCommentary')?.hasError('required')">
+          Commentary is required to file a report.
+        </small>
+      </div>
+
+      <hr class="section-divider">
+
+      <div class="metrics-container" formGroupName="metrics">
+        <h3>Metric Evaluations</h3>
+        
+        <div class="category-block" *ngFor="let category of categories">
+          <h4 class="category-title">{{ formatCategoryName(category) }}</h4>
+          
+          <div class="metrics-grid">
+            <div class="metric-input-card" *ngFor="let metric of metricsByCategory[category]">
+              
+              <label [for]="'metric-' + metric.id">{{ metric.name }}</label>
+              <input 
+                type="number" 
+                [id]="'metric-' + metric.id" 
+                [formControlName]="metric.id.toString()" 
+                class="form-control mini-input" 
+                placeholder="0.0"
+                step="0.1" />
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/scouting">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="reportForm.invalid || isSubmitting">
+          {{ isSubmitting ? 'Transmitting Data...' : 'Submit Final Report' }}
+        </button>
+      </div>
+
+    </div>
+  </form>
+</div>
