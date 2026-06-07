@@ -16,4 +16,6 @@ public interface IScoutRequestService {
     List<ScoutRequestDTO> getRequestsByDirector(Long directorId);
     ScoutRequestDTO claimRequest(Long id, Long scoutId);
     ScoutRequestDTO completeRequest(Long id);
+    ScoutRequestDTO cancelRequest(Long id, Long scoutId);
+    ScoutRequestDTO directorCancelRequest(Long id, Long directorId);
 }
