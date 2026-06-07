@@ -28,16 +28,18 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value).subscribe({
         next: () => {
-          if (this.authService.user$.value !== null && (this.authService.user$.value?.role === RoleEnum.ROLE_SCOUT
-            || this.authService.user$.value.role === RoleEnum.ROLE_SPORTS_DIRECTOR)) {
-            this.router.navigate(['/scouting-dashboard']);
+          if (this.authService.user$.value !== null && (
+            this.authService.user$.value?.role === RoleEnum.ROLE_SCOUT || 
+            this.authService.user$.value.role === RoleEnum.ROLE_SPORTS_DIRECTOR)
+            ) {
+              this.router.navigate(['/scouting-dashboard']);
             }
             else if (
               this.authService.user$.value?.role === 'ROLE_HEAD_COACH' ||
               this.authService.user$.value?.role === 'ROLE_ASSISTANT_COACH' ||
               this.authService.user$.value?.role === 'ROLE_STATISTICIAN'
             ) {
-              this.router.navigate(['/matches']);
+              this.router.navigate(['/search-matches']);
             }
           else {
             this.router.navigate(['/']); // Redirect to home or dashboard on success

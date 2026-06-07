@@ -73,4 +73,8 @@ export class NavbarComponent implements OnInit {
   onWishlistsClick() {
     this.router.navigate(['/wishlists']);
   }
+
+  onRequestsClick() {
+    this.router.navigate(['/scouting-requests']);
+  }
 }

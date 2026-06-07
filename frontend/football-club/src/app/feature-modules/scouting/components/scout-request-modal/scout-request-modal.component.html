@@ -1,8 +1,8 @@
 <div class="modal-overlay" *ngIf="isOpen">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>Novi skauting zahtev</h3>
-      <button class="close-btn" (click)="onClose()">&times;</button>
+      <h3>{{ requestToEdit ? 'Izmeni skauting zahtev' : 'Novi skauting zahtev' }}</h3>
+      <button class="close-btn" (click)="onClose(false)">&times;</button>
     </div>
 
     <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
@@ -26,9 +26,9 @@
       </div>
 
       <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" (click)="onClose()">Odustani</button>
+        <button type="button" class="btn btn-secondary" (click)="onClose(false)">Odustani</button>
         <button type="submit" class="btn btn-primary" [disabled]="requestForm.invalid || isSubmitting">
-          {{ isSubmitting ? 'Slanje...' : 'Pošalji zahtev' }}
+          {{ isSubmitting ? 'Čuvanje...' : (requestToEdit ? 'Sačuvaj izmene' : 'Pošalji zahtev') }}
         </button>
       </div>
     </form>

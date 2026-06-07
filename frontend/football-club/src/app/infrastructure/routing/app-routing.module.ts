@@ -40,6 +40,7 @@ import { ViewReportComponent } from 'src/app/feature-modules/scouting/components
 import { ViewPlayerComponent } from 'src/app/feature-modules/scouting/components/player-details/view-player.component';
 import { MetricsDashboardComponent } from 'src/app/feature-modules/scouting/components/metrics-dashboard/metrics-dashboard.component';
 import { WishlistsComponent } from 'src/app/feature-modules/scouting/components/wishlists/wishlists.component';
+import { ScoutingRequestsComponent } from 'src/app/feature-modules/scouting/components/scouting-requests/scouting-requests.component';
 
 const routes: Routes = [
   { path: '',                     redirectTo: 'login', pathMatch: 'full' },
@@ -88,6 +89,7 @@ const routes: Routes = [
   // Skaut/Direktor
   { path: 'scouting-dashboard',       component: ScoutingPlayerListComponent },
   { path: 'view-player/:id',          component: ViewPlayerComponent },
+  { path: 'scouting-requests',        component: ScoutingRequestsComponent },
 
   // Skaut
   { path: 'create-report',           component: CreateReportComponent },
