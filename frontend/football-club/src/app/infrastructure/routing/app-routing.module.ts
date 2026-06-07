@@ -32,6 +32,16 @@ import { SeatListComponent } from '../../feature-modules/ticket-sales/components
 import { TicketTypeListComponent } from '../../feature-modules/ticket-sales/components/ticket-type-list/ticket-type-list.component';
 import { TicketTypeFormComponent } from '../../feature-modules/ticket-sales/components/ticket-type-form/ticket-type-form.component';
 
+import { ScoutingPlayerListComponent } from '../../feature-modules/scouting/components/scouting-player-list/scouting-player-list.component';
+import { CreateReportComponent } from '../../feature-modules/scouting/components/create-report/create-report.component';
+import { MyReportsComponent } from 'src/app/feature-modules/scouting/components/my-reports/my-reports.component';
+import { EditReportComponent } from 'src/app/feature-modules/scouting/components/edit-report/edit-report.component';
+import { ViewReportComponent } from 'src/app/feature-modules/scouting/components/view-report/view-report.component';
+import { ViewPlayerComponent } from 'src/app/feature-modules/scouting/components/player-details/view-player.component';
+import { MetricsDashboardComponent } from 'src/app/feature-modules/scouting/components/metrics-dashboard/metrics-dashboard.component';
+import { WishlistsComponent } from 'src/app/feature-modules/scouting/components/wishlists/wishlists.component';
+import { ScoutingRequestsComponent } from 'src/app/feature-modules/scouting/components/scouting-requests/scouting-requests.component';
+
 const routes: Routes = [
   { path: '',                     redirectTo: 'login', pathMatch: 'full' },
 
@@ -75,6 +85,21 @@ const routes: Routes = [
   { path: 'ticket-types',            component: TicketTypeListComponent },
   { path: 'add-ticket-type',         component: TicketTypeFormComponent },
   { path: 'edit-ticket-type/:id',    component: TicketTypeFormComponent },
+
+  // Skaut/Direktor
+  { path: 'scouting-dashboard',       component: ScoutingPlayerListComponent },
+  { path: 'view-player/:id',          component: ViewPlayerComponent },
+  { path: 'scouting-requests',        component: ScoutingRequestsComponent },
+
+  // Skaut
+  { path: 'create-report',           component: CreateReportComponent },
+  { path: 'edit-report/:id',         component: EditReportComponent },
+  { path: 'my-reports',              component: MyReportsComponent },
+  { path: 'report/:id',              component: ViewReportComponent },
+
+  // Direktor
+  { path: 'metrics-dashboard',      component: MetricsDashboardComponent },
+  { path: 'wishlists',              component: WishlistsComponent },
 
   { path: '**',                      redirectTo: 'matches' }
 ];

@@ -14,6 +14,8 @@ import { TicketSalesModule } from './feature-modules/ticket-sales/ticket-sales.m
 import { CommonModule } from '@angular/common';
 import { AuthModule } from './infrastructure/auth/components/auth.module';
 import { LayoutModule } from './feature-modules/layout/layout.module';
+import { ScoutingPlayerListComponent } from './feature-modules/scouting/components/scouting-player-list/scouting-player-list.component';
+import { ScoutingModule } from './feature-modules/scouting/scouting.module';
 
 export function tokenGetter() {
   return localStorage.getItem('access-token');
@@ -21,7 +23,7 @@ export function tokenGetter() {
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,
@@ -34,6 +36,7 @@ export function tokenGetter() {
     TicketSalesModule,
     AuthModule,
     LayoutModule,
+    ScoutingModule,
     JwtModule.forRoot({
       config: {
         tokenGetter,

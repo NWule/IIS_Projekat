@@ -38,7 +38,7 @@ export class NavbarComponent implements OnInit {
   }
 
   onReportsClick() {
-    this.router.navigate(['/reports']);
+    this.router.navigate(['/my-reports']);
   }
 
   onLogoutClick() {
@@ -48,5 +48,33 @@ export class NavbarComponent implements OnInit {
 
   onLoginClick() {
     this.router.navigate(['/login']);
+  }
+
+  onLogoClicked() {
+    if (this.isLoggedIn) {
+      if (this.userRole === 'ROLE_SCOUT' || this.userRole === 'ROLE_SPORTS_DIRECTOR') {
+        this.router.navigate(['/scouting-dashboard']);
+      } else if (
+        this.userRole === 'ROLE_HEAD_COACH' ||
+        this.userRole === 'ROLE_ASSISTANT_COACH' ||
+        this.userRole === 'ROLE_STATISTICIAN'
+      ) {
+        this.router.navigate(['/matches']);
+      } else {
+        this.router.navigate(['/']);
+      }
+    }
+  }
+
+  onMetricsClick() {
+    this.router.navigate(['/metrics-dashboard']);
+  }
+
+  onWishlistsClick() {
+    this.router.navigate(['/wishlists']);
+  }
+
+  onRequestsClick() {
+    this.router.navigate(['/scouting-requests']);
   }
 }

@@ -92,6 +92,24 @@ public class ScoutRequestController {
         return ResponseEntity.ok(claimed);
     }
 
+    @PostMapping("/{id}/cancel")
+    @PreAuthorize("hasAnyRole('SCOUT', 'ADMIN')")
+    public ResponseEntity<ScoutRequestDTO> cancelRequest(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User userDetails) {
+        ScoutRequestDTO canceled = scoutRequestService.cancelRequest(id, userDetails.getId());
+        return ResponseEntity.ok(canceled);
+    }
+
+    @PostMapping("/{id}/cancel-by-director")
+    @PreAuthorize("hasAnyRole('SPORTS_DIRECTOR', 'ADMIN')")
+    public ResponseEntity<ScoutRequestDTO> cancelRequestByDirector(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User userDetails) {
+        ScoutRequestDTO canceled = scoutRequestService.directorCancelRequest(id, userDetails.getId());
+        return ResponseEntity.ok(canceled);
+    }
+
     @PostMapping("/{id}/complete")
     @PreAuthorize("hasAnyRole('SCOUT', 'ADMIN')")
     public ResponseEntity<ScoutRequestDTO> completeRequest(@PathVariable Long id) {
@@ -99,15 +117,15 @@ public class ScoutRequestController {
         return ResponseEntity.ok(completed);
     }
 
-    @GetMapping("/scout/{scoutId}")
-    @PreAuthorize("hasAnyRole('SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
-    public ResponseEntity<List<ScoutRequestDTO>> getRequestsByScout(@PathVariable Long scoutId) {
-        return ResponseEntity.ok(scoutRequestService.getRequestsByScout(scoutId));
+    @GetMapping("/scout")
+    @PreAuthorize("hasAnyRole('SCOUT', 'ADMIN')")
+    public ResponseEntity<List<ScoutRequestDTO>> getRequestsByScout(@AuthenticationPrincipal User userDetails) {
+        return ResponseEntity.ok(scoutRequestService.getRequestsByScout(userDetails.getId()));
     }
 
-    @GetMapping("/director/{directorId}")
+    @GetMapping("/director")
     @PreAuthorize("hasAnyRole('SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
-    public ResponseEntity<List<ScoutRequestDTO>> getRequestsByDirector(@PathVariable Long directorId) {
-        return ResponseEntity.ok(scoutRequestService.getRequestsByDirector(directorId));
+    public ResponseEntity<List<ScoutRequestDTO>> getRequestsByDirector(@AuthenticationPrincipal User userDetails) {
+        return ResponseEntity.ok(scoutRequestService.getRequestsByDirector(userDetails.getId()));
     }
 }

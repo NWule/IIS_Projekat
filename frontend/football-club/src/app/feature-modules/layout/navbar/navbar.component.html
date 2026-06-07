@@ -1,5 +1,5 @@
 <nav class="navbar">
-  <div class="navbar-brand" >
+  <div class="navbar-brand" (click)="onLogoClicked()">
     Fudbalski Klub
   </div>
 
@@ -22,10 +22,16 @@
 
     <ng-container *ngIf="(isLoggedIn && userRole === 'ROLE_SCOUT')">
       <button class="nav-btn" (click)="onReportsClick()">Izveštaji</button>
-      <button class="nav-btn">Zahtevi</button>
+      <button class="nav-btn" (click)="onRequestsClick()">Zahtevi</button>
     </ng-container>
 
-    <ng-container *ngIf="isLoggedIn">
+    <ng-container *ngIf="(isLoggedIn && userRole === 'ROLE_SPORTS_DIRECTOR')">
+      <button class="nav-btn" (click)="onMetricsClick()">Metrike</button>
+      <button class="nav-btn" (click)="onWishlistsClick()">Liste Želja</button>
+      <button class="nav-btn" (click)="onRequestsClick()">Zahtevi</button>
+    </ng-container>
+
+    <ng-container *ngIf="isLoggedIn && userRole === 'ROLE_BUYER'">
       <button class="nav-btn" (click)="router.navigate(['/search-matches'])">Kupovina karata</button>
       <button class="nav-btn" (click)="router.navigate(['/my-tickets'])">Moje karte</button>
     </ng-container>

@@ -140,6 +140,12 @@ public class ReportService implements IReportService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public ReportDTO getLatestReportByPlayer(Long playerId) {
+        return mapToDTO(reportRepository.findLatestReportByPlayerId(playerId));
+    }
+
     private ReportDTO mapToDTO(Report report) {
         List<ValuedMetricDTO> metrics = report.getValuedMetrics() != null ? 
                 report.getValuedMetrics().stream()

@@ -96,6 +96,7 @@ public class ScoutRequestService implements IScoutRequestService {
     @Transactional(readOnly = true)
     public List<ScoutRequestDTO> getUnclaimedRequests() {
         return scoutRequestRepository.findByScoutIdIsNull().stream()
+                .filter(status -> status.getStatus() != RequestStatus.CANCELLED)
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
@@ -104,6 +105,7 @@ public class ScoutRequestService implements IScoutRequestService {
     @Transactional(readOnly = true)
     public List<ScoutRequestDTO> getRequestsByScout(Long scoutId) {
         return scoutRequestRepository.findByScoutId(scoutId).stream()
+                .filter(status -> status.getStatus() != RequestStatus.CANCELLED)
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
@@ -130,7 +132,45 @@ public class ScoutRequestService implements IScoutRequestService {
                 .orElseThrow(() -> new NoSuchElementException("Skaut nije pronađen sa ID-em: " + scoutId));
 
         request.setScout(scout);
-        request.setStatus(RequestStatus.IN_PROGRESS); // Or custom processing status from your RequestStatus enum
+        request.setStatus(RequestStatus.IN_PROGRESS);
+
+        return mapToDTO(scoutRequestRepository.save(request));
+    }
+
+    @Override
+    @Transactional
+    public ScoutRequestDTO cancelRequest(Long id, Long scoutId) {
+        ScoutRequest request = scoutRequestRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Zahtev za skauting nije pronađen."));
+
+        User scout = userRepository.findById(scoutId)
+                .orElseThrow(() -> new NoSuchElementException("Skaut nije pronađen sa ID-em: " + scoutId));
+
+        if (!request.getScout().equals(scout)) {
+            throw new IllegalStateException("Ovaj zahtev nije preuzet od strane ovog skauta.");
+        }
+
+        request.setScout(null);
+        request.setStatus(RequestStatus.CANCELLED);
+
+        return mapToDTO(scoutRequestRepository.save(request));
+    }
+
+    @Override
+    @Transactional
+    public ScoutRequestDTO directorCancelRequest(Long id, Long directorId) {
+        ScoutRequest request = scoutRequestRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Zahtev za skauting nije pronađen."));
+
+        User director = userRepository.findById(directorId)
+                .orElseThrow(() -> new NoSuchElementException("Direktor nije pronađen sa ID-em: " + directorId));
+
+        if (!request.getDirector().equals(director)) {
+            throw new IllegalStateException("Vi niste napravili ovaj zahtev.");
+        }
+
+        request.setScout(null);
+        request.setStatus(RequestStatus.CANCELLED);
 
         return mapToDTO(scoutRequestRepository.save(request));
     }
@@ -141,7 +181,7 @@ public class ScoutRequestService implements IScoutRequestService {
         ScoutRequest request = scoutRequestRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Zahtev za skauting nije pronađen."));
 
-        request.setStatus(RequestStatus.COMPLETED); // Transition to completed once report has been submitted
+        request.setStatus(RequestStatus.COMPLETED);
         return mapToDTO(scoutRequestRepository.save(request));
     }
 

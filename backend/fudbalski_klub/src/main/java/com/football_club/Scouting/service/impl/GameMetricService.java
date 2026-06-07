@@ -159,6 +159,8 @@ public class GameMetricService implements IGameMetricService {
                 .gameId(metric.getGame().getId())
                 .matchDate(metric.getGame().getMatchDate())
                 .playerId(metric.getPlayer().getId())
+                .homeClubName(metric.getGame().getHomeClub().getName())
+                .awayClubName(metric.getGame().getAwayClub().getName())
                 .metricId(metric.getMetric().getId())
                 .metricName(metric.getMetric().getName())
                 .recordedValue(metric.getRecordedValue())
