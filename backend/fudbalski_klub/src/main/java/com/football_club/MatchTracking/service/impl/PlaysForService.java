@@ -4,9 +4,13 @@ import com.football_club.MatchTracking.dto.PlaysForDTO;
 import com.football_club.MatchTracking.model.Club;
 import com.football_club.MatchTracking.model.Player;
 import com.football_club.MatchTracking.model.PlaysFor;
+import com.football_club.MatchTracking.model.graph.ClubGraph;
+import com.football_club.MatchTracking.model.graph.PlayerGraph;
 import com.football_club.MatchTracking.repository.ClubRepository;
 import com.football_club.MatchTracking.repository.PlayerRepository;
 import com.football_club.MatchTracking.repository.PlaysForRepository;
+import com.football_club.MatchTracking.repository.graph.ClubGraphRepository;
+import com.football_club.MatchTracking.repository.graph.PlayerGraphRepository;
 import com.football_club.MatchTracking.service.IPlaysForService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +27,8 @@ public class PlaysForService implements IPlaysForService {
     private final PlaysForRepository playsForRepository;
     private final PlayerRepository playerRepository;
     private final ClubRepository clubRepository;
+    private final PlayerGraphRepository playerGraphRepository;
+    private final ClubGraphRepository clubGraphRepository;
 
     @Override
     @Transactional
@@ -41,6 +47,16 @@ public class PlaysForService implements IPlaysForService {
         contract.setContractEnd(dto.getContractEnd());
 
         PlaysFor savedContract = playsForRepository.save(contract);
+
+        PlayerGraph graphPlayer = playerGraphRepository.findById(savedContract.getPlayer().getId())
+                .orElseThrow(() -> new RuntimeException("PlayerGraph node not found"));
+
+        ClubGraph graphClub = clubGraphRepository.findById((long) savedContract.getClub().getId())
+                .orElseThrow(() -> new RuntimeException("ClubGraph node not found"));
+
+        graphPlayer.setClubGraph(graphClub);
+        playerGraphRepository.save(graphPlayer);
+
         return mapToDTO(savedContract);
     }
 
@@ -72,6 +88,11 @@ public class PlaysForService implements IPlaysForService {
             throw new RuntimeException("Cannot delete. Contract not found with id: " + id);
         }
         playsForRepository.deleteById(id);
+
+        playerGraphRepository.findById(id).ifPresent(graphPlayer -> {
+            graphPlayer.setClubGraph(null);
+            playerGraphRepository.save(graphPlayer);
+        });
     }
 
     @Override

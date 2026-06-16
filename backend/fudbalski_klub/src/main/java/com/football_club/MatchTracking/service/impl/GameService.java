@@ -4,8 +4,12 @@ import com.football_club.MatchTracking.dto.GameDTO;
 import com.football_club.MatchTracking.model.Club;
 import com.football_club.MatchTracking.model.Game;
 import com.football_club.MatchTracking.model.enums.GameStatus;
+import com.football_club.MatchTracking.model.graph.ClubGraph;
+import com.football_club.MatchTracking.model.graph.GameGraph;
 import com.football_club.MatchTracking.repository.ClubRepository;
 import com.football_club.MatchTracking.repository.GameRepository;
+import com.football_club.MatchTracking.repository.graph.ClubGraphRepository;
+import com.football_club.MatchTracking.repository.graph.GameGraphRepository;
 import com.football_club.MatchTracking.service.IGameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,8 @@ public class GameService implements IGameService {
 
     private final GameRepository gameRepository;
     private final ClubRepository clubRepository;
+    private final GameGraphRepository gameGraphRepository;
+    private final ClubGraphRepository clubGraphRepository;
 
     @Override
     @Transactional
@@ -46,6 +52,20 @@ public class GameService implements IGameService {
         game.setAwayClub(awayClub);
 
         Game savedGame = gameRepository.save(game);
+        GameGraph gameGraph = new GameGraph();
+        gameGraph.setId(savedGame.getId());
+        gameGraph.setStatus(savedGame.getStatus().name());
+
+        ClubGraph homeGraph = clubGraphRepository.findById((long) savedGame.getHomeClub().getId())
+                .orElseThrow(() -> new RuntimeException("Home ClubGraph node not found"));
+        ClubGraph awayGraph = clubGraphRepository.findById((long) savedGame.getAwayClub().getId())
+                .orElseThrow(() -> new RuntimeException("Away ClubGraph node not found"));
+
+        gameGraph.setHomeClub(homeGraph);
+        gameGraph.setAwayClub(awayGraph);
+
+        gameGraphRepository.save(gameGraph);
+
         return mapToDTO(savedGame);
     }
 
@@ -88,6 +108,22 @@ public class GameService implements IGameService {
         }
 
         Game updatedGame = gameRepository.save(game);
+
+        GameGraph gameGraph = gameGraphRepository.findById(id)
+                .orElse(new GameGraph());
+
+        gameGraph.setStatus(updatedGame.getStatus().name());
+
+        ClubGraph homeGraph = clubGraphRepository.findById((long) updatedGame.getHomeClub().getId())
+                .orElseThrow(() -> new RuntimeException("Home ClubGraph node not found"));
+        ClubGraph awayGraph = clubGraphRepository.findById((long) updatedGame.getAwayClub().getId())
+                .orElseThrow(() -> new RuntimeException("Away ClubGraph node not found"));
+
+        gameGraph.setHomeClub(homeGraph);
+        gameGraph.setAwayClub(awayGraph);
+
+        gameGraphRepository.save(gameGraph);
+
         return mapToDTO(updatedGame);
     }
 
@@ -98,6 +134,7 @@ public class GameService implements IGameService {
             throw new RuntimeException("Cannot delete. Game not found with id: " + id);
         }
         gameRepository.deleteById(id);
+        gameGraphRepository.deleteById(id);
     }
 
     @Override
