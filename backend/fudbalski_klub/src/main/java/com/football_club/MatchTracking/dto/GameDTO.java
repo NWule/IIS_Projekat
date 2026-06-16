@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class GameDTO {
     private Long id;
     private LocalDateTime matchDate;
+    private String status;
     private int homeClubId;
     private String homeClubName;
     private int awayClubId;

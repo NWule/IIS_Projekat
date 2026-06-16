@@ -3,6 +3,7 @@ package com.football_club.MatchTracking.service.impl;
 import com.football_club.MatchTracking.dto.GameDTO;
 import com.football_club.MatchTracking.model.Club;
 import com.football_club.MatchTracking.model.Game;
+import com.football_club.MatchTracking.model.enums.GameStatus;
 import com.football_club.MatchTracking.repository.ClubRepository;
 import com.football_club.MatchTracking.repository.GameRepository;
 import com.football_club.MatchTracking.service.IGameService;
@@ -36,6 +37,11 @@ public class GameService implements IGameService {
 
         Game game = new Game();
         game.setMatchDate(gameDTO.getMatchDate());
+        if (gameDTO.getStatus() != null) {
+            game.setStatus(GameStatus.valueOf(gameDTO.getStatus()));
+        } else {
+            game.setStatus(GameStatus.UPCOMING);
+        }
         game.setHomeClub(homeClub);
         game.setAwayClub(awayClub);
 
@@ -77,6 +83,10 @@ public class GameService implements IGameService {
         game.setHomeClub(homeClub);
         game.setAwayClub(awayClub);
 
+        if (gameDTO.getStatus() != null) {
+            game.setStatus(GameStatus.valueOf(gameDTO.getStatus()));
+        }
+
         Game updatedGame = gameRepository.save(game);
         return mapToDTO(updatedGame);
     }
@@ -111,10 +121,33 @@ public class GameService implements IGameService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<GameDTO> getUpcomingGames() {
+        return gameRepository.findUpcomingGames().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GameDTO> getLiveGames() {
+        return gameRepository.findLiveGames().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GameDTO> getPlayedGames() {
+        return gameRepository.findPlayedGames().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+
     private GameDTO mapToDTO(Game game) {
         return GameDTO.builder()
                 .id(game.getId())
                 .matchDate(game.getMatchDate())
+                .status(String.valueOf(game.getStatus()))
                 .homeClubId(game.getHomeClub().getId())
                 .homeClubName(game.getHomeClub().getName())
                 .awayClubId(game.getAwayClub().getId())

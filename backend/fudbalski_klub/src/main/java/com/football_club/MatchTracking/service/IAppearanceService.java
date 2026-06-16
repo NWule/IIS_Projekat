@@ -1,6 +1,7 @@
 package com.football_club.MatchTracking.service;
 
 import com.football_club.MatchTracking.dto.AppearanceDTO;
+import com.football_club.MatchTracking.dto.GameLineupResponseDTO;
 
 import java.util.List;
 
@@ -17,4 +18,6 @@ public interface IAppearanceService {
     AppearanceDTO updateAppearance(Long id, AppearanceDTO appearanceDTO);
 
     void deleteAppearance(Long id);
+
+    GameLineupResponseDTO saveLineup(Long gameId, Long clubId, List<AppearanceDTO> lineupDTOs);
 }

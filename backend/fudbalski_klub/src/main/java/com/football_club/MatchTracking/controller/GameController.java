@@ -102,4 +102,25 @@ public class GameController {
         List<GameDTO> matches = gameService.getHeadToHeadMatches(club1Id, club2Id);
         return ResponseEntity.ok(matches);
     }
+
+    @GetMapping("/upcoming")
+    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'STATISTICIAN', 'SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
+    public ResponseEntity<List<GameDTO>> getUpcomingGames() {
+        List<GameDTO> games = gameService.getUpcomingGames();
+        return ResponseEntity.ok(games);
+    }
+
+    @GetMapping("/live")
+    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'STATISTICIAN', 'SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
+    public ResponseEntity<List<GameDTO>> getLiveGames() {
+        List<GameDTO> games = gameService.getLiveGames();
+        return ResponseEntity.ok(games);
+    }
+
+    @GetMapping("/played")
+    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'STATISTICIAN', 'SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
+    public ResponseEntity<List<GameDTO>> getPlayedGames() {
+        List<GameDTO> games = gameService.getPlayedGames();
+        return ResponseEntity.ok(games);
+    }
 }

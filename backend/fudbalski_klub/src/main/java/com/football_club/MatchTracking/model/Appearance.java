@@ -1,5 +1,6 @@
 package com.football_club.MatchTracking.model;
 
+import com.football_club.MatchTracking.model.enums.MatchRole;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,6 +24,10 @@ public class Appearance {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id", nullable = false)
     private Game game;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="match_role", nullable = false)
+    private MatchRole matchRole;
 
     @Column(name = "minutes_played", nullable = false)
     private int minutesPlayed = 0;

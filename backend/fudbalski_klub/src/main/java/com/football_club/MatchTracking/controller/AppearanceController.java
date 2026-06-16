@@ -2,6 +2,7 @@ package com.football_club.MatchTracking.controller;
 
 import com.football_club.MatchTracking.dto.AppearanceDTO;
 import com.football_club.MatchTracking.dto.GameDTO;
+import com.football_club.MatchTracking.dto.GameLineupResponseDTO;
 import com.football_club.MatchTracking.service.IAppearanceService;
 import com.football_club.MatchTracking.service.IGameService;
 import com.football_club.Auth.model.User;
@@ -95,5 +96,26 @@ public class AppearanceController {
 
         appearanceService.deleteAppearance(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/game/{gameId}/lineup")
+    @PreAuthorize("hasAnyRole('STATISTICIAN', 'HEAD_COACH', 'ADMIN')")
+    public ResponseEntity<?> saveLineup(@PathVariable Long gameId, @RequestParam Long clubId,
+            @RequestBody List<AppearanceDTO> lineupDTOs, @AuthenticationPrincipal User user) {
+        GameDTO game = gameService.getGameById(gameId);
+
+        if (!clubId.equals(game.getHomeClubId()) && !clubId.equals(game.getAwayClubId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Greška: Izabrani klub ne učestvuje u ovoj utakmici!");
+        }
+
+        if (!user.getRole().name().equals("ROLE_ADMIN")) {
+            if (user.getClubId() == null || (!user.getClubId().equals(game.getHomeClubId()) && !user.getClubId().equals(game.getAwayClubId()))) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        }
+
+        GameLineupResponseDTO savedLineup = appearanceService.saveLineup(gameId, clubId, lineupDTOs);
+        return ResponseEntity.ok(savedLineup);
     }
 }
