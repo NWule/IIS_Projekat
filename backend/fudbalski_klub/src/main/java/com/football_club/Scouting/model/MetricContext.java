@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "metric_context", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"position", "metric_id"})
@@ -32,6 +34,12 @@ public class MetricContext {
 
     @Column(name = "max_value", nullable = false)
     private double maxValue;
+
+    @Column(name = "avg_value", nullable = false)
+    private double avgValue;
+
+    @Column(name = "last_updated", nullable = false)
+    private LocalDateTime lastUpdated;
 
     public double normalize(double rawValue) {
         if (maxValue <= minValue) return 0.0;
