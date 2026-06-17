@@ -19,6 +19,9 @@ import { ContractService } from './services/playsFor.service';
 import { PlayerDetailsComponent } from './components/player-details/player-details.component';
 import { ClubDetailsComponent } from './components/club-details/club-details.component';
 import { MatchPreparationComponent } from './components/match-preparation/match-preparation.component';
+import { UpcomingMatchesComponent } from './components/upcoming-matches/upcoming-matches.component';
+import { LiveTrackingComponent } from './components/live-tracking/live-tracking.component';
+import { LiveMatchCoachComponent } from './components/live-match-coach/live-match-coach.component'; 
 
 
 
@@ -35,7 +38,10 @@ import { MatchPreparationComponent } from './components/match-preparation/match-
     PlayerDetailsComponent,
     MatchPreparationComponent,
     MatchDetailsComponent,
-    MatchListComponent
+    MatchListComponent,
+    UpcomingMatchesComponent,
+    LiveTrackingComponent,
+    LiveMatchCoachComponent
   ],
   imports: [
     CommonModule,
@@ -54,7 +60,10 @@ import { MatchPreparationComponent } from './components/match-preparation/match-
     PlayerDetailsComponent,
     MatchPreparationComponent,
     MatchDetailsComponent,
-    MatchListComponent
+    MatchListComponent,
+    UpcomingMatchesComponent,
+    LiveTrackingComponent,
+    LiveMatchCoachComponent
   ]
 })
 export class MatchModule { }

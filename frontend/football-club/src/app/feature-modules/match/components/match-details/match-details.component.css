@@ -4,7 +4,6 @@
   font-family: sans-serif; 
 }
 
-/* ==================== ZAGLAVLJE MEČA ==================== */
 .score-header {
   display: flex;
   align-items: center;
@@ -42,7 +41,30 @@
   margin-bottom: 20px;
 }
 
-/* ==================== TABOVI ==================== */
+.vs-text {
+  font-size: 1.8rem;
+  color: #64748b;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.upcoming-box {
+  background-color: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  padding: 40px 20px;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 600px;
+  margin: 30px auto;
+}
+
+.upcoming-message {
+  color: #334155;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 25px;
+}
+
 .tabs { 
   display: flex; 
   gap: 5px; 
@@ -64,7 +86,6 @@
   color: white; 
 }
 
-/* ==================== STATISTIKA ==================== */
 .stats-table { 
   width: 100%; 
   border-collapse: collapse; 
@@ -110,7 +131,6 @@
   cursor: not-allowed;
 }
 
-/* ==================== PERFORMANSE ==================== */
 .teams-container { 
   display: grid; 
   grid-template-columns: 1fr 1fr; 
@@ -142,7 +162,6 @@
   margin: 8px 0;
 }
 
-/* Prilagođeno da izgleda kao inline stil koji si napisao */
 .btn-add {
   margin-top: 10px;
   background-color: #0b133d;
@@ -160,7 +179,6 @@
   background-color: #1e293b; 
 }
 
-/* ==================== UČITAVANJE ==================== */
 .loading-container {
   text-align: center;
   padding: 60px;

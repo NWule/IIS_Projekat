@@ -23,4 +23,8 @@ export class GameService {
   getAllGames(): Observable<Game[]> {
     return this.http.get<Game[]>(this.apiUrl);
   }
+
+  getUpcomingGames(): Observable<Game[]> {
+    return this.http.get<Game[]>(`${this.apiUrl}/upcoming`);
+  }
 }

@@ -17,15 +17,13 @@ import { TeamStatistic } from '../../models/team-statistic.model';
 import { PlaysFor } from '../../models/player.model';
 import { Club } from '../../models/club.model';
 
-// ptre, tre, stat
-
 @Component({
   selector: 'app-match-detail',
   templateUrl: './match-details.component.html',
   styleUrls: ['./match-details.component.css']
 })
 export class MatchDetailsComponent implements OnInit {
-  activeTab: 'statistike' | 'performanse' = 'statistike';
+  activeTab: 'statistics' | 'performances' = 'statistics';
   gameId!: number;
   game!: Game;
   homeClub!: Club;
@@ -33,19 +31,20 @@ export class MatchDetailsComponent implements OnInit {
   myClub!: Club;
 
   isHomeClub = false;
-  isStatistician: boolean = true;
+  isStatistician = true;
+  isUpcoming = false;
 
-  statistike: TeamStatistic | null = null;
+  statistics: TeamStatistic | null = null;
   statsForm!: FormGroup;
-  statsPostoji = false;
+  statsExists = false;
 
-  homePerformanse: Appearance[] = [];
-  awayPerformanse: Appearance[] = [];
+  homePerformances: Appearance[] = [];
+  awayPerformances: Appearance[] = [];
 
-  mojRoster: PlaysFor[] = [];
+  myRoster: PlaysFor[] = [];
 
-  showAddForma = false;
-  addForma!: FormGroup;
+  showAddForm = false;
+  addForm!: FormGroup;
 
   loading = true;
 
@@ -63,9 +62,9 @@ export class MatchDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.gameId = Number(this.route.snapshot.paramMap.get('id'));
-    this.initAddForma();
-    this.initStatsForma();
-    this.ucitajPodatke();
+    this.initAddForm();
+    this.initStatsForm();
+    this.loadData();
     this.checkUserRole();
   }
 
@@ -75,7 +74,7 @@ export class MatchDetailsComponent implements OnInit {
     });
   }
 
-  private ucitajPodatke(): void {
+  private loadData(): void {
     this.loading = true;
 
     this.gameService.getGameById(this.gameId).pipe(
@@ -85,21 +84,22 @@ export class MatchDetailsComponent implements OnInit {
           homeClub: this.clubService.getClubById(game.homeClubId),
           awayClub: this.clubService.getClubById(game.awayClubId),
           myClub: this.clubService.getMyClub(),
-          performanse: this.appearanceService.getAppearancesByGame(this.gameId)
+          performances: this.appearanceService.getAppearancesByGame(this.gameId)
         });
       })
     ).subscribe({
-      next: ({ homeClub, awayClub, myClub, performanse }) => {
+      next: ({ homeClub, awayClub, myClub, performances }) => {
         this.homeClub = homeClub;
         this.awayClub = awayClub;
         this.myClub = myClub;
         this.isHomeClub = myClub.id === this.game.homeClubId;
+        this.isUpcoming = this.game.status === 'UPCOMING';
 
-        this.homePerformanse = performanse.filter(p => p.clubId === this.game.homeClubId);
-        this.awayPerformanse = performanse.filter(p => p.clubId === this.game.awayClubId);
+        this.homePerformances = performances.filter(p => p.clubId === this.game.homeClubId);
+        this.awayPerformances = performances.filter(p => p.clubId === this.game.awayClubId);
 
         this.contractService.getCurrentRoster(myClub.id!).subscribe(roster => {
-          this.mojRoster = roster;
+          this.myRoster = roster;
           this.loading = false;
         });
       },
@@ -111,15 +111,15 @@ export class MatchDetailsComponent implements OnInit {
 
     this.statisticService.getStatisticByGameId(this.gameId).subscribe({
       next: (stat) => {
-        this.statistike = stat;
+        this.statistics = stat;
         this.statsForm.patchValue(stat);
-        this.statsPostoji = true;
+        this.statsExists = true;
         if (!this.isStatistician) {
           this.statsForm.disable();
         }
       },
       error: () => {
-        this.statsPostoji = false;
+        this.statsExists = false;
         if (!this.isStatistician) {
           this.statsForm.disable();
         }
@@ -127,7 +127,7 @@ export class MatchDetailsComponent implements OnInit {
     });
   }
 
-  private initStatsForma(): void {
+  private initStatsForm(): void {
     this.statsForm = this.fb.group({
       homeGoals:          [0, [Validators.required, Validators.min(0)]],
       awayGoals:          [0, [Validators.required, Validators.min(0)]],
@@ -148,8 +148,8 @@ export class MatchDetailsComponent implements OnInit {
     });
   }
 
-  private initAddForma(): void {
-    this.addForma = this.fb.group({
+  private initAddForm(): void {
+    this.addForm = this.fb.group({
       playsForId:       [null, Validators.required],
       minutesPlayed:    [0,   [Validators.required, Validators.min(0), Validators.max(120)]],
       goals:            [0,   [Validators.required, Validators.min(0)]],
@@ -161,30 +161,30 @@ export class MatchDetailsComponent implements OnInit {
     });
   }
 
-  sacuvajStatistike(): void {
-    if (this.statsForm.invalid|| !this.isStatistician) return;
+  saveStatistics(): void {
+    if (this.statsForm.invalid || !this.isStatistician) return;
     const payload: TeamStatistic = { ...this.statsForm.value, gameId: this.gameId };
     this.statisticService.saveFinalStatistic(payload).subscribe({
       next: (saved) => {
-        this.statistike = saved;
-        this.statsPostoji = true;
+        this.statistics = saved;
+        this.statsExists = true;
         alert('Statistike su uspešno sačuvane!');
       },
       error: (err) => console.error('Greška:', err)
     });
   }
 
-  toggleAddForma(): void {
-    this.showAddForma = !this.showAddForma;
-    if (!this.showAddForma) this.addForma.reset({
+  toggleAddForm(): void {
+    this.showAddForm = !this.showAddForm;
+    if (!this.showAddForm) this.addForm.reset({
       playsForId: null, minutesPlayed: 0, goals: 0, assists: 0,
       passingAccuracy: 0, fouls: 0, yellowCardCheckbox: false, redCard: false
     });
   }
 
-  sacuvajPerformansu(): void {
-    if (this.addForma.invalid) return;
-    const formValue = this.addForma.value;
+  savePerformance(): void {
+    if (this.addForm.invalid) return;
+    const formValue = this.addForm.value;
 
     const payload: Appearance = {
       gameId: this.gameId,
@@ -202,12 +202,12 @@ export class MatchDetailsComponent implements OnInit {
     this.appearanceService.createAppearance(payload).subscribe({
       next: (created) => {
         if (this.isHomeClub) {
-          this.homePerformanse = [...this.homePerformanse, created];
+          this.homePerformances = [...this.homePerformances, created];
         } else {
-          this.awayPerformanse = [...this.awayPerformanse, created];
+          this.awayPerformances = [...this.awayPerformances, created];
         }
         alert('Performansa je uspešno sačuvana!');
-        this.toggleAddForma();
+        this.toggleAddForm();
       },
       error: (err) => {
         console.error('Greška:', err);
@@ -218,5 +218,9 @@ export class MatchDetailsComponent implements OnInit {
 
   goToAddPerformance(): void {
     this.router.navigate(['/add-performance'], { queryParams: { gameId: this.gameId } });
+  }
+
+  goToMatchPreparation(): void {
+    this.router.navigate(['/match-preparation', this.gameId]);
   }
 }

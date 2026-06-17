@@ -1,0 +1,34 @@
+<div class="page-container">
+  
+  <div class="header-row">
+    <h1>Predstojeće utakmice (Raspored)</h1>
+  </div>
+  
+  <table class="match-table">
+    <thead>
+      <tr>
+        <th>Datum i vreme</th>
+        <th>Domaćin</th>
+        <th>Gost</th>
+        <th *ngIf="canViewUpcoming">Akcija</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let match of upcomingMatches">
+        <td>{{ match.dateTime | date:'dd.MM.yyyy HH:mm' }}</td>
+        <td>{{ match.homeClubName }}</td>
+        <td>{{ match.awayClubName }}</td>
+        
+        <td *ngIf="canViewUpcoming">
+          <button class="btn-details" (click)="viewMatchDetails(match.id)">
+            📋 Priprema meča
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="upcomingMatches.length === 0" class="no-matches">
+    Trenutno nema zakazanih predstojećih utakmica.
+  </div>
+</div>
