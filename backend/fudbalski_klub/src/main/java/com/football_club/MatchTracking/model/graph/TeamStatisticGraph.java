@@ -1,15 +1,19 @@
-package com.football_club.MatchTracking.dto;
+package com.football_club.MatchTracking.model.graph;
 
 import lombok.*;
+import org.springframework.data.neo4j.core.schema.Id;
+import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Relationship;
 
+@Node
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class TeamStatisticDTO {
+public class TeamStatisticGraph {
+    @Id
     private Long id;
-    private Long gameId;
+
     private int homeGoals;
     private int awayGoals;
     private int homeShots;
@@ -26,4 +30,7 @@ public class TeamStatisticDTO {
     private int awayOffsides;
     private double homePassSuccessRate;
     private double awayPassSuccessRate;
+
+    @Relationship(type = "STATS_FOR_GAME", direction = Relationship.Direction.OUTGOING)
+    private GameGraph gameGraph;
 }

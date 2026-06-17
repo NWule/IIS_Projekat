@@ -22,4 +22,10 @@ public interface IGameService {
     List<GameDTO> getGamesByClub(int clubId);
 
     List<GameDTO> getHeadToHeadMatches(int club1Id, int club2Id);
+
+    List<GameDTO> getUpcomingGames();
+
+    List<GameDTO> getLiveGames();
+
+    List<GameDTO> getPlayedGames();
 }

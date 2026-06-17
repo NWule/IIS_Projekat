@@ -1,6 +1,7 @@
 package com.football_club.MatchTracking.repository;
 
 import com.football_club.MatchTracking.model.Game;
+import com.football_club.MatchTracking.model.enums.GameStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,4 +28,23 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     @Query("SELECT g FROM Game g JOIN FETCH g.homeClub JOIN FETCH g.awayClub " +
             "WHERE g.matchDate >= :now ORDER BY g.matchDate ASC")
     List<Game> findUpcomingGames(@Param("now") LocalDateTime now);
+
+    @Query("SELECT g FROM Game g JOIN FETCH g.homeClub JOIN FETCH g.awayClub " +
+            "WHERE g.status = com.football_club.MatchTracking.model.enums.GameStatus.UPCOMING " +
+            "ORDER BY g.matchDate ASC")
+    List<Game> findUpcomingGames();
+
+    @Query("SELECT g FROM Game g JOIN FETCH g.homeClub JOIN FETCH g.awayClub " +
+            "WHERE g.status = com.football_club.MatchTracking.model.enums.GameStatus.LIVE")
+    List<Game> findLiveGames();
+
+    @Query("SELECT g FROM Game g JOIN FETCH g.homeClub JOIN FETCH g.awayClub " +
+            "WHERE g.status = com.football_club.MatchTracking.model.enums.GameStatus.PLAYED " +
+            "ORDER BY g.matchDate DESC")
+    List<Game> findPlayedGames();
+
+    @Query("SELECT g FROM Game g JOIN FETCH g.homeClub JOIN FETCH g.awayClub " +
+            "WHERE (g.homeClub.id = :clubId OR g.awayClub.id = :clubId) " +
+            "AND g.status = :status")
+    List<Game> findGamesByClubAndStatus(@Param("clubId") Long clubId, @Param("status") GameStatus status);
 }

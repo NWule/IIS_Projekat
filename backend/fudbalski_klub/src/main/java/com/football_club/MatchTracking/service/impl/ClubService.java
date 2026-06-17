@@ -2,7 +2,9 @@ package com.football_club.MatchTracking.service.impl;
 
 import com.football_club.MatchTracking.dto.ClubDTO;
 import com.football_club.MatchTracking.model.Club;
+import com.football_club.MatchTracking.model.graph.ClubGraph;
 import com.football_club.MatchTracking.repository.ClubRepository;
+import com.football_club.MatchTracking.repository.graph.ClubGraphRepository;
 import com.football_club.MatchTracking.service.ICLubService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ClubService implements ICLubService {
     private final ClubRepository clubRepository;
+    private final ClubGraphRepository clubGraphRepository;
 
     @Override
     @Transactional
@@ -27,6 +30,13 @@ public class ClubService implements ICLubService {
         club.setName(clubDTO.getName());
         club.setLocation(clubDTO.getLocation());
         Club savedClub = clubRepository.save(club);
+
+        ClubGraph graphClub = new ClubGraph();
+        graphClub.setId((long) savedClub.getId());
+        graphClub.setName(savedClub.getName());
+
+        clubGraphRepository.save(graphClub);
+
         return mapToDTO(savedClub);
     }
 
@@ -63,6 +73,12 @@ public class ClubService implements ICLubService {
         club.setGoalsConceded(clubDTO.getGoalsConceded());
 
         Club updatedClub = clubRepository.save(club);
+
+        ClubGraph graphClub = clubGraphRepository.findById((long) id)
+                .orElse(new ClubGraph());
+
+        graphClub.setId((long) updatedClub.getId());
+        graphClub.setName(updatedClub.getName());
         return mapToDTO(updatedClub);
     }
 
@@ -73,6 +89,7 @@ public class ClubService implements ICLubService {
             throw new RuntimeException("Cannot delete. Club not found with id: " + id);
         }
         clubRepository.deleteById(id);
+        clubGraphRepository.deleteById((long) id);
     }
 
     @Override

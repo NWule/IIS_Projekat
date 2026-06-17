@@ -3,8 +3,13 @@ package com.football_club.MatchTracking.service.impl;
 import com.football_club.MatchTracking.dto.GameDTO;
 import com.football_club.MatchTracking.model.Club;
 import com.football_club.MatchTracking.model.Game;
+import com.football_club.MatchTracking.model.enums.GameStatus;
+import com.football_club.MatchTracking.model.graph.ClubGraph;
+import com.football_club.MatchTracking.model.graph.GameGraph;
 import com.football_club.MatchTracking.repository.ClubRepository;
 import com.football_club.MatchTracking.repository.GameRepository;
+import com.football_club.MatchTracking.repository.graph.ClubGraphRepository;
+import com.football_club.MatchTracking.repository.graph.GameGraphRepository;
 import com.football_club.MatchTracking.service.IGameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +25,8 @@ public class GameService implements IGameService {
 
     private final GameRepository gameRepository;
     private final ClubRepository clubRepository;
+    private final GameGraphRepository gameGraphRepository;
+    private final ClubGraphRepository clubGraphRepository;
 
     @Override
     @Transactional
@@ -36,10 +43,29 @@ public class GameService implements IGameService {
 
         Game game = new Game();
         game.setMatchDate(gameDTO.getMatchDate());
+        if (gameDTO.getStatus() != null) {
+            game.setStatus(GameStatus.valueOf(gameDTO.getStatus()));
+        } else {
+            game.setStatus(GameStatus.UPCOMING);
+        }
         game.setHomeClub(homeClub);
         game.setAwayClub(awayClub);
 
         Game savedGame = gameRepository.save(game);
+        GameGraph gameGraph = new GameGraph();
+        gameGraph.setId(savedGame.getId());
+        gameGraph.setStatus(savedGame.getStatus().name());
+
+        ClubGraph homeGraph = clubGraphRepository.findById((long) savedGame.getHomeClub().getId())
+                .orElseThrow(() -> new RuntimeException("Home ClubGraph node not found"));
+        ClubGraph awayGraph = clubGraphRepository.findById((long) savedGame.getAwayClub().getId())
+                .orElseThrow(() -> new RuntimeException("Away ClubGraph node not found"));
+
+        gameGraph.setHomeClub(homeGraph);
+        gameGraph.setAwayClub(awayGraph);
+
+        gameGraphRepository.save(gameGraph);
+
         return mapToDTO(savedGame);
     }
 
@@ -77,7 +103,27 @@ public class GameService implements IGameService {
         game.setHomeClub(homeClub);
         game.setAwayClub(awayClub);
 
+        if (gameDTO.getStatus() != null) {
+            game.setStatus(GameStatus.valueOf(gameDTO.getStatus()));
+        }
+
         Game updatedGame = gameRepository.save(game);
+
+        GameGraph gameGraph = gameGraphRepository.findById(id)
+                .orElse(new GameGraph());
+
+        gameGraph.setStatus(updatedGame.getStatus().name());
+
+        ClubGraph homeGraph = clubGraphRepository.findById((long) updatedGame.getHomeClub().getId())
+                .orElseThrow(() -> new RuntimeException("Home ClubGraph node not found"));
+        ClubGraph awayGraph = clubGraphRepository.findById((long) updatedGame.getAwayClub().getId())
+                .orElseThrow(() -> new RuntimeException("Away ClubGraph node not found"));
+
+        gameGraph.setHomeClub(homeGraph);
+        gameGraph.setAwayClub(awayGraph);
+
+        gameGraphRepository.save(gameGraph);
+
         return mapToDTO(updatedGame);
     }
 
@@ -88,6 +134,7 @@ public class GameService implements IGameService {
             throw new RuntimeException("Cannot delete. Game not found with id: " + id);
         }
         gameRepository.deleteById(id);
+        gameGraphRepository.deleteById(id);
     }
 
     @Override
@@ -111,10 +158,33 @@ public class GameService implements IGameService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<GameDTO> getUpcomingGames() {
+        return gameRepository.findUpcomingGames().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GameDTO> getLiveGames() {
+        return gameRepository.findLiveGames().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GameDTO> getPlayedGames() {
+        return gameRepository.findPlayedGames().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+
     private GameDTO mapToDTO(Game game) {
         return GameDTO.builder()
                 .id(game.getId())
                 .matchDate(game.getMatchDate())
+                .status(String.valueOf(game.getStatus()))
                 .homeClubId(game.getHomeClub().getId())
                 .homeClubName(game.getHomeClub().getName())
                 .awayClubId(game.getAwayClub().getId())

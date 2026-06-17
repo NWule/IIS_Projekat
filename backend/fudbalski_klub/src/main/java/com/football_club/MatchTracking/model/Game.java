@@ -1,5 +1,6 @@
 package com.football_club.MatchTracking.model;
 
+import com.football_club.MatchTracking.model.enums.GameStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +21,10 @@ public class Game {
 
     @Column(name = "match_date", nullable = false)
     private LocalDateTime matchDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private GameStatus status = GameStatus.UPCOMING;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_club_id", nullable = false)

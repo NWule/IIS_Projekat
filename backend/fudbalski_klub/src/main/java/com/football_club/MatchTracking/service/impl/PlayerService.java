@@ -2,7 +2,9 @@ package com.football_club.MatchTracking.service.impl;
 
 import com.football_club.MatchTracking.dto.PlayerDTO;
 import com.football_club.MatchTracking.model.Player;
+import com.football_club.MatchTracking.model.graph.PlayerGraph;
 import com.football_club.MatchTracking.repository.PlayerRepository;
+import com.football_club.MatchTracking.repository.graph.PlayerGraphRepository;
 import com.football_club.MatchTracking.service.IPlayerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 public class PlayerService implements IPlayerService {
 
     private final PlayerRepository playerRepository;
+    private final PlayerGraphRepository playerGraphRepository;
 
     @Override
     @Transactional
@@ -26,6 +29,14 @@ public class PlayerService implements IPlayerService {
         player.setDateOfBirth(playerDTO.getDateOfBirth());
 
         Player savedPlayer = playerRepository.save(player);
+
+        PlayerGraph graphPlayer = new PlayerGraph();
+        graphPlayer.setPlayerId(savedPlayer.getId());
+        graphPlayer.setName(savedPlayer.getName());
+        graphPlayer.setSurname(savedPlayer.getSurname());
+        graphPlayer.setPosition(savedPlayer.getPosition());
+
+        playerGraphRepository.save(graphPlayer);
         return mapToDTO(savedPlayer);
     }
 
@@ -55,6 +66,17 @@ public class PlayerService implements IPlayerService {
         player.setPosition(playerDTO.getPlayerPosition());
 
         Player updatedPlayer = playerRepository.save(player);
+
+        PlayerGraph graphPlayer = playerGraphRepository.findById(id)
+                .orElse(new PlayerGraph());
+
+        graphPlayer.setPlayerId(updatedPlayer.getId());
+        graphPlayer.setName(updatedPlayer.getName());
+        graphPlayer.setSurname(updatedPlayer.getSurname());
+        graphPlayer.setPosition(updatedPlayer.getPosition());
+
+        playerGraphRepository.save(graphPlayer);
+
         return mapToDTO(updatedPlayer);
     }
 
@@ -65,6 +87,7 @@ public class PlayerService implements IPlayerService {
             throw new RuntimeException("Cannot delete. Player not found with id: " + id);
         }
         playerRepository.deleteById(id);
+        playerGraphRepository.deleteById(id);
     }
 
     @Override

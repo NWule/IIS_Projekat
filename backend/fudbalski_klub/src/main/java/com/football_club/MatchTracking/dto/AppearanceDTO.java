@@ -13,6 +13,7 @@ public class AppearanceDTO {
     private String playerName;
     private String playerSurname;
     private Long gameId;
+    private String matchRole;
     private int minutesPlayed;
     private int goals;
     private int assists;

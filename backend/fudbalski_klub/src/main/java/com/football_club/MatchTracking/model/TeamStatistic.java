@@ -32,11 +32,11 @@ public class TeamStatistic {
     @Column(name = "away_shots", nullable = false)
     private int awayShots = 0;
 
-    @Column(name = "home_possession", nullable = false)
-    private double homePossession = 0.0;
+    //@Column(name = "home_possession", nullable = false)
+    //private double homePossession = 0.0;
 
-    @Column(name = "away_possession", nullable = false)
-    private double awayPossession = 0.0;
+    //@Column(name = "away_possession", nullable = false)
+    //private double awayPossession = 0.0;
 
     @Column(name = "home_shots_on_target", nullable = false)
     private int homeShotsOnTarget = 0;
