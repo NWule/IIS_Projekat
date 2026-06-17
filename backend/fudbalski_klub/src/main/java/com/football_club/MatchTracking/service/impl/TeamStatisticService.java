@@ -39,8 +39,8 @@ public class TeamStatisticService implements ITeamStatisticService {
         statistic.setAwayGoals(dto.getAwayGoals());
         statistic.setHomeShots(dto.getHomeShots());
         statistic.setAwayShots(dto.getAwayShots());
-        statistic.setHomePossession(dto.getHomePossession());
-        statistic.setAwayPossession(dto.getAwayPossession());
+        //statistic.setHomePossession(dto.getHomePossession());
+        //statistic.setAwayPossession(dto.getAwayPossession());
         statistic.setHomeShotsOnTarget(dto.getHomeShotsOnTarget());
         statistic.setAwayShotsOnTarget(dto.getAwayShotsOnTarget());
         statistic.setHomeFouls(dto.getHomeFouls());
@@ -92,8 +92,8 @@ public class TeamStatisticService implements ITeamStatisticService {
         target.setAwayGoals(source.getAwayGoals());
         target.setHomeShots(source.getHomeShots());
         target.setAwayShots(source.getAwayShots());
-        target.setHomePossession(source.getHomePossession());
-        target.setAwayPossession(source.getAwayPossession());
+        //target.setHomePossession(source.getHomePossession());
+        //target.setAwayPossession(source.getAwayPossession());
         target.setHomeShotsOnTarget(source.getHomeShotsOnTarget());
         target.setAwayShotsOnTarget(source.getAwayShotsOnTarget());
         target.setHomeFouls(source.getHomeFouls());
@@ -114,8 +114,8 @@ public class TeamStatisticService implements ITeamStatisticService {
                 .awayGoals(statistic.getAwayGoals())
                 .homeShots(statistic.getHomeShots())
                 .awayShots(statistic.getAwayShots())
-                .homePossession(statistic.getHomePossession())
-                .awayPossession(statistic.getAwayPossession())
+                //.homePossession(statistic.getHomePossession())
+                //.awayPossession(statistic.getAwayPossession())
                 .homeShotsOnTarget(statistic.getHomeShotsOnTarget())
                 .awayShotsOnTarget(statistic.getAwayShotsOnTarget())
                 .homeFouls(statistic.getHomeFouls())

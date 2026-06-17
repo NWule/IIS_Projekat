@@ -6,6 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TacticalAnalysisDTO {
+    private Long teamId;
     private String analysisText;
     private String recommendationText;
     private String severity;

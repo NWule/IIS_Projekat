@@ -18,8 +18,8 @@ public class TeamStatisticGraph {
     private int awayGoals;
     private int homeShots;
     private int awayShots;
-    private double homePossession;
-    private double awayPossession;
+    //private double homePossession;
+    //private double awayPossession;
     private int homeShotsOnTarget;
     private int awayShotsOnTarget;
     private int homeFouls;

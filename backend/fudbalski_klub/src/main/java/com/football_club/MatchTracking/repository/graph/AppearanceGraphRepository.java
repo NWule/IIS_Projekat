@@ -4,6 +4,9 @@ import com.football_club.MatchTracking.model.graph.AppearanceGraph;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface AppearanceGraphRepository extends Neo4jRepository<AppearanceGraph, Long> {
+    List<AppearanceGraph> findByGameGraphId(Long gameId);
 }

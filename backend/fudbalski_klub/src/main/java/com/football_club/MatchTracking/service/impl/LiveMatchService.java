@@ -235,8 +235,8 @@ public class LiveMatchService {
         statGraph.setAwayGoals(relStat.getAwayGoals());
         statGraph.setHomeShots(relStat.getHomeShots());
         statGraph.setAwayShots(relStat.getAwayShots());
-        statGraph.setHomePossession(relStat.getHomePossession());
-        statGraph.setAwayPossession(relStat.getAwayPossession());
+        //statGraph.setHomePossession(relStat.getHomePossession());
+        //statGraph.setAwayPossession(relStat.getAwayPossession());
         statGraph.setHomeShotsOnTarget(relStat.getHomeShotsOnTarget());
         statGraph.setAwayShotsOnTarget(relStat.getAwayShotsOnTarget());
         statGraph.setHomeFouls(relStat.getHomeFouls());
