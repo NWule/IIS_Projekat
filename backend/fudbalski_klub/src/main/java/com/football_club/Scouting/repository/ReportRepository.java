@@ -1,5 +1,6 @@
 package com.football_club.Scouting.repository;
 
+import com.football_club.MatchTracking.model.enums.PlayerPosition;
 import com.football_club.Scouting.model.Report;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -7,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Long> {
@@ -16,4 +18,12 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     List<Report> findByPlayerIdWithMetrics(@Param("playerId") Long playerId);
     @Query("SELECT r FROM Report r LEFT JOIN FETCH r.valuedMetrics WHERE r.player.id = :playerId ORDER BY r.createdAt DESC LIMIT 1")
     Report findLatestReportByPlayerId(Long playerId);
+    @Query( "SELECT r FROM Report r " +
+            "JOIN FETCH r.player p " +
+            "JOIN FETCH r.valuedMetrics vm " +
+            "WHERE p.position = :position " +
+            "AND vm.metric.id IN :metricIds " +
+            "AND r.createdAt = (SELECT MAX(r2.createdAt) FROM Report r2 WHERE r2.player = p)")
+    List<Report> findLatestReportsWithMetrics(@Param("position")PlayerPosition position,
+                                              @Param("metricIds") Set<Long> metricIds);
 }

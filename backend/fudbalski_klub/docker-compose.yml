@@ -52,6 +52,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/football_club
       SPRING_NEO4J_URI: bolt://neo4j-db:7687
       INFLUXDB_URL: http://influx-db:8086
+      INFLUXDB_TOKEN: MOJ_SUPER_TAJNI_INFLUXDB_TOKEN_KOJI_PROSTIRE_DO_BAZE
 
 volumes:
   postgres_data:
