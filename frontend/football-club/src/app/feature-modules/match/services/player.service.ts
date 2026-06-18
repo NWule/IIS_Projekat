@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/env/environment';
-import { Player } from '../models/player.model'; 
+import { Player, SearchParameters } from '../models/player.model'; 
 
 @Injectable({
   providedIn: 'root'
@@ -40,5 +40,9 @@ export class PlayerService {
   searchPlayers(keyword: string): Observable<Player[]> {
     const params = new HttpParams().set('keyword', keyword);
     return this.http.get<Player[]>(`${this.apiUrl}/search`, { params });
+  }
+
+  advancedSearch(searchParameters: SearchParameters): Observable<Player[]> {
+    return this.http.post<Player[]>(`${this.apiUrl}/advanced-search`, searchParameters);
   }
 }
