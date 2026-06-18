@@ -17,7 +17,7 @@ public interface MetricContextRepository extends JpaRepository<MetricContext, Lo
     @Modifying
     @Transactional
     @Query(nativeQuery = true, value =
-            "INSERT INTO metric_context (metrid_id, position, min_value, max_value, avg_value, last_updated) " +
+            "INSERT INTO metric_context (metric_id, position, min_value, max_value, avg_value, last_updated) " +
             "SELECT " +
             "   vm.metric_id, " +
             "   p.position, " +
@@ -26,7 +26,8 @@ public interface MetricContextRepository extends JpaRepository<MetricContext, Lo
             "   AVG(vm.value) AS avg_value, " +
             "   CURRENT_TIMESTAMP AS last_updated " +
             "FROM valued_metrics vm " +
-            "JOIN players p ON vm.player_id = p.id " +
+            "JOIN scout_reports r ON vm.report_id = r.id " +
+            "JOIN players p ON r.player_id = p.id " +
             "WHERE p.position IS NOT NULL " +
             "GROUP BY vm.metric_id, p.position " +
             "ON CONFLICT (metric_id, position) " +

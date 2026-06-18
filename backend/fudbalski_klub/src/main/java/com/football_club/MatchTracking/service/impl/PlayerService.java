@@ -27,6 +27,7 @@ public class PlayerService implements IPlayerService {
         player.setName(playerDTO.getName());
         player.setSurname(playerDTO.getSurname());
         player.setDateOfBirth(playerDTO.getDateOfBirth());
+        player.setPosition(playerDTO.getPlayerPosition());
 
         Player savedPlayer = playerRepository.save(player);
 
