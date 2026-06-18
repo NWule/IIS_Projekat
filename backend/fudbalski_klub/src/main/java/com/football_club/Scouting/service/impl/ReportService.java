@@ -59,13 +59,18 @@ public class ReportService implements IReportService {
             scoutRequestRepository.save(request);
         });
 
+        double multiplier = 1.0;
+        if (club != null && club.getLeague() != null) {
+            multiplier = club.getLeague().getDifficultyMultiplier();
+        }
+
         Report report = new Report();
         report.setPlayer(player);
         report.setScout(scout);
         report.setClubAtTime(club);
         report.setCreatedAt(LocalDateTime.now());
         report.setOverallCommentary(dto.getOverallCommentary());
-        report.setLeagueMultiplierAtTime(dto.getLeagueMultiplierAtTime());
+        report.setLeagueMultiplierAtTime(multiplier);
 
         Report savedReport = reportRepository.save(report);
         return mapToDTO(savedReport);
