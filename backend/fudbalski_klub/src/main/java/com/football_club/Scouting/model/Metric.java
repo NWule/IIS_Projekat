@@ -1,6 +1,7 @@
 package com.football_club.Scouting.model;
 
 import com.football_club.Scouting.model.enums.MetricCategory;
+import com.football_club.Scouting.model.enums.MetricType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +21,10 @@ public class Metric {
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "type", nullable = true)
+    @Enumerated(EnumType.STRING)
+    private MetricType type;
 
     @Column(name = "category", nullable = false)
     @Enumerated(EnumType.STRING)

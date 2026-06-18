@@ -77,4 +77,8 @@ export class NavbarComponent implements OnInit {
   onRequestsClick() {
     this.router.navigate(['/scouting-requests']);
   }
+
+  onPlayerRecommendationClick() {
+    this.router.navigate(['/player-recommendation']);
+  }
 }

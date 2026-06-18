@@ -91,9 +91,27 @@ public class RecommendationService implements IRecommendationService {
             ));
         });
 
+        double maxScore = recommendations.stream()
+                .mapToDouble(PlayerRecommendationDTO::getScore)
+                .max()
+                .orElse(0.0);
+
+        if (maxScore > 0) {
+            recommendations.forEach(r -> {
+                double normalized = normalizeScore(maxScore, r.getScore());
+                r.setScore(normalized);
+            });
+        } else if (!recommendations.isEmpty()) {
+            recommendations.forEach(r -> r.setScore(100.0));
+        }
+
         return recommendations.stream()
                 .sorted(Comparator.comparingDouble(PlayerRecommendationDTO::getScore).reversed())
                 .limit(5)
                 .collect(Collectors.toList());
+    }
+
+    private double normalizeScore(double maxScore, double score) {
+        return score / maxScore * 100.00;
     }
 }

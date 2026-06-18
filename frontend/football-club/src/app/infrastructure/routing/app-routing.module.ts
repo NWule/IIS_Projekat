@@ -41,6 +41,7 @@ import { ViewPlayerComponent } from 'src/app/feature-modules/scouting/components
 import { MetricsDashboardComponent } from 'src/app/feature-modules/scouting/components/metrics-dashboard/metrics-dashboard.component';
 import { WishlistsComponent } from 'src/app/feature-modules/scouting/components/wishlists/wishlists.component';
 import { ScoutingRequestsComponent } from 'src/app/feature-modules/scouting/components/scouting-requests/scouting-requests.component';
+import { PlayerRecommendationComponent } from 'src/app/feature-modules/scouting/components/player-recommendation/player-recommendation.component';
 import { UpcomingMatchesComponent } from 'src/app/feature-modules/match/components/upcoming-matches/upcoming-matches.component';
 import { LiveMatchCoachComponent } from 'src/app/feature-modules/match/components/live-match-coach/live-match-coach.component';
 import { LiveTrackingComponent } from 'src/app/feature-modules/match/components/live-tracking/live-tracking.component';
@@ -109,6 +110,7 @@ const routes: Routes = [
   // Direktor
   { path: 'metrics-dashboard',      component: MetricsDashboardComponent },
   { path: 'wishlists',              component: WishlistsComponent },
+  { path: 'player-recommendation',  component: PlayerRecommendationComponent },
 
   { path: '**',                      redirectTo: 'matches' }
 ];

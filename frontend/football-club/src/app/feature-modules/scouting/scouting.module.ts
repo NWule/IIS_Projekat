@@ -13,6 +13,7 @@ import { ViewPlayerComponent } from './components/player-details/view-player.com
 import { MetricsDashboardComponent } from './components/metrics-dashboard/metrics-dashboard.component';
 import { WishlistsComponent } from './components/wishlists/wishlists.component';
 import { ScoutingRequestsComponent } from './components/scouting-requests/scouting-requests.component';
+import { PlayerRecommendationComponent } from './components/player-recommendation/player-recommendation.component';
 
 
 
@@ -28,7 +29,8 @@ import { ScoutingRequestsComponent } from './components/scouting-requests/scouti
     ViewPlayerComponent,
     MetricsDashboardComponent,
     WishlistsComponent,
-    ScoutingRequestsComponent
+    ScoutingRequestsComponent,
+    PlayerRecommendationComponent
   ],
   imports: [
     CommonModule,
