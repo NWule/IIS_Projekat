@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class MetricContextService {
     private final MetricContextRepository metricContextRepository;
 
-    @Scheduled(cron = "0 34 1 * * *")
+    @Scheduled(cron = "0 11 6 * * *")
     private int refreshContextTable() {
         return metricContextRepository.refreshMetricContextTable();
     }
