@@ -33,6 +33,15 @@ public class PlayerController {
         return ResponseEntity.ok(playerDTO);
     }
 
+    @GetMapping("/find")
+    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
+    public ResponseEntity<List<PlayerDTO>> getPlayersByIds(
+            @RequestParam("ids") List<Long> ids
+    ) {
+        List<PlayerDTO> players = playerService.getPlayersByIds(ids);
+        return ResponseEntity.ok(players);
+    }
+
     @GetMapping
     @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
     public ResponseEntity<List<PlayerDTO>> getAllPlayers() {

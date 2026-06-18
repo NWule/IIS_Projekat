@@ -9,6 +9,8 @@ public interface IPlayerService {
 
     PlayerDTO getPlayerById(Long id);
 
+    List<PlayerDTO> getPlayersByIds(List<Long> playerIds);
+
     List<PlayerDTO> getAllPlayers();
 
     PlayerDTO updatePlayer(Long id, PlayerDTO playerDTO);

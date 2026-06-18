@@ -49,6 +49,13 @@ public class PlayerService implements IPlayerService {
     }
 
     @Override
+    public List<PlayerDTO> getPlayersByIds(List<Long> playerIds) {
+        return playerRepository.findByIdIn(playerIds).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<PlayerDTO> getAllPlayers() {
         return playerRepository.findAll().stream()
                 .map(this::mapToDTO)
