@@ -5,13 +5,18 @@ import com.football_club.Auth.repository.UserRepository;
 import com.football_club.Scouting.dto.SearchTemplateDTO;
 import com.football_club.Scouting.dto.SearchTemplateSaveDTO;
 import com.football_club.Scouting.dto.TemplatePartDTO;
+import com.football_club.Scouting.dto.TemplatePartSaveDTO;
+import com.football_club.Scouting.model.Metric;
 import com.football_club.Scouting.model.SearchTemplate;
+import com.football_club.Scouting.model.TemplatePart;
+import com.football_club.Scouting.repository.MetricRepository;
 import com.football_club.Scouting.repository.SearchTemplateRepository;
 import com.football_club.Scouting.service.ISearchTemplateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -22,6 +27,7 @@ import java.util.stream.Collectors;
 public class SearchTemplateService implements ISearchTemplateService {
 
     private final SearchTemplateRepository searchTemplateRepository;
+    private final MetricRepository metricRepository;
     private final UserRepository userRepository;
 
     @Override
@@ -33,6 +39,24 @@ public class SearchTemplateService implements ISearchTemplateService {
         SearchTemplate template = new SearchTemplate();
         template.setTemplateName(dto.getTemplateName());
         template.setCreator(creator);
+
+        List<TemplatePart> templateParts = new ArrayList<>();
+        if (dto.getParts() != null) {
+            for (TemplatePartSaveDTO partDto : dto.getParts()) {
+                Metric metric = metricRepository.findById(partDto.getMetricId())
+                        .orElseThrow(() -> new NoSuchElementException("Metrika nije pronađena sa ID-em: " + partDto.getMetricId()));
+
+                TemplatePart part = new TemplatePart();
+                part.setMetric(metric);
+                part.setWeight(partDto.getWeight());
+
+                part.setSearchTemplate(template);
+
+                templateParts.add(part);
+            }
+        }
+
+        template.setTemplateParts(templateParts);
 
         SearchTemplate saved = searchTemplateRepository.save(template);
         return mapToDTO(saved);

@@ -18,3 +18,20 @@ export interface PlaysFor {
   contractEnd: string;
   playerPosition?: string;
 }
+
+export enum SearchType {
+  EQUAL = 'EQUAL',
+  GREATER_THAN = 'GREATER_THAN',
+  LESS_THAN = 'LESS_THAN',
+}
+
+export interface SearchMetric {
+  metricId: number;
+  value: number;
+  searchType: SearchType;
+}
+
+export interface SearchParameters {
+  searchTerm: string;
+  metrics: SearchMetric[];
+}
