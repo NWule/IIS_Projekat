@@ -3,6 +3,39 @@
     <h2>Spisak svih igrača</h2>
     <span class="player-count" *ngIf="!isLoading">Ukupno igrača: {{ players.length }}</span>
   </div>
+
+  <div class="search-section">
+    <div class="search-bar">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        placeholder="Pretraži po imenu ili prezimenu..." 
+        class="keyword-input"
+      />
+      <button class="btn-outline" (click)="openModal()"><b>Dodaj filter</b></button>
+    </div>
+
+    <div class="filters-grid" *ngIf="activeFilters.length > 0">
+      <div class="filter-card" *ngFor="let filter of activeFilters; let i = index">
+        <button class="remove-filter-btn" (click)="removeFilter(i)">×</button>
+        <div class="filter-header">
+          <span class="filter-name">{{ filter.metric.name }}</span>
+          <span class="filter-category">{{ formatCategoryName(filter.metric.category) }}</span>
+        </div>
+        <div class="filter-inputs">
+          <select [(ngModel)]="filter.searchType" class="filter-select">
+            <option *ngFor="let st of searchTypes" [value]="st.value">{{ st.label }}</option>
+          </select>
+          <input type="number" [(ngModel)]="filter.value" class="filter-value-input" />
+        </div>
+      </div>
+    </div>
+
+    <div class="search-actions">
+      <button class="btn-primary" (click)="applyFilters()">Filtriraj</button>
+      <button class="btn-secondary" (click)="clearFilters()">Očisti filtere</button>
+    </div>
+  </div>
   
   <div *ngIf="errorMessage" class="error-banner">
     {{ errorMessage }}
@@ -54,6 +87,29 @@
       <div class="card-footer">
         <span class="action-link">Detaljan pregled →</span>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Dostupne metrike</h3>
+      <button class="close-modal-btn" (click)="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <ng-container *ngFor="let cat of getCategoryKeys(getAvailableMetricsByCategory())">
+        <div class="category-group">
+          <h4>{{ formatCategoryName(cat) }}</h4>
+          <div class="modal-metrics-list">
+            <ng-container *ngFor="let m of getAvailableMetricsByCategory()[cat]">
+              <div class="modal-metric-item" (click)="selectMetric(m)">
+                {{m.name}}
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </ng-container>
     </div>
   </div>
 </div>

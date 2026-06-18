@@ -25,6 +25,7 @@ public class MetricService implements IMetricService {
         Metric metric = new Metric();
         metric.setName(dto.getName());
         metric.setCategory(dto.getCategory());
+        metric.setType(dto.getType());
 
         Metric savedMetric = metricRepository.save(metric);
         return convertToDTO(savedMetric);
@@ -53,6 +54,7 @@ public class MetricService implements IMetricService {
 
         metric.setName(dto.getName());
         metric.setCategory(dto.getCategory());
+        metric.setType(dto.getType());
 
         Metric updatedMetric = metricRepository.save(metric);
         return convertToDTO(updatedMetric);
@@ -67,6 +69,6 @@ public class MetricService implements IMetricService {
     }
 
     private MetricDTO convertToDTO(Metric metric) {
-        return new MetricDTO(metric.getId(), metric.getName(), metric.getCategory());
+        return new MetricDTO(metric.getId(), metric.getName(), metric.getCategory(), metric.getType());
     }
 }
