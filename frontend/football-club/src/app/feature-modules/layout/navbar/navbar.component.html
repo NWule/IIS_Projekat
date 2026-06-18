@@ -40,6 +40,9 @@
     <ng-container *ngIf="isLoggedIn && userRole === 'ROLE_ADMIN'">
       <button class="nav-btn" (click)="router.navigate(['/zones'])">Zone</button>
       <button class="nav-btn" (click)="router.navigate(['/ticket-types'])">Tipovi karata</button>
+      <button class="nav-btn" (click)="router.navigate(['/pricing-rules'])">Cenovnik</button>
+      <button class="nav-btn" (click)="router.navigate(['/game-zone-prices'])">Cene po utakmici</button>
+      <button class="nav-btn" (click)="router.navigate(['/price-change-log'])">Istorija cena</button>
     </ng-container>
 
     <ng-container *ngIf="isLoggedIn">
