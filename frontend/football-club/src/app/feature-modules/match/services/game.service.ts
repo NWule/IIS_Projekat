@@ -16,6 +16,10 @@ export class GameService {
     return this.http.post<Game>(this.apiUrl, game);
   }
 
+  updateGame(id: number, game: Game): Observable<Game> {
+    return this.http.put<Game>(`${this.apiUrl}/${id}`, game);
+  }
+
   getGameById(id: number): Observable<Game> {
     return this.http.get<Game>(`${this.apiUrl}/${id}`);
   }
@@ -26,5 +30,9 @@ export class GameService {
 
   getUpcomingGames(): Observable<Game[]> {
     return this.http.get<Game[]>(`${this.apiUrl}/upcoming`);
+  }
+
+  getLiveGames(): Observable<Game[]> {
+    return this.http.get<Game[]>(`${this.apiUrl}/live`);
   }
 }

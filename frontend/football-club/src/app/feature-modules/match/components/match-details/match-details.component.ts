@@ -31,7 +31,7 @@ export class MatchDetailsComponent implements OnInit {
   myClub!: Club;
 
   isHomeClub = false;
-  isStatistician = true;
+  isStatistician = false; 
   isUpcoming = false;
 
   statistics: TeamStatistic | null = null;
@@ -158,6 +158,26 @@ export class MatchDetailsComponent implements OnInit {
       fouls:            [0,   [Validators.required, Validators.min(0)]],
       yellowCardCheckbox: [false],
       redCard:          [false]
+    });
+  }
+
+  
+  startMatch(): void {
+    if (!this.isStatistician) return;
+
+    const updatedGamePayload: Game = {
+      ...this.game,
+      status: 'LIVE'
+    };
+
+    this.gameService.updateGame(this.gameId, updatedGamePayload).subscribe({
+      next: () => {
+        alert('Utakmica je uspešno pokrenuta uživo!');
+        this.router.navigate(['/live-tracking', this.gameId]);
+      },
+      error: (err) => {
+        alert('Došlo je do greške na serveru pri pokretanju utakmice.');
+      }
     });
   }
 

@@ -44,6 +44,8 @@ import { ScoutingRequestsComponent } from 'src/app/feature-modules/scouting/comp
 import { UpcomingMatchesComponent } from 'src/app/feature-modules/match/components/upcoming-matches/upcoming-matches.component';
 import { LiveMatchCoachComponent } from 'src/app/feature-modules/match/components/live-match-coach/live-match-coach.component';
 import { LiveTrackingComponent } from 'src/app/feature-modules/match/components/live-tracking/live-tracking.component';
+import { LiveMatchFinderComponent } from 'src/app/feature-modules/match/components/live-match-finder/live-match-finder.component';
+
 
 const routes: Routes = [
   { path: '',                     redirectTo: 'login', pathMatch: 'full' },
@@ -71,6 +73,7 @@ const routes: Routes = [
   { path: 'upcoming-matches',          component: UpcomingMatchesComponent },
   { path: 'live-tracking/:id',       component: LiveTrackingComponent }, 
   { path: 'live-match-coach/:id',    component: LiveMatchCoachComponent },
+  { path: 'coach-live-finder', component: LiveMatchFinderComponent },
 
   // Performanse
   { path: 'add-performance',         component: PlayerPerformanceEntryComponent },

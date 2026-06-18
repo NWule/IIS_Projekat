@@ -91,7 +91,8 @@ export class MatchEntryComponent implements OnInit {
       const gamePayload = {
         homeClubId: Number(formValue.homeClubId),
         awayClubId: Number(formValue.awayClubId),
-        dateTime: isoDateTime
+        dateTime: isoDateTime,
+        status: 'FINISHED' as const
       };
 
       this.gameService.createGame(gamePayload).pipe(

@@ -88,6 +88,7 @@ public class TeamStatisticService implements ITeamStatisticService {
     }
 
     private void mapFieldsToGraph(TeamStatistic source, TeamStatisticGraph target) {
+        target.setId(source.getId());
         target.setHomeGoals(source.getHomeGoals());
         target.setAwayGoals(source.getAwayGoals());
         target.setHomeShots(source.getHomeShots());

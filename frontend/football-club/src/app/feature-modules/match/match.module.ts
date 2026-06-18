@@ -22,7 +22,7 @@ import { MatchPreparationComponent } from './components/match-preparation/match-
 import { UpcomingMatchesComponent } from './components/upcoming-matches/upcoming-matches.component';
 import { LiveTrackingComponent } from './components/live-tracking/live-tracking.component';
 import { LiveMatchCoachComponent } from './components/live-match-coach/live-match-coach.component'; 
-
+import { LiveMatchFinderComponent } from './components/live-match-finder/live-match-finder.component';
 
 
 @NgModule({
@@ -41,7 +41,8 @@ import { LiveMatchCoachComponent } from './components/live-match-coach/live-matc
     MatchListComponent,
     UpcomingMatchesComponent,
     LiveTrackingComponent,
-    LiveMatchCoachComponent
+    LiveMatchCoachComponent,
+    LiveMatchFinderComponent
   ],
   imports: [
     CommonModule,
@@ -63,7 +64,8 @@ import { LiveMatchCoachComponent } from './components/live-match-coach/live-matc
     MatchListComponent,
     UpcomingMatchesComponent,
     LiveTrackingComponent,
-    LiveMatchCoachComponent
+    LiveMatchCoachComponent,
+    LiveMatchFinderComponent
   ]
 })
 export class MatchModule { }

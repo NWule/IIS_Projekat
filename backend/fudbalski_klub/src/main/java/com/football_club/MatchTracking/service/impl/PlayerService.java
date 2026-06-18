@@ -32,6 +32,7 @@ public class PlayerService implements IPlayerService {
 
         PlayerGraph graphPlayer = new PlayerGraph();
         graphPlayer.setPlayerId(savedPlayer.getId());
+        graphPlayer.setPlayerId(savedPlayer.getId());
         graphPlayer.setName(savedPlayer.getName());
         graphPlayer.setSurname(savedPlayer.getSurname());
         graphPlayer.setPosition(savedPlayer.getPosition());

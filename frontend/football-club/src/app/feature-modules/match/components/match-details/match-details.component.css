@@ -186,3 +186,19 @@
   font-family: sans-serif;
   font-size: 1.2rem;
 }
+
+.btn-start-match {
+  background-color: #16a34a;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-start-match:hover {
+  background-color: #15803d;
+}

@@ -19,9 +19,13 @@
     <p class="upcoming-message">
       Ova utakmica tek treba da se odigra. Pređite na stranicu za pripremu meča kako biste postavili timove i konfiguraciju.
     </p>
-    <div class="submit-container">
+    <div class="submit-container" style="display: flex; gap: 15px; justify-content: center;">
       <button class="btn-submit" (click)="goToMatchPreparation()">
         📋 Idi na pripremu meča
+      </button>
+
+      <button *ngIf="isStatistician" class="btn-start-match" (click)="startMatch()">
+        ▶ Pokreni utakmicu uživo
       </button>
     </div>
   </div>
@@ -55,7 +59,7 @@
               { naziv: 'Korneri',               home: 'homeCorners',        away: 'awayCorners'       },
               { naziv: 'Faulovi',               home: 'homeFouls',          away: 'awayFouls'         },
               { naziv: 'Ofsajdi',               home: 'homeOffsides',       away: 'awayOffsides'      },
-              { naziv: 'Tačnost dodavanja (%)', home: 'homePassAccuracy',   away: 'awayPassAccuracy'  }
+              { font: 'Tačnost dodavanja (%)', home: 'homePassAccuracy',   away: 'awayPassAccuracy'  }
             ]">
               <td><input type="number" [formControlName]="red.home" min="0" class="stat-input" /></td>
               <td>{{ red.naziv }}</td>

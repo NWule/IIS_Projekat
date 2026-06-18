@@ -1,7 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { forkJoin, Subscription, interval } from 'rxjs';
+import { forkJoin, interval, Subscription } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
+import { Client } from '@stomp/stompjs';
+import * as SockJS from 'sockjs-client';
+import { environment } from 'src/env/environment';
 
 import { GameService } from '../../services/game.service';
 import { ClubService } from '../../services/club.service';
@@ -32,7 +35,8 @@ export class LiveMatchCoachComponent implements OnInit, OnDestroy {
   statistics: TeamStatistic | null = null;
   ruleBasedRecommendations: any[] = [];
 
-  private pollingSubscription?: Subscription;
+  private stompClient: Client | null = null;
+  private analysisPollingSub?: Subscription;
 
   constructor(
     private route: ActivatedRoute,
@@ -49,7 +53,12 @@ export class LiveMatchCoachComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.pollingSubscription?.unsubscribe();
+    if (this.stompClient) {
+      this.stompClient.deactivate();
+    }
+    if (this.analysisPollingSub) {
+      this.analysisPollingSub.unsubscribe();
+    }
   }
 
   private loadStaticData(): void {
@@ -60,18 +69,21 @@ export class LiveMatchCoachComponent implements OnInit, OnDestroy {
         return forkJoin({
           homeClub: this.clubService.getClubById(game.homeClubId),
           awayClub: this.clubService.getClubById(game.awayClubId),
-          appearances: this.appearanceService.getAppearancesByGame(this.gameId)
+          appearances: this.appearanceService.getAppearancesByGame(this.gameId),
+          stats: this.statisticService.getStatisticByGameId(this.gameId)
         });
       })
     ).subscribe({
-      next: ({ homeClub, awayClub, appearances }) => {
+      next: ({ homeClub, awayClub, appearances, stats }) => {
         this.homeClub = homeClub;
         this.awayClub = awayClub;
         this.homeLineup = appearances.filter(p => p.clubId === this.game.homeClubId);
         this.awayLineup = appearances.filter(p => p.clubId === this.game.awayClubId);
-        
+        this.statistics = stats;
         this.isLoading = false;
-        this.startLivePolling();
+        
+        this.connectToWebSocket();
+        this.startAnalysisPolling();
       },
       error: (err) => {
         console.error('Greška pri učitavanju statičkih podataka:', err);
@@ -80,22 +92,40 @@ export class LiveMatchCoachComponent implements OnInit, OnDestroy {
     });
   }
 
-  private startLivePolling(): void {
-    this.pollingSubscription = interval(5000).pipe(
-      startWith(0),
-      switchMap(() => {
-        return forkJoin({
-          stats: this.statisticService.getStatisticByGameId(this.gameId),
-          analysis: this.tacticalService.getAnalysisByGame(this.gameId)
-        });
-      })
+  private connectToWebSocket(): void {
+    const baseUrl = environment.apiHost.replace('/api/', ''); 
+    const socket = new (SockJS as any)(`${baseUrl}/ws-live`);
+    
+    this.stompClient = new Client({
+      webSocketFactory: () => socket,
+      reconnectDelay: 5000,
+      debug: (str) => {
+      }
+    });
+
+    this.stompClient.onConnect = (frame) => {
+      console.log('Povezan na WebSocket kanal za statistiku utakmice #' + this.gameId);
+
+      this.stompClient?.subscribe(`/topic/game/${this.gameId}/team-stats`, (message) => {
+        if (message.body) {
+          this.statistics = JSON.parse(message.body);
+        }
+      });
+    };
+
+    this.stompClient.activate();
+  }
+
+  private startAnalysisPolling(): void {
+    this.analysisPollingSub = interval(10000).pipe(
+      startWith(0), 
+      switchMap(() => this.tacticalService.getAnalysisByGame(this.gameId))
     ).subscribe({
-      next: ({ stats, analysis }) => {
-        this.statistics = stats;
-        this.ruleBasedRecommendations = analysis;
+      next: (analysisData) => {
+        this.ruleBasedRecommendations = analysisData;
       },
       error: (err) => {
-        console.error('Greška tokom automatskog osvežavanja podataka:', err);
+        console.error('Greška pri polling-u taktičkih preporuka:', err);
       }
     });
   }
