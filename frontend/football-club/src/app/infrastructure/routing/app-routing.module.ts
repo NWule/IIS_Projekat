@@ -46,6 +46,7 @@ import { MetricsDashboardComponent } from 'src/app/feature-modules/scouting/comp
 import { WishlistsComponent } from 'src/app/feature-modules/scouting/components/wishlists/wishlists.component';
 import { ScoutingRequestsComponent } from 'src/app/feature-modules/scouting/components/scouting-requests/scouting-requests.component';
 import { PlayerRecommendationComponent } from 'src/app/feature-modules/scouting/components/player-recommendation/player-recommendation.component';
+import { SearchTemplateManagementComponent } from 'src/app/feature-modules/scouting/components/search-template-management/search-template-management.component';
 
 const routes: Routes = [
   { path: '',                     redirectTo: 'login', pathMatch: 'full' },
@@ -111,6 +112,7 @@ const routes: Routes = [
   { path: 'metrics-dashboard',      component: MetricsDashboardComponent },
   { path: 'wishlists',              component: WishlistsComponent },
   { path: 'player-recommendation',  component: PlayerRecommendationComponent },
+  { path: 'search-templates',       component: SearchTemplateManagementComponent },
 
   { path: '**',                      redirectTo: 'matches' }
 ];
