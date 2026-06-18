@@ -3,6 +3,7 @@ package com.football_club.MatchTracking.controller;
 import com.football_club.MatchTracking.dto.PlayerDTO;
 import com.football_club.MatchTracking.service.IPlayerService;
 import com.football_club.Auth.model.User;
+import com.football_club.Scouting.dto.SearchParameters;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -68,5 +69,11 @@ public class PlayerController {
     public ResponseEntity<List<PlayerDTO>> searchPlayers(@RequestParam("keyword") String keyword) {
         List<PlayerDTO> players = playerService.searchPlayers(keyword);
         return ResponseEntity.ok(players);
+    }
+
+    @PostMapping("/advanced-search")
+    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
+    public ResponseEntity<List<PlayerDTO>> advancedSearch(@RequestBody() SearchParameters searchParameters) {
+        return ResponseEntity.ok(playerService.advancedSearch(searchParameters));
     }
 }
