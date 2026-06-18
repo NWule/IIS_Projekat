@@ -31,7 +31,8 @@ export class MetricsDashboardComponent implements OnInit {
   private initForm(): void {
     this.metricForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
-      category: [{ value: '', disabled: true }, Validators.required] 
+      category: [{ value: '', disabled: true }, Validators.required],
+      type: ['', Validators.required]
     });
   }
 
@@ -58,7 +59,7 @@ export class MetricsDashboardComponent implements OnInit {
       "DEFENSIVE_ACTIONS",
       "PHYSICAL",
       "IMPACT_AND_EFFICIENCY"
-    ]
+    ];
 
     this.categories.forEach(category => {
       this.metricsByCategory[category] = [];
@@ -66,7 +67,9 @@ export class MetricsDashboardComponent implements OnInit {
     
     metrics.forEach(metric => {
       const cat = metric.category || 'UNCATEGORIZED';
-      this.metricsByCategory[cat].push(metric);
+      if (this.metricsByCategory[cat]) {
+        this.metricsByCategory[cat].push(metric);
+      }
     });
   }
 
@@ -75,7 +78,8 @@ export class MetricsDashboardComponent implements OnInit {
     this.isModalOpen = true;
     this.metricForm.patchValue({
       name: '',
-      category: category
+      category: category,
+      type: ''
     });
   }
 
@@ -84,7 +88,8 @@ export class MetricsDashboardComponent implements OnInit {
     this.isModalOpen = true;
     this.metricForm.patchValue({
       name: metric.name,
-      category: metric.category
+      category: metric.category,
+      type: metric.type
     });
   }
 
@@ -117,10 +122,21 @@ export class MetricsDashboardComponent implements OnInit {
   }
 
   formatCategoryName(category: string): string {
+    if (!category) return '';
     return category
       .toLowerCase()
       .split('_')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
+  }
+
+  formatTypeName(type: string): string {
+    if (!type) return '';
+    switch (type.toUpperCase()) {
+      case 'POSITIVE': return 'Pozitivna';
+      case 'NEGATIVE': return 'Negativna';
+      case 'NEUTRAL': return 'Neutralna';
+      default: return type;
+    }
   }
 }
