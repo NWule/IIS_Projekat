@@ -1,0 +1,93 @@
+<div class="management-container">
+  <div class="header-section">
+    <h2>Upravljanje Šablonima Pretrage</h2>
+    <p>Pregledajte, menjajte težine metrika ili uklanjajte metrike iz postojećih sistemskih šablona.</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    Učitavanje šablona pretrage...
+  </div>
+
+  <div class="templates-grid" *ngIf="!isLoading">
+    <div class="template-card" *ngFor="let template of templates">
+      <div class="card-header">
+        <h3 class="clickable-title" (click)="openRenameModal(template)">
+          {{ template.tempName }} <i class="edit-name-icon">✎</i>
+        </h3>
+        <button class="btn-delete-template" (click)="deleteTemplateCard(template.id)">
+          <b>Obriši šablon</b>
+        </button>
+      </div>
+
+      <div class="card-body">
+        <div class="metrics-list">
+          <div 
+            class="metric-item-row" 
+            *ngFor="let part of template.uiParts"
+            [class.marked-deletion]="part.markedForDeletion">
+            
+            <div class="metric-meta">
+              <span class="metric-name">{{ part.metricName }}</span>
+              <span class="metric-weight-display">
+                Težina: <b>{{ part.tempWeight | number:'1.1-2' }}</b>
+              </span>
+              <div class="deletion-overlay" *ngIf="part.markedForDeletion"></div>
+            </div>
+
+            <div class="metric-controls">
+              <input 
+                type="range" 
+                min="1" 
+                max="5" 
+                step="0.5" 
+                [(ngModel)]="part.tempWeight" 
+                (input)="checkDirty(template)"
+                [disabled]="part.markedForDeletion"
+                class="weight-slider"
+              />
+              
+              <button 
+                type="button" 
+                class="btn-action-delete" 
+                (click)="toggleDeletePart(template, part)">
+                {{ part.markedForDeletion ? 'Vrati' : 'Ukloni' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer" *ngIf="template.isDirty">
+        <button class="btn-save" (click)="saveChanges(template)">Sačuvaj</button>
+        <button class="btn-cancel" (click)="cancelChanges(template)">Odustani</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="isRenameModalOpen">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Izmeni naziv šablona</h3>
+      <button class="close-btn" (click)="closeRenameModal()">&times;</button>
+    </div>
+    <div class="form-group">
+      <label for="newTemplateName">Novi naziv</label>
+      <input 
+        type="text" 
+        id="newTemplateName" 
+        [(ngModel)]="newNameInput" 
+        class="form-control" 
+        autocomplete="off" 
+      />
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" (click)="closeRenameModal()">Odustani</button>
+      <button type="button" class="btn btn-primary" [disabled]="newNameInput.trim().length < 3" (click)="confirmRename()">U redu</button>
+    </div>
+  </div>
+</div>

@@ -30,6 +30,7 @@
       <button class="nav-btn" (click)="onWishlistsClick()">Liste Želja</button>
       <button class="nav-btn" (click)="onRequestsClick()">Zahtevi</button>
       <button class="nav-btn" (click)="onPlayerRecommendationClick()">Preporuka Igrača</button>
+      <button class="nav-btn" (click)="onSeachTemplatesClick()">Šabloni Preporuke</button>
     </ng-container>
 
     <ng-container *ngIf="isLoggedIn && userRole === 'ROLE_BUYER'">
