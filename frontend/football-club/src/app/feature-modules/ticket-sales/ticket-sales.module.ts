@@ -15,6 +15,7 @@ import { TicketTypeFormComponent } from './components/ticket-type-form/ticket-ty
 import { PricingRuleListComponent } from './components/pricing-rule-list/pricing-rule-list.component';
 import { PricingRuleFormComponent } from './components/pricing-rule-form/pricing-rule-form.component';
 import { GameZonePriceComponent } from './components/game-zone-price/game-zone-price.component';
+import { PriceChangeLogComponent } from './components/price-change-log/price-change-log.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { GameZonePriceComponent } from './components/game-zone-price/game-zone-p
     TicketTypeFormComponent,
     PricingRuleListComponent,
     PricingRuleFormComponent,
-    GameZonePriceComponent
+    GameZonePriceComponent,
+    PriceChangeLogComponent
   ],
   imports: [
     CommonModule,

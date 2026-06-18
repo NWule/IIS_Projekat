@@ -34,6 +34,7 @@ import { TicketTypeFormComponent } from '../../feature-modules/ticket-sales/comp
 import { PricingRuleListComponent } from '../../feature-modules/ticket-sales/components/pricing-rule-list/pricing-rule-list.component';
 import { PricingRuleFormComponent } from '../../feature-modules/ticket-sales/components/pricing-rule-form/pricing-rule-form.component';
 import { GameZonePriceComponent } from '../../feature-modules/ticket-sales/components/game-zone-price/game-zone-price.component';
+import { PriceChangeLogComponent } from '../../feature-modules/ticket-sales/components/price-change-log/price-change-log.component';
 
 import { ScoutingPlayerListComponent } from '../../feature-modules/scouting/components/scouting-player-list/scouting-player-list.component';
 import { CreateReportComponent } from '../../feature-modules/scouting/components/create-report/create-report.component';
@@ -92,6 +93,7 @@ const routes: Routes = [
   { path: 'add-pricing-rule',        component: PricingRuleFormComponent },
   { path: 'edit-pricing-rule/:id',   component: PricingRuleFormComponent },
   { path: 'game-zone-prices',        component: GameZonePriceComponent },
+  { path: 'price-change-log',        component: PriceChangeLogComponent },
 
   // Skaut/Direktor
   { path: 'scouting-dashboard',       component: ScoutingPlayerListComponent },
