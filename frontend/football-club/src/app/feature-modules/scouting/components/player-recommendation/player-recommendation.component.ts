@@ -3,8 +3,12 @@ import { Router } from '@angular/router';
 import { MetricService } from '../../services/metric.service';
 import { Metric } from '../../models/metric.model';
 import { RecommendationService } from '../../services/recommendation.service';
-import { SelectedMetric, PlayerRecommendation, RecommendationRequest } from '../../models/recommendation.model';
+import { SelectedMetric, PlayerRecommendation, RecommendationRequest, ShownRecommendation } from '../../models/recommendation.model';
 import { RecommendationStateService } from '../../services/recommendation-state.service';
+import { Player } from 'src/app/feature-modules/match/models/player.model';
+import { PlayerService } from 'src/app/feature-modules/match/services/player.service';
+import { ReportService } from '../../services/report.service';
+import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-player-recommendation',
@@ -29,7 +33,9 @@ export class PlayerRecommendationComponent implements OnInit {
 
   constructor(
     private metricService: MetricService,
+    private reportService: ReportService,
     private recommendationService: RecommendationService,
+    private playerService: PlayerService,
     private stateService: RecommendationStateService,
     private router: Router
   ) {}
@@ -56,11 +62,11 @@ export class PlayerRecommendationComponent implements OnInit {
     this.stateService.selectedMetrics = value;
   }
 
-  get recommendations(): PlayerRecommendation[] {
+  get recommendations(): ShownRecommendation[] {
     return this.stateService.recommendations;
   }
 
-  set recommendations(value: PlayerRecommendation[]) {
+  set recommendations(value: ShownRecommendation[]) {
     this.stateService.recommendations = value;
   }
 
@@ -110,12 +116,35 @@ export class PlayerRecommendationComponent implements OnInit {
       }))
     };
 
-    this.recommendationService.getRecommendations(request).subscribe(results => {
-      this.recommendations = results;
-    });
+    this.recommendationService.getRecommendations(request).pipe(
+      switchMap((results) => {
+        if (!results || results.length === 0) {
+          return of([]);
+        }
+
+        const playersWithReports = results.map(player => {
+          if (player.playerId === undefined) {
+            return of({...player, latestReport: null });
+          }
+          return this.reportService.getLatestReportForPlayer(player.playerId).pipe(
+            map(report => ({ ...player, latestReport: report })),
+            catchError(() => of({ ...player, latestReport: null }))
+          )
+        })
+        
+        return forkJoin(playersWithReports);
+      })
+      ).subscribe({
+        next: (combinedData) => {
+          this.recommendations = combinedData.sort((a, b) => b.score - a.score);
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      });
   }
 
-  viewPlayer(playerId: number): void {
+  viewPlayer(playerId: number | undefined): void {
     this.router.navigate(['/view-player', playerId]);
   }
 

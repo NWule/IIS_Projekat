@@ -20,6 +20,11 @@ export class PlayerService {
     return this.http.get<Player>(`${this.apiUrl}/${id}`);
   }
 
+  getPlayers(ids: number[]): Observable<Player[]> {
+    const params = new HttpParams().set('ids', ids.join(','));
+    return this.http.get<Player[]>(`${this.apiUrl}/find`, { params });
+  }
+
   getAllPlayers(): Observable<Player[]> {
     return this.http.get<Player[]>(this.apiUrl);
   }

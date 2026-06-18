@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SelectedMetric, PlayerRecommendation } from '../models/recommendation.model';
+import { SelectedMetric, ShownRecommendation } from '../models/recommendation.model';
 
 @Injectable({
   providedIn: 'root'
@@ -7,5 +7,5 @@ import { SelectedMetric, PlayerRecommendation } from '../models/recommendation.m
 export class RecommendationStateService {
   selectedPosition: string = 'STRIKER';
   selectedMetrics: SelectedMetric[] = [];
-  recommendations: PlayerRecommendation[] = [];
+  recommendations: ShownRecommendation[] = [];
 }
