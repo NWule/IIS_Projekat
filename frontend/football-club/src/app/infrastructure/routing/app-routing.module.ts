@@ -31,6 +31,9 @@ import { ZoneFormComponent } from '../../feature-modules/ticket-sales/components
 import { SeatListComponent } from '../../feature-modules/ticket-sales/components/seat-list/seat-list.component';
 import { TicketTypeListComponent } from '../../feature-modules/ticket-sales/components/ticket-type-list/ticket-type-list.component';
 import { TicketTypeFormComponent } from '../../feature-modules/ticket-sales/components/ticket-type-form/ticket-type-form.component';
+import { PricingRuleListComponent } from '../../feature-modules/ticket-sales/components/pricing-rule-list/pricing-rule-list.component';
+import { PricingRuleFormComponent } from '../../feature-modules/ticket-sales/components/pricing-rule-form/pricing-rule-form.component';
+import { GameZonePriceComponent } from '../../feature-modules/ticket-sales/components/game-zone-price/game-zone-price.component';
 
 import { ScoutingPlayerListComponent } from '../../feature-modules/scouting/components/scouting-player-list/scouting-player-list.component';
 import { CreateReportComponent } from '../../feature-modules/scouting/components/create-report/create-report.component';
@@ -85,6 +88,10 @@ const routes: Routes = [
   { path: 'ticket-types',            component: TicketTypeListComponent },
   { path: 'add-ticket-type',         component: TicketTypeFormComponent },
   { path: 'edit-ticket-type/:id',    component: TicketTypeFormComponent },
+  { path: 'pricing-rules',           component: PricingRuleListComponent },
+  { path: 'add-pricing-rule',        component: PricingRuleFormComponent },
+  { path: 'edit-pricing-rule/:id',   component: PricingRuleFormComponent },
+  { path: 'game-zone-prices',        component: GameZonePriceComponent },
 
   // Skaut/Direktor
   { path: 'scouting-dashboard',       component: ScoutingPlayerListComponent },

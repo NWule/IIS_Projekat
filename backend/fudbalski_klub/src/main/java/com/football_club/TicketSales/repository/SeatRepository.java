@@ -11,4 +11,5 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
     List<Seat> findByZoneId(Long zoneId);
     List<Seat> findByZoneIdAndStatus(Long zoneId, SeatStatus status);
     Optional<Seat> findByZoneIdAndRowNumberAndSeatNumber(Long zoneId, int rowNumber, int seatNumber);
+    long countByZoneId(Long zoneId);
 }

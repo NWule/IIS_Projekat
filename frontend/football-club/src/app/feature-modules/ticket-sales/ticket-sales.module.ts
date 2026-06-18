@@ -12,6 +12,9 @@ import { ZoneFormComponent } from './components/zone-form/zone-form.component';
 import { SeatListComponent } from './components/seat-list/seat-list.component';
 import { TicketTypeListComponent } from './components/ticket-type-list/ticket-type-list.component';
 import { TicketTypeFormComponent } from './components/ticket-type-form/ticket-type-form.component';
+import { PricingRuleListComponent } from './components/pricing-rule-list/pricing-rule-list.component';
+import { PricingRuleFormComponent } from './components/pricing-rule-form/pricing-rule-form.component';
+import { GameZonePriceComponent } from './components/game-zone-price/game-zone-price.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +26,10 @@ import { TicketTypeFormComponent } from './components/ticket-type-form/ticket-ty
     ZoneFormComponent,
     SeatListComponent,
     TicketTypeListComponent,
-    TicketTypeFormComponent
+    TicketTypeFormComponent,
+    PricingRuleListComponent,
+    PricingRuleFormComponent,
+    GameZonePriceComponent
   ],
   imports: [
     CommonModule,
