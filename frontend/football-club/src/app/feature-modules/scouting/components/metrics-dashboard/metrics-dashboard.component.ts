@@ -51,16 +51,23 @@ export class MetricsDashboardComponent implements OnInit {
 
   private groupMetrics(metrics: Metric[]): void {
     this.metricsByCategory = {};
+
+    this.categories = [
+      "PASSING_AND_PROGRESSION",
+      "ATTACKING_AND_OUTPUT",
+      "DEFENSIVE_ACTIONS",
+      "PHYSICAL",
+      "IMPACT_AND_EFFICIENCY"
+    ]
+
+    this.categories.forEach(category => {
+      this.metricsByCategory[category] = [];
+    });
     
     metrics.forEach(metric => {
       const cat = metric.category || 'UNCATEGORIZED';
-      if (!this.metricsByCategory[cat]) {
-        this.metricsByCategory[cat] = [];
-      }
       this.metricsByCategory[cat].push(metric);
     });
-
-    this.categories = Object.keys(this.metricsByCategory).sort();
   }
 
   openModal(category: string): void {

@@ -1,0 +1,84 @@
+<div class="recommendation-container">
+  
+  <div class="setup-section">
+    <h2>Kriterijumi za preporuku</h2>
+    
+    <div class="controls-row">
+      <div class="position-selector">
+        <label for="positionSelect">Pozicija u timu:</label>
+        <select id="positionSelect" [(ngModel)]="selectedPosition">
+          <ng-container *ngFor="let pos of playerPositions">
+            <option [value]="pos">{{ formatPosition(pos) }}</option>
+          </ng-container>
+        </select>
+      </div>
+      
+      <button class="btn-primary" (click)="openModal()">
+        <b>Dodaj metriku</b>
+      </button>
+    </div>
+
+    <div class="metrics-grid">
+      <ng-container *ngFor="let sm of selectedMetrics">
+        <div class="metric-card">
+          <button class="remove-btn" (click)="removeMetric(sm.metric.id)">×</button>
+          <h3>{{sm.metric.name}}</h3>
+          <span class="category-badge">{{ formatCategoryName(sm.metric.category) }}</span>
+          <div class="slider-container">
+            <label>Težina: {{sm.weight}}</label>
+            <input type="range" step="0.5" min="1" max="5" [(ngModel)]="sm.weight">
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-recommend" [disabled]="selectedMetrics.length === 0" (click)="submitRecommendation()">
+        <b>Preporuči igrače</b>
+      </button>
+    </div>
+  </div>
+
+  <div class="results-section" *ngIf="recommendations.length > 0">
+    <h2>Top preporuke</h2>
+    <div class="players-grid">
+      <ng-container *ngFor="let player of recommendations; let i = index">
+        <div class="player-card" (click)="viewPlayer(player.playerId)">
+          <div class="rank-badge">#{{i + 1}}</div>
+          <div class="player-info">
+            <h3>{{player.name}} {{player.surname}}</h3>
+            <p><strong>Pozicija:</strong> {{player.position || selectedPosition}}</p>
+          </div>
+          <div class="player-score">
+            <span class="score-val">{{player.score | number:'1.2-2'}}</span>
+            <span class="source-lbl">{{ formatCategoryName(player.source) }}</span>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-backdrop" *ngIf="showModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Dostupne metrike</h3>
+      <button class="close-modal-btn" (click)="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <ng-container *ngFor="let cat of getCategoryKeys(getAvailableMetricsByCategory())">
+        <div class="category-group">
+          <h4>{{ formatCategoryName(cat) }}</h4>
+          <div class="modal-metrics-list">
+            <ng-container *ngFor="let m of getAvailableMetricsByCategory()[cat]">
+              <div class="modal-metric-item" (click)="selectMetric(m)">
+                {{m.name}}
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
