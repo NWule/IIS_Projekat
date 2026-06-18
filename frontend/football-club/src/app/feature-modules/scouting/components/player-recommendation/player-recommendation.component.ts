@@ -3,12 +3,13 @@ import { Router } from '@angular/router';
 import { MetricService } from '../../services/metric.service';
 import { Metric } from '../../models/metric.model';
 import { RecommendationService } from '../../services/recommendation.service';
-import { SelectedMetric, PlayerRecommendation, RecommendationRequest, ShownRecommendation } from '../../models/recommendation.model';
+import { SelectedMetric, ShownRecommendation } from '../../models/recommendation.model';
 import { RecommendationStateService } from '../../services/recommendation-state.service';
-import { Player } from 'src/app/feature-modules/match/models/player.model';
 import { PlayerService } from 'src/app/feature-modules/match/services/player.service';
 import { ReportService } from '../../services/report.service';
+import { SearchTemplate, SearchTemplateSave } from '../../models/search-template.model';
 import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
+import { SearchTemplateService } from '../../services/search-template.service';
 
 @Component({
   selector: 'app-player-recommendation',
@@ -18,6 +19,11 @@ import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
 export class PlayerRecommendationComponent implements OnInit {
   allMetrics: Metric[] = [];
   showModal: boolean = false;
+  
+  showSaveTemplateModal: boolean = false;
+  showLoadTemplateModal: boolean = false;
+  newTemplateName: string = '';
+  savedTemplates: SearchTemplate[] = [];
 
   playerPositions: string[] = [
     'GOALKEEPER',
@@ -37,6 +43,7 @@ export class PlayerRecommendationComponent implements OnInit {
     private recommendationService: RecommendationService,
     private playerService: PlayerService,
     private stateService: RecommendationStateService,
+    private templateService: SearchTemplateService,
     private router: Router
   ) {}
 
@@ -105,10 +112,70 @@ export class PlayerRecommendationComponent implements OnInit {
     return Object.keys(obj);
   }
 
+  openSaveTemplateModal(): void {
+    this.newTemplateName = '';
+    this.showSaveTemplateModal = true;
+  }
+
+  closeSaveTemplateModal(): void {
+    this.showSaveTemplateModal = false;
+  }
+
+  saveTemplate(): void {
+    if (!this.newTemplateName.trim() || this.selectedMetrics.length === 0) return;
+
+    const templatePayload: SearchTemplateSave = {
+      templateName: this.newTemplateName,
+      parts: this.selectedMetrics.map(sm => ({
+        metricId: sm.metric.id,
+        weight: sm.weight
+      }))
+    };
+
+    this.templateService.createTemplate(templatePayload).subscribe({
+      next: () => {
+        this.closeSaveTemplateModal();
+        alert('Šablon uspešno sačuvan!');
+      },
+      error: (err) => console.error('Greška pri čuvanju šablona:', err)
+    });
+  }
+
+  openLoadTemplateModal(): void {
+    this.templateService.getMyTemplates().subscribe({
+      next: (templates) => {
+        this.savedTemplates = templates;
+        this.showLoadTemplateModal = true;
+      },
+      error: (err) => console.error('Greška pri dobavljanju šablona:', err)
+    });
+  }
+
+  closeLoadTemplateModal(): void {
+    this.showLoadTemplateModal = false;
+  }
+
+  loadTemplate(template: SearchTemplate): void {
+    const loadedMetrics: SelectedMetric[] = [];
+    
+    template.parts.forEach(part => {
+      const fullMetric = this.allMetrics.find(m => m.id === part.metricId);
+      if (fullMetric) {
+        loadedMetrics.push({
+          metric: fullMetric,
+          weight: part.weight
+        });
+      }
+    });
+
+    this.selectedMetrics = loadedMetrics;
+    this.closeLoadTemplateModal();
+  }
+
   submitRecommendation(): void {
     if (this.selectedMetrics.length === 0) return;
 
-    const request: RecommendationRequest = {
+    const request = {
       position: this.selectedPosition,
       metricWeights: this.selectedMetrics.map(sm => ({
         metricdId: sm.metric.id,
@@ -129,19 +196,19 @@ export class PlayerRecommendationComponent implements OnInit {
           return this.reportService.getLatestReportForPlayer(player.playerId).pipe(
             map(report => ({ ...player, latestReport: report })),
             catchError(() => of({ ...player, latestReport: null }))
-          )
-        })
+          );
+        });
         
         return forkJoin(playersWithReports);
       })
-      ).subscribe({
-        next: (combinedData) => {
-          this.recommendations = combinedData.sort((a, b) => b.score - a.score);
-        },
-        error: (err) => {
-          console.error(err);
-        }
-      });
+    ).subscribe({
+      next: (combinedData) => {
+        this.recommendations = combinedData.sort((a, b) => b.score - a.score);
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
   }
 
   viewPlayer(playerId: number | undefined): void {
@@ -158,6 +225,7 @@ export class PlayerRecommendationComponent implements OnInit {
   }
 
   formatCategoryName(category: string): string {
+    if (!category) return '';
     return category
       .toLowerCase()
       .split('_')

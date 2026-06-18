@@ -13,9 +13,17 @@
         </select>
       </div>
       
-      <button class="btn-primary" (click)="openModal()">
-        <b>Dodaj metriku</b>
-      </button>
+      <div class="management-actions">
+        <button class="btn-outline" (click)="openLoadTemplateModal()">
+          Učitaj šablon
+        </button>
+        <button class="btn-outline" [disabled]="selectedMetrics.length === 0" (click)="openSaveTemplateModal()">
+          Sačuvaj u šablon
+        </button>
+        <button class="btn-primary" (click)="openModal()">
+          <b>Dodaj metriku</b>
+        </button>
+      </div>
     </div>
 
     <div class="metrics-grid">
@@ -94,6 +102,59 @@
           </div>
         </div>
       </ng-container>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showSaveTemplateModal">
+  <div class="modal-content smaller-modal">
+    <div class="modal-header">
+      <h3>Sačuvaj kao šablon</h3>
+      <button class="close-modal-btn" (click)="closeSaveTemplateModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="templateName">Naziv šablona:</label>
+        <input 
+          type="text" 
+          id="templateName" 
+          [(ngModel)]="newTemplateName" 
+          placeholder="Unesite naziv šablona..." 
+          class="form-control"
+        />
+      </div>
+      <div class="modal-actions-row">
+        <button class="btn-primary full-width" [disabled]="!newTemplateName.trim()" (click)="saveTemplate()">
+          Potvrdi
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showLoadTemplateModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Moji sačuvani šabloni</h3>
+      <button class="close-modal-btn" (click)="closeLoadTemplateModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="templates-list" *ngIf="savedTemplates.length > 0; else noTemplates">
+        <div 
+          class="template-list-item" 
+          *ngFor="let template of savedTemplates" 
+          (click)="loadTemplate(template)"
+        >
+          <div class="template-item-details">
+            <span class="template-name-title">{{ template.templateName }}</span>
+            <span class="template-parts-count">Broj metrika: {{ template.parts?.length || 0 }}</span>
+          </div>
+          <span class="load-action-icon">→</span>
+        </div>
+      </div>
+      <ng-template #noTemplates>
+        <p class="empty-state-text">Nemate sačuvanih šablona za pretragu.</p>
+      </ng-template>
     </div>
   </div>
 </div>
