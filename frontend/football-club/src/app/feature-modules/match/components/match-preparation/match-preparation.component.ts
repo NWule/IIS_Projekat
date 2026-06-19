@@ -163,28 +163,29 @@ export class MatchPreparationComponent implements OnInit {
   }
 
   private saveAppearancesForCurrentStep() {
+    const currentClubId = this.currentStep === 'my-club' ? this.myClub.id! : this.opponentClub.id!;
     const allPlayers = [
-      ...this.startingLineup.map(p => ({ player: p, matchRole: 'STARTER' })),
+      ...this.startingLineup.map(p => ({ player: p, matchRole: 'STARTING_XI' })),
       ...this.bench.map(p => ({ player: p, matchRole: 'BENCH' }))
     ];
 
-    const requests = allPlayers.map(item => {
-      const payload: any = { 
-        gameId: this.gameId,
-        playsForId: item.player.id,
-        minutesPlayed: 0,
-        goals: 0,
-        assists: 0,
-        passingAccuracy: 0,
-        fouls: 0,
-        yellowCards: 0,
-        redCard: false,
-        rating: 0.0,
-        matchRole: item.matchRole 
-      };
-      return this.appearanceService.createAppearance(payload);
-    });
+    const payload: any[] = allPlayers.map(item => ({
+      gameId: this.gameId,
+      playsForId: item.player.id,
+      matchRole: item.matchRole,
+      minutesPlayed: 0,
+      goals: 0,
+      assists: 0,
+      fouls: 0,
+      yellowCards: 0,
+      redCard: false,
+      rating: 0.0,
+      passingAccuracy: 0.0,
+      clubId: currentClubId
+    }));
 
-    return forkJoin(requests);
+    
+
+    return this.appearanceService.saveLineup(this.gameId, currentClubId, payload);
   }
 }

@@ -2,8 +2,8 @@ package com.football_club.Scouting.service.impl;
 
 import com.football_club.MatchTracking.model.Game;
 import com.football_club.MatchTracking.model.Player;
-import com.football_club.MatchTracking.repository.GameRepository;
-import com.football_club.MatchTracking.repository.PlayerRepository;
+import com.football_club.MatchTracking.repository.jpa.GameRepository;
+import com.football_club.MatchTracking.repository.jpa.PlayerRepository;
 import com.football_club.Scouting.dto.GameMetricDTO;
 import com.football_club.Scouting.dto.GameMetricSaveDTO;
 import com.football_club.Scouting.model.GameMetric;

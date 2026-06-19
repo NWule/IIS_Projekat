@@ -1,18 +1,21 @@
 package com.football_club.MatchTracking.service.impl;
 
 import com.football_club.MatchTracking.dto.PlaysForDTO;
+import com.football_club.MatchTracking.event.ContractCreatedEvent;
+import com.football_club.MatchTracking.event.ContractDeletedEvent;
 import com.football_club.MatchTracking.model.Club;
 import com.football_club.MatchTracking.model.Player;
 import com.football_club.MatchTracking.model.PlaysFor;
 import com.football_club.MatchTracking.model.graph.ClubGraph;
 import com.football_club.MatchTracking.model.graph.PlayerGraph;
-import com.football_club.MatchTracking.repository.ClubRepository;
-import com.football_club.MatchTracking.repository.PlayerRepository;
-import com.football_club.MatchTracking.repository.PlaysForRepository;
+import com.football_club.MatchTracking.repository.jpa.ClubRepository;
+import com.football_club.MatchTracking.repository.jpa.PlayerRepository;
+import com.football_club.MatchTracking.repository.jpa.PlaysForRepository;
 import com.football_club.MatchTracking.repository.graph.ClubGraphRepository;
 import com.football_club.MatchTracking.repository.graph.PlayerGraphRepository;
 import com.football_club.MatchTracking.service.IPlaysForService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,7 @@ public class PlaysForService implements IPlaysForService {
     private final ClubRepository clubRepository;
     private final PlayerGraphRepository playerGraphRepository;
     private final ClubGraphRepository clubGraphRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -48,14 +52,12 @@ public class PlaysForService implements IPlaysForService {
 
         PlaysFor savedContract = playsForRepository.save(contract);
 
-        PlayerGraph graphPlayer = playerGraphRepository.findById(savedContract.getPlayer().getId())
-                .orElseThrow(() -> new RuntimeException("PlayerGraph node not found"));
 
-        ClubGraph graphClub = clubGraphRepository.findById((long) savedContract.getClub().getId())
-                .orElseThrow(() -> new RuntimeException("ClubGraph node not found"));
 
-        graphPlayer.setClubGraph(graphClub);
-        playerGraphRepository.save(graphPlayer);
+        eventPublisher.publishEvent(new ContractCreatedEvent(
+                savedContract.getPlayer().getId(),
+                (long) savedContract.getClub().getId()
+        ));
 
         return mapToDTO(savedContract);
     }
@@ -88,11 +90,7 @@ public class PlaysForService implements IPlaysForService {
             throw new RuntimeException("Cannot delete. Contract not found with id: " + id);
         }
         playsForRepository.deleteById(id);
-
-        playerGraphRepository.findById(id).ifPresent(graphPlayer -> {
-            graphPlayer.setClubGraph(null);
-            playerGraphRepository.save(graphPlayer);
-        });
+        eventPublisher.publishEvent(new ContractDeletedEvent(id));
     }
 
     @Override

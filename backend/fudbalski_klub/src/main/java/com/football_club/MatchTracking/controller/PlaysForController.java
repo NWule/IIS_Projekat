@@ -88,7 +88,7 @@ public class PlaysForController {
     }
 
     @GetMapping("/club/{clubId}/roster")
-    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'SCOUT', 'SPORTS_DIRECTOR', 'ADMIN', 'STATISTICIAN')")
     public ResponseEntity<?> getCurrentRoster(
             @PathVariable int clubId,
             @AuthenticationPrincipal User user) {

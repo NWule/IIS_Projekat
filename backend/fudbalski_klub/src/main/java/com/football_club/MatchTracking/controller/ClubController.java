@@ -37,7 +37,7 @@ public class ClubController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'STATISTICIAN', 'SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
     public ResponseEntity<ClubDTO> getClubById(@PathVariable int id) {
         ClubDTO clubDTO = clubService.getClubById(id);
         return ResponseEntity.ok(clubDTO);

@@ -1,12 +1,15 @@
 package com.football_club.MatchTracking.service.impl;
 
 import com.football_club.MatchTracking.dto.ClubDTO;
+import com.football_club.MatchTracking.event.ClubDeletedEvent;
+import com.football_club.MatchTracking.event.ClubCreatedEvent;
+import com.football_club.MatchTracking.event.ClubUpdatedEvent;
 import com.football_club.MatchTracking.model.Club;
-import com.football_club.MatchTracking.model.graph.ClubGraph;
-import com.football_club.MatchTracking.repository.ClubRepository;
+import com.football_club.MatchTracking.repository.jpa.ClubRepository;
 import com.football_club.MatchTracking.repository.graph.ClubGraphRepository;
 import com.football_club.MatchTracking.service.ICLubService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
 public class ClubService implements ICLubService {
     private final ClubRepository clubRepository;
     private final ClubGraphRepository clubGraphRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -31,11 +35,10 @@ public class ClubService implements ICLubService {
         club.setLocation(clubDTO.getLocation());
         Club savedClub = clubRepository.save(club);
 
-        ClubGraph graphClub = new ClubGraph();
-        graphClub.setId((long) savedClub.getId());
-        graphClub.setName(savedClub.getName());
-
-        clubGraphRepository.save(graphClub);
+        eventPublisher.publishEvent(new ClubCreatedEvent(
+                (long) savedClub.getId(),
+                savedClub.getName()
+        ));
 
         return mapToDTO(savedClub);
     }
@@ -74,11 +77,11 @@ public class ClubService implements ICLubService {
 
         Club updatedClub = clubRepository.save(club);
 
-        ClubGraph graphClub = clubGraphRepository.findById((long) id)
-                .orElse(new ClubGraph());
+        eventPublisher.publishEvent(new ClubUpdatedEvent(
+                (long) club.getId(),
+                club.getName()
+        ));
 
-        graphClub.setId((long) updatedClub.getId());
-        graphClub.setName(updatedClub.getName());
         return mapToDTO(updatedClub);
     }
 
@@ -89,7 +92,7 @@ public class ClubService implements ICLubService {
             throw new RuntimeException("Cannot delete. Club not found with id: " + id);
         }
         clubRepository.deleteById(id);
-        clubGraphRepository.deleteById((long) id);
+        eventPublisher.publishEvent(new ClubDeletedEvent((long) id));
     }
 
     @Override

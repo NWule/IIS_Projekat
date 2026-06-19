@@ -35,4 +35,8 @@ export class GameService {
   getLiveGames(): Observable<Game[]> {
     return this.http.get<Game[]>(`${this.apiUrl}/live`);
   }
+
+  getPlayedGames(): Observable<Game[]> {
+    return this.http.get<Game[]>(`${this.apiUrl}/played`);
+  }
 }

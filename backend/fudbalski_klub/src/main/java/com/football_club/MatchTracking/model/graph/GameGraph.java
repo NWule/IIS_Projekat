@@ -12,7 +12,7 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 @AllArgsConstructor
 public class GameGraph {
     @Id
-    private Long Id;
+    private Long id;
     private String status;
 
     @Relationship(type = "HOME_CLUB", direction = Relationship.Direction.OUTGOING)

@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.football_club.MatchTracking.model.Club;
-import com.football_club.MatchTracking.repository.ClubRepository;
+import com.football_club.MatchTracking.repository.jpa.ClubRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;

@@ -2,6 +2,9 @@ package com.football_club.MatchTracking.service.impl;
 
 import com.football_club.MatchTracking.dto.AppearanceDTO;
 import com.football_club.MatchTracking.dto.GameLineupResponseDTO;
+import com.football_club.MatchTracking.event.AppearanceCreatedEvent;
+import com.football_club.MatchTracking.event.AppearanceDeletedEvent;
+import com.football_club.MatchTracking.event.AppearanceUpdatedEvent;
 import com.football_club.MatchTracking.model.Appearance;
 import com.football_club.MatchTracking.model.Game;
 import com.football_club.MatchTracking.model.PlaysFor;
@@ -10,14 +13,15 @@ import com.football_club.MatchTracking.model.enums.MatchRole;
 import com.football_club.MatchTracking.model.graph.AppearanceGraph;
 import com.football_club.MatchTracking.model.graph.GameGraph;
 import com.football_club.MatchTracking.model.graph.PlayerGraph;
-import com.football_club.MatchTracking.repository.AppearanceRepository;
-import com.football_club.MatchTracking.repository.GameRepository;
-import com.football_club.MatchTracking.repository.PlaysForRepository;
+import com.football_club.MatchTracking.repository.jpa.AppearanceRepository;
+import com.football_club.MatchTracking.repository.jpa.GameRepository;
+import com.football_club.MatchTracking.repository.jpa.PlaysForRepository;
 import com.football_club.MatchTracking.repository.graph.AppearanceGraphRepository;
 import com.football_club.MatchTracking.repository.graph.GameGraphRepository;
 import com.football_club.MatchTracking.repository.graph.PlayerGraphRepository;
 import com.football_club.MatchTracking.service.IAppearanceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +39,7 @@ public class AppearanceService implements IAppearanceService {
     private final AppearanceGraphRepository appearanceGraphRepository;
     private final PlayerGraphRepository playerGraphRepository;
     private final GameGraphRepository gameGraphRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -60,19 +65,16 @@ public class AppearanceService implements IAppearanceService {
 
         Appearance savedAppearance = appearanceRepository.save(appearance);
 
-        AppearanceGraph appGraph = new AppearanceGraph();
-        appGraph.setId(savedAppearance.getId());
-        mapStatsToGraph(savedAppearance, appGraph);
+        appearanceRepository.flush();
 
-        PlayerGraph playerGraph = playerGraphRepository.findById(savedAppearance.getPlaysFor().getPlayer().getId())
-                .orElseThrow(() -> new RuntimeException("PlayerGraph node not found"));
-        GameGraph gameGraph = gameGraphRepository.findById(savedAppearance.getGame().getId())
-                .orElseThrow(() -> new RuntimeException("GameGraph node not found"));
+        eventPublisher.publishEvent(new AppearanceCreatedEvent(
+                savedAppearance.getId(), savedAppearance.getMatchRole(), savedAppearance.getMinutesPlayed(),
+                savedAppearance.getGoals(), savedAppearance.getAssists(), savedAppearance.getFouls(),
+                savedAppearance.getYellowCards(), savedAppearance.isRedCard(), savedAppearance.getRating(),
+                savedAppearance.getPassingAccuracy(), savedAppearance.getPlaysFor().getPlayer().getId(),
+                savedAppearance.getGame().getId()
+        ));
 
-        appGraph.setPlayerGraph(playerGraph);
-        appGraph.setGameGraph(gameGraph);
-
-        appearanceGraphRepository.save(appGraph);
         return mapToDTO(savedAppearance);
     }
 
@@ -114,19 +116,15 @@ public class AppearanceService implements IAppearanceService {
         appearance.setMatchRole(MatchRole.valueOf(dto.getMatchRole()));
 
         Appearance updatedAppearance = appearanceRepository.save(appearance);
-        AppearanceGraph appGraph = appearanceGraphRepository.findById(id).orElse(new AppearanceGraph());
+        appearanceRepository.flush();
 
-        appGraph.setId(updatedAppearance.getId());
-        mapStatsToGraph(updatedAppearance, appGraph);
-
-        if (appGraph.getPlayerGraph() == null) {
-            playerGraphRepository.findById(updatedAppearance.getPlaysFor().getPlayer().getId()).ifPresent(appGraph::setPlayerGraph);
-        }
-        if (appGraph.getGameGraph() == null) {
-            gameGraphRepository.findById(updatedAppearance.getGame().getId()).ifPresent(appGraph::setGameGraph);
-        }
-
-        appearanceGraphRepository.save(appGraph);
+        eventPublisher.publishEvent(new AppearanceUpdatedEvent(
+                updatedAppearance.getId(), updatedAppearance.getMatchRole(), updatedAppearance.getMinutesPlayed(),
+                updatedAppearance.getGoals(), updatedAppearance.getAssists(), updatedAppearance.getFouls(),
+                updatedAppearance.getYellowCards(), updatedAppearance.isRedCard(), updatedAppearance.getRating(),
+                updatedAppearance.getPassingAccuracy(), updatedAppearance.getPlaysFor().getPlayer().getId(),
+                updatedAppearance.getGame().getId()
+        ));
         return mapToDTO(updatedAppearance);
     }
 
@@ -137,7 +135,7 @@ public class AppearanceService implements IAppearanceService {
             throw new RuntimeException("Cannot delete. Appearance not found with id: " + id);
         }
         appearanceRepository.deleteById(id);
-        appearanceGraphRepository.deleteById(id);
+        eventPublisher.publishEvent(new AppearanceDeletedEvent(id));
     }
 
     @Override
@@ -177,21 +175,18 @@ public class AppearanceService implements IAppearanceService {
         }
         List<Appearance> savedAppearances = appearanceRepository.saveAll(appearancesToSave);
 
-        List<AppearanceGraph> graphAppearancesToSave = savedAppearances.stream().map(app -> {
-            AppearanceGraph ag = appearanceGraphRepository.findById(app.getId()).orElse(new AppearanceGraph());
-            ag.setId(app.getId());
-            mapStatsToGraph(app, ag);
+        appearanceRepository.flush();
 
-            if (ag.getPlayerGraph() == null) {
-                ag.setPlayerGraph(playerGraphRepository.findById(app.getPlaysFor().getPlayer().getId()).orElse(null));
-            }
-            if (ag.getGameGraph() == null) {
-                ag.setGameGraph(gameGraphRepository.findById(app.getGame().getId()).orElse(null));
-            }
-            return ag;
-        }).collect(Collectors.toList());
 
-        appearanceGraphRepository.saveAll(graphAppearancesToSave);
+        for (Appearance app : savedAppearances) {
+            eventPublisher.publishEvent(new AppearanceUpdatedEvent(
+                    app.getId(), app.getMatchRole(), app.getMinutesPlayed(),
+                    app.getGoals(), app.getAssists(), app.getFouls(),
+                    app.getYellowCards(), app.isRedCard(), app.getRating(),
+                    app.getPassingAccuracy(), app.getPlaysFor().getPlayer().getId(),
+                    app.getGame().getId()
+            ));
+        }
 
         List<AppearanceDTO> allAppearances = appearanceRepository.findAppearancesWithPlayerInfoByGameId(gameId).stream()
                 .map(this::mapToDTO).collect(Collectors.toList());

@@ -1,5 +1,6 @@
 export interface MatchEventRequest {
-  appearanceId: number;
+  clubId: number;
+  playsForId: number;
   eventType: string;
-  minute: number;
+  matchMinute: number;
 }

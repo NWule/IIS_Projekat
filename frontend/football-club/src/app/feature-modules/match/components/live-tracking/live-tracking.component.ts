@@ -11,6 +11,7 @@ import { MatchEventService } from '../../services/match-event.service';
 import { Game } from '../../models/game.model';
 import { Club } from '../../models/club.model';
 import { Appearance } from '../../models/appearance.model';
+import { MatchEventRequest } from '../../models/match-event.model';
 
 @Component({
   selector: 'app-live-tracking',
@@ -143,9 +144,9 @@ export class LiveTrackingComponent implements OnInit, OnDestroy {
 
   private handlePassExecution(player1: Appearance, player2: Appearance): void {
     const isSuccessful = player1.clubId === player2.clubId;
-    const eventType = isSuccessful ? 'PASS_SUCCESS' : 'PASS_FAILURE';
+    const eventType = isSuccessful ? 'PASS_SUCCESS' : 'PASS_FAIL';
 
-    this.sendEventToBackend(player1.id!, eventType);
+    this.sendEventToBackend(player1, eventType);
 
     this.isPassMode = false;
     this.selectedPlayer = null;
@@ -157,15 +158,16 @@ export class LiveTrackingComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.sendEventToBackend(this.selectedPlayer.id!, eventType);
+    this.sendEventToBackend(this.isPassMode ? this.selectedPlayer : this.selectedPlayer!, eventType);
     this.selectedPlayer = null;
   }
 
-  private sendEventToBackend(appearanceId: number, eventType: string): void {
-    const matchEventDto = {
-      appearanceId: appearanceId,
+  private sendEventToBackend(appearance: Appearance, eventType: string): void {
+    const matchEventDto: MatchEventRequest = {
+      clubId: appearance.clubId!,
+      playsForId: appearance.playsForId!,
       eventType: eventType,
-      minute: this.currentMinute
+      matchMinute: this.currentMinute
     };
 
     this.matchEventService.recordLiveEvent(this.gameId, matchEventDto).subscribe({

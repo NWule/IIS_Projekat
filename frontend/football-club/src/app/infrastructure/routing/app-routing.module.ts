@@ -70,11 +70,11 @@ const routes: Routes = [
   { path: 'matches',                 component: MatchListComponent },
   { path: 'add-match',               component: MatchEntryComponent },
   { path: 'match-details/:id',       component: MatchDetailsComponent },
-  { path: 'match-preparation',   component: MatchPreparationComponent },
+  { path: 'match-preparation/:id',   component: MatchPreparationComponent },
   { path: 'upcoming-matches',          component: UpcomingMatchesComponent },
   { path: 'live-tracking/:id',       component: LiveTrackingComponent }, 
   { path: 'live-match-coach/:id',    component: LiveMatchCoachComponent },
-  { path: 'coach-live-finder', component: LiveMatchFinderComponent },
+  { path: 'live-match-finder', component: LiveMatchFinderComponent },
 
   // Performanse
   { path: 'add-performance',         component: PlayerPerformanceEntryComponent },

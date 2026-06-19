@@ -23,6 +23,7 @@ public class PlayerController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ASSISTANT_COACH', 'ADMIN')")
     public ResponseEntity<PlayerDTO> createPlayer(@RequestBody PlayerDTO playerDTO) {
+        System.out.println("DEBUG: Kontroler primio zahtev: " + playerDTO);
         PlayerDTO createdPlayer = playerService.createPlayer(playerDTO);
         return new ResponseEntity<>(createdPlayer, HttpStatus.CREATED);
     }

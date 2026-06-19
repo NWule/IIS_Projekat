@@ -51,19 +51,19 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let red of [
-              { naziv: 'Golovi',                home: 'homeGoals',          away: 'awayGoals'         },
-              { naziv: 'Šutevi',                home: 'homeShots',          away: 'awayShots'         },
-              { naziv: 'Šutevi u okvir',        home: 'homeShotsOnTarget',  away: 'awayShotsOnTarget' },
-              { naziv: 'Posed (%)',             home: 'homePossession',     away: 'awayPossession'    },
-              { naziv: 'Korneri',               home: 'homeCorners',        away: 'awayCorners'       },
-              { naziv: 'Faulovi',               home: 'homeFouls',          away: 'awayFouls'         },
-              { naziv: 'Ofsajdi',               home: 'homeOffsides',       away: 'awayOffsides'      },
-              { font: 'Tačnost dodavanja (%)', home: 'homePassAccuracy',   away: 'awayPassAccuracy'  }
+            <tr *ngFor="let row of [
+              { label: 'Golovi', home: 'homeGoals', away: 'awayGoals' },
+              { label: 'Šutevi', home: 'homeShots', away: 'awayShots' },
+              { label: 'Šutevi u okvir', home: 'homeShotsOnTarget', away: 'awayShotsOnTarget' },
+              { label: 'Posed (%)', home: 'homePossession', away: 'awayPossession' },
+              { label: 'Korneri', home: 'homeCorners', away: 'awayCorners' },
+              { label: 'Faulovi', home: 'homeFouls', away: 'awayFouls' },
+              { label: 'Ofsajdi', home: 'homeOffsides', away: 'awayOffsides' },
+              { label: 'Tačnost dodavanja (%)', home: 'homePassAccuracy', away: 'awayPassAccuracy' }
             ]">
-              <td><input type="number" [formControlName]="red.home" min="0" class="stat-input" /></td>
-              <td>{{ red.naziv }}</td>
-              <td><input type="number" [formControlName]="red.away" min="0" class="stat-input" /></td>
+              <td><input type="number" [formControlName]="row.home" min="0" class="stat-input" /></td>
+              <td>{{ row.label }}</td>
+              <td><input type="number" [formControlName]="row.away" min="0" class="stat-input" /></td>
             </tr>
           </tbody>
         </table>

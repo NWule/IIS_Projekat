@@ -71,6 +71,10 @@ export class MatchDetailsComponent implements OnInit {
   private checkUserRole(): void {
     this.authService.user$.subscribe(user => {
       this.isStatistician = user?.role === 'ROLE_STATISTICIAN';
+      console.log('ROLE DIAGNOSTICS:', {
+        currentRole: user?.role,
+        isStatistician: this.isStatistician
+      });
     });
   }
 
@@ -95,16 +99,43 @@ export class MatchDetailsComponent implements OnInit {
         this.isHomeClub = myClub.id === this.game.homeClubId;
         this.isUpcoming = this.game.status === 'UPCOMING';
 
+        const isMyClubParticipating = myClub.id === this.game.homeClubId || myClub.id === this.game.awayClubId;
+        
+        this.isStatistician = this.isStatistician && isMyClubParticipating;
+
+        console.log('MATCH PARTICIPATION DIAGNOSTICS:', {
+          myClubId: myClub.id,
+          homeClubId: this.game.homeClubId,
+          awayClubId: this.game.awayClubId,
+          doesMyClubParticipate: isMyClubParticipating,
+          finalManagementRight: this.isStatistician
+        });
+
+        if (!this.isStatistician && this.statsForm) {
+          this.statsForm.disable();
+        }
+
         this.homePerformances = performances.filter(p => p.clubId === this.game.homeClubId);
         this.awayPerformances = performances.filter(p => p.clubId === this.game.awayClubId);
 
-        this.contractService.getCurrentRoster(myClub.id!).subscribe(roster => {
-          this.myRoster = roster;
+        if (isMyClubParticipating) {
+          this.contractService.getCurrentRoster(myClub.id!).subscribe({
+            next: (roster) => {
+              this.myRoster = roster;
+              this.loading = false;
+            },
+            error: (err) => {
+              console.error('Error loading roster:', err);
+              this.loading = false;
+            }
+          });
+        } else {
+          this.myRoster = [];
           this.loading = false;
-        });
+        }
       },
       error: (err) => {
-        console.error('Greška pri učitavanju podataka:', err);
+        console.error('Error loading match data:', err);
         this.loading = false;
       }
     });
@@ -161,7 +192,6 @@ export class MatchDetailsComponent implements OnInit {
     });
   }
 
-  
   startMatch(): void {
     if (!this.isStatistician) return;
 
@@ -172,11 +202,12 @@ export class MatchDetailsComponent implements OnInit {
 
     this.gameService.updateGame(this.gameId, updatedGamePayload).subscribe({
       next: () => {
-        alert('Utakmica je uspešno pokrenuta uživo!');
+        alert('Match successfully started live!');
         this.router.navigate(['/live-tracking', this.gameId]);
       },
       error: (err) => {
-        alert('Došlo je do greške na serveru pri pokretanju utakmice.');
+        console.error('Error starting the match:', err);
+        alert('A server error occurred while starting the match.');
       }
     });
   }
@@ -188,9 +219,9 @@ export class MatchDetailsComponent implements OnInit {
       next: (saved) => {
         this.statistics = saved;
         this.statsExists = true;
-        alert('Statistike su uspešno sačuvane!');
+        alert('Statistics successfully saved!');
       },
-      error: (err) => console.error('Greška:', err)
+      error: (err) => console.error('Error saving statistics:', err)
     });
   }
 
@@ -226,12 +257,12 @@ export class MatchDetailsComponent implements OnInit {
         } else {
           this.awayPerformances = [...this.awayPerformances, created];
         }
-        alert('Performansa je uspešno sačuvana!');
+        alert('Performance successfully saved!');
         this.toggleAddForm();
       },
       error: (err) => {
-        console.error('Greška:', err);
-        alert('Greška prilikom čuvanja performanse!');
+        console.error('Error saving performance:', err);
+        alert('An error occurred while saving player performance!');
       }
     });
   }

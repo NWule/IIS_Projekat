@@ -1,8 +1,7 @@
-package com.football_club.MatchTracking.repository;
+package com.football_club.MatchTracking.repository.jpa;
 
 import com.football_club.MatchTracking.model.MatchEvent;
 import com.influxdb.client.InfluxDBClient;
-import com.influxdb.client.WriteApi;
 import com.influxdb.client.WriteApiBlocking;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.query.FluxTable;

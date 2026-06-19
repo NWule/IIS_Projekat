@@ -104,13 +104,13 @@ public class AppearanceController {
             @RequestBody List<AppearanceDTO> lineupDTOs, @AuthenticationPrincipal User user) {
         GameDTO game = gameService.getGameById(gameId);
 
-        if (!clubId.equals(game.getHomeClubId()) && !clubId.equals(game.getAwayClubId())) {
+        if (clubId.intValue() != game.getHomeClubId() && clubId.intValue() != game.getAwayClubId()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Greška: Izabrani klub ne učestvuje u ovoj utakmici!");
         }
 
         if (!user.getRole().name().equals("ROLE_ADMIN")) {
-            if (user.getClubId() == null || (!user.getClubId().equals(game.getHomeClubId()) && !user.getClubId().equals(game.getAwayClubId()))) {
+            if (user.getClubId() == null || (user.getClubId() != game.getHomeClubId() && user.getClubId() != game.getAwayClubId())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
         }
