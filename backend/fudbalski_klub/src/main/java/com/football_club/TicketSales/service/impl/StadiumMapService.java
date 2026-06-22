@@ -10,6 +10,8 @@ import com.football_club.TicketSales.repository.SeatRepository;
 import com.football_club.TicketSales.repository.TicketRepository;
 import com.football_club.TicketSales.repository.TicketTypeRepository;
 import com.football_club.TicketSales.repository.ZoneRepository;
+import com.football_club.TicketSales.service.IGameZonePriceService;
+import com.football_club.TicketSales.service.IPricingRuleService;
 import com.football_club.TicketSales.service.IStadiumMapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,8 @@ public class StadiumMapService implements IStadiumMapService {
     private final SeatRepository seatRepository;
     private final TicketTypeRepository ticketTypeRepository;
     private final TicketRepository ticketRepository;
+    private final IPricingRuleService pricingRuleService;
+    private final IGameZonePriceService gameZonePriceService;
 
     @Override
     public StadiumMapDTO getStadiumMap(Long gameId) {
@@ -39,7 +43,7 @@ public class StadiumMapService implements IStadiumMapService {
         Set<Long> unavailableSeatIds = resolveUnavailableSeatIds(gameId);
 
         List<ZoneMapDTO> zoneMaps = zoneRepository.findAll().stream()
-                .map(zone -> buildZoneMap(zone, unavailableSeatIds))
+                .map(zone -> buildZoneMap(zone, unavailableSeatIds, gameId))
                 .collect(Collectors.toList());
 
         return StadiumMapDTO.builder()
@@ -72,7 +76,7 @@ public class StadiumMapService implements IStadiumMapService {
                 .build();
     }
 
-    private ZoneMapDTO buildZoneMap(Zone zone, Set<Long> unavailableSeatIds) {
+    private ZoneMapDTO buildZoneMap(Zone zone, Set<Long> unavailableSeatIds, Long gameId) {
         List<SeatMapDTO> seatDTOs = seatRepository.findByZoneId(zone.getId()).stream()
                 .map(seat -> SeatMapDTO.builder()
                         .id(seat.getId())
@@ -84,11 +88,14 @@ public class StadiumMapService implements IStadiumMapService {
                         .build())
                 .collect(Collectors.toList());
 
+        BigDecimal basePrice = gameZonePriceService.getEffectiveBasePrice(gameId, zone.getId(), zone.getBasePrice());
+        BigDecimal effectivePrice = pricingRuleService.applyRules(basePrice, gameId, zone.getId());
+
         return ZoneMapDTO.builder()
                 .id(zone.getId())
                 .name(zone.getName())
                 .color(zone.getColor())
-                .basePrice(zone.getBasePrice())
+                .basePrice(effectivePrice)
                 .numberOfRows(zone.getNumberOfRows())
                 .seatsPerRow(zone.getSeatsPerRow())
                 .seats(seatDTOs)

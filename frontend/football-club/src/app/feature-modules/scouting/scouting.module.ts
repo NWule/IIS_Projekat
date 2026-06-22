@@ -14,6 +14,7 @@ import { MetricsDashboardComponent } from './components/metrics-dashboard/metric
 import { WishlistsComponent } from './components/wishlists/wishlists.component';
 import { ScoutingRequestsComponent } from './components/scouting-requests/scouting-requests.component';
 import { PlayerRecommendationComponent } from './components/player-recommendation/player-recommendation.component';
+import { SearchTemplateManagementComponent } from './components/search-template-management/search-template-management.component';
 
 
 
@@ -30,7 +31,8 @@ import { PlayerRecommendationComponent } from './components/player-recommendatio
     MetricsDashboardComponent,
     WishlistsComponent,
     ScoutingRequestsComponent,
-    PlayerRecommendationComponent
+    PlayerRecommendationComponent,
+    SearchTemplateManagementComponent,
   ],
   imports: [
     CommonModule,

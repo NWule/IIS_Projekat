@@ -11,8 +11,10 @@ import com.football_club.Scouting.model.SearchTemplate;
 import com.football_club.Scouting.model.TemplatePart;
 import com.football_club.Scouting.repository.MetricRepository;
 import com.football_club.Scouting.repository.SearchTemplateRepository;
+import com.football_club.Scouting.repository.TemplatePartRepository;
 import com.football_club.Scouting.service.ISearchTemplateService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SearchTemplateService implements ISearchTemplateService {
@@ -42,18 +45,7 @@ public class SearchTemplateService implements ISearchTemplateService {
 
         List<TemplatePart> templateParts = new ArrayList<>();
         if (dto.getParts() != null) {
-            for (TemplatePartSaveDTO partDto : dto.getParts()) {
-                Metric metric = metricRepository.findById(partDto.getMetricId())
-                        .orElseThrow(() -> new NoSuchElementException("Metrika nije pronađena sa ID-em: " + partDto.getMetricId()));
-
-                TemplatePart part = new TemplatePart();
-                part.setMetric(metric);
-                part.setWeight(partDto.getWeight());
-
-                part.setSearchTemplate(template);
-
-                templateParts.add(part);
-            }
+            templateParts = createTemplateParts(dto.getParts(), template);
         }
 
         template.setTemplateParts(templateParts);
@@ -81,13 +73,40 @@ public class SearchTemplateService implements ISearchTemplateService {
     @Override
     @Transactional
     public SearchTemplateDTO updateTemplate(Long id, SearchTemplateSaveDTO dto) {
-        SearchTemplate template = searchTemplateRepository.findById(id)
+        SearchTemplate template = searchTemplateRepository.findWithPartsById(id)
                 .orElseThrow(() -> new NoSuchElementException("Šablon pretrage sa ID-em " + id + " ne postoji."));
 
         template.setTemplateName(dto.getTemplateName());
 
-        SearchTemplate updated = searchTemplateRepository.save(template);
-        return mapToDTO(updated);
+        template.getTemplateParts().clear();
+        searchTemplateRepository.saveAndFlush(template);
+
+        List<TemplatePart> templateParts = new ArrayList<>();
+        if (dto.getParts() != null) {
+            templateParts = createTemplateParts(dto.getParts(), template);
+        }
+
+        template.getTemplateParts().addAll(templateParts);
+
+        SearchTemplate saved = searchTemplateRepository.save(template);
+        return mapToDTO(saved);
+    }
+
+    private List<TemplatePart> createTemplateParts(List<TemplatePartSaveDTO> parts, SearchTemplate template) {
+        List<TemplatePart> templateParts = new ArrayList<>();
+        for (TemplatePartSaveDTO part : parts) {
+            Metric metric = metricRepository.findById(part.getMetricId())
+                    .orElseThrow(() -> new NoSuchElementException("Metrika nije pronađena sa ID-em: " + part.getMetricId()));
+
+            TemplatePart newPart = new TemplatePart();
+            newPart.setMetric(metric);
+            newPart.setWeight(part.getWeight());
+
+            newPart.setSearchTemplate(template);
+
+            templateParts.add(newPart);
+        }
+        return templateParts;
     }
 
     @Override

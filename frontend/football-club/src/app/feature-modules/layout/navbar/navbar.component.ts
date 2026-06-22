@@ -81,4 +81,8 @@ export class NavbarComponent implements OnInit {
   onPlayerRecommendationClick() {
     this.router.navigate(['/player-recommendation']);
   }
+
+  onSeachTemplatesClick() {
+    this.router.navigate(['/search-templates']);
+  }
 }

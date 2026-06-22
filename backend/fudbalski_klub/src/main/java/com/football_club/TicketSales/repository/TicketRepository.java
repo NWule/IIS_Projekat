@@ -16,4 +16,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     @Query("SELECT t.seat.id FROM Ticket t WHERE t.game.id = :gameId")
     Set<Long> findSeatIdsByGameId(@Param("gameId") Long gameId);
+
+    long countByGameIdAndSeat_ZoneId(Long gameId, Long zoneId);
 }

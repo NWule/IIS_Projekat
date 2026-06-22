@@ -27,6 +27,6 @@ public class SearchTemplate {
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
 
-    @OneToMany(mappedBy = "searchTemplate", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "searchTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TemplatePart> templateParts;
 }

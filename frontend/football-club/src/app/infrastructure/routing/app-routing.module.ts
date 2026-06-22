@@ -31,6 +31,10 @@ import { ZoneFormComponent } from '../../feature-modules/ticket-sales/components
 import { SeatListComponent } from '../../feature-modules/ticket-sales/components/seat-list/seat-list.component';
 import { TicketTypeListComponent } from '../../feature-modules/ticket-sales/components/ticket-type-list/ticket-type-list.component';
 import { TicketTypeFormComponent } from '../../feature-modules/ticket-sales/components/ticket-type-form/ticket-type-form.component';
+import { PricingRuleListComponent } from '../../feature-modules/ticket-sales/components/pricing-rule-list/pricing-rule-list.component';
+import { PricingRuleFormComponent } from '../../feature-modules/ticket-sales/components/pricing-rule-form/pricing-rule-form.component';
+import { GameZonePriceComponent } from '../../feature-modules/ticket-sales/components/game-zone-price/game-zone-price.component';
+import { PriceChangeLogComponent } from '../../feature-modules/ticket-sales/components/price-change-log/price-change-log.component';
 
 import { ScoutingPlayerListComponent } from '../../feature-modules/scouting/components/scouting-player-list/scouting-player-list.component';
 import { CreateReportComponent } from '../../feature-modules/scouting/components/create-report/create-report.component';
@@ -47,6 +51,7 @@ import { LiveMatchCoachComponent } from 'src/app/feature-modules/match/component
 import { LiveTrackingComponent } from 'src/app/feature-modules/match/components/live-tracking/live-tracking.component';
 import { LiveMatchFinderComponent } from 'src/app/feature-modules/match/components/live-match-finder/live-match-finder.component';
 
+import { SearchTemplateManagementComponent } from 'src/app/feature-modules/scouting/components/search-template-management/search-template-management.component';
 
 const routes: Routes = [
   { path: '',                     redirectTo: 'login', pathMatch: 'full' },
@@ -95,6 +100,11 @@ const routes: Routes = [
   { path: 'ticket-types',            component: TicketTypeListComponent },
   { path: 'add-ticket-type',         component: TicketTypeFormComponent },
   { path: 'edit-ticket-type/:id',    component: TicketTypeFormComponent },
+  { path: 'pricing-rules',           component: PricingRuleListComponent },
+  { path: 'add-pricing-rule',        component: PricingRuleFormComponent },
+  { path: 'edit-pricing-rule/:id',   component: PricingRuleFormComponent },
+  { path: 'game-zone-prices',        component: GameZonePriceComponent },
+  { path: 'price-change-log',        component: PriceChangeLogComponent },
 
   // Skaut/Direktor
   { path: 'scouting-dashboard',       component: ScoutingPlayerListComponent },
@@ -111,6 +121,7 @@ const routes: Routes = [
   { path: 'metrics-dashboard',      component: MetricsDashboardComponent },
   { path: 'wishlists',              component: WishlistsComponent },
   { path: 'player-recommendation',  component: PlayerRecommendationComponent },
+  { path: 'search-templates',       component: SearchTemplateManagementComponent },
 
   { path: '**',                      redirectTo: 'matches' }
 ];
