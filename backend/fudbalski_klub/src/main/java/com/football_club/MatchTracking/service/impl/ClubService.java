@@ -24,7 +24,7 @@ public class ClubService implements ICLubService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
-    @Transactional
+    @Transactional("transactionManager")
     public ClubDTO createClub(ClubDTO clubDTO) {
         if (clubRepository.findByName(clubDTO.getName()).isPresent()) {
             throw new RuntimeException("Club with name '" + clubDTO.getName() + "' already exists!");
@@ -44,6 +44,7 @@ public class ClubService implements ICLubService {
     }
 
     @Override
+    @Transactional(value = "transactionManager", readOnly = true)
     public ClubDTO getClubById(int id) {
         Club club = clubRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Club not found with id: " + id));
@@ -51,6 +52,7 @@ public class ClubService implements ICLubService {
     }
 
     @Override
+    @Transactional(value = "transactionManager", readOnly = true)
     public List<ClubDTO> getAllClubs() {
         return clubRepository.findAll().stream()
                 .map(this::mapToDTO)
@@ -58,7 +60,7 @@ public class ClubService implements ICLubService {
     }
 
     @Override
-    @Transactional
+    @Transactional("transactionManager")
     public ClubDTO updateClub(int id, ClubDTO clubDTO) {
         Club club = clubRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Club not found with id: " + id));
@@ -86,7 +88,7 @@ public class ClubService implements ICLubService {
     }
 
     @Override
-    @Transactional
+    @Transactional("transactionManager")
     public void deleteClub(int id) {
         if (!clubRepository.existsById(id)) {
             throw new RuntimeException("Cannot delete. Club not found with id: " + id);
@@ -96,6 +98,7 @@ public class ClubService implements ICLubService {
     }
 
     @Override
+    @Transactional(value = "transactionManager", readOnly = true)
     public List<ClubDTO> getLeagueTable() {
         return clubRepository.findAllByOrderByWinsDesc().stream()
                 .map(this::mapToDTO)
@@ -103,6 +106,7 @@ public class ClubService implements ICLubService {
     }
 
     @Override
+    @Transactional(value = "transactionManager", readOnly = true)
     public List<ClubDTO> searchClubsByName(String name) {
         return clubRepository.findByNameContainingIgnoreCase(name).stream()
                 .map(this::mapToDTO)

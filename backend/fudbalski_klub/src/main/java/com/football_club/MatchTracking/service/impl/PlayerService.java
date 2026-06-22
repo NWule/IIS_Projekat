@@ -34,7 +34,7 @@ public class PlayerService implements IPlayerService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
-    @Transactional
+    @Transactional("transactionManager")
     public PlayerDTO createPlayer(PlayerDTO playerDTO) {
         Player player = new Player();
         player.setName(playerDTO.getName());
@@ -57,6 +57,7 @@ public class PlayerService implements IPlayerService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public PlayerDTO getPlayerById(Long id) {
         Player player = playerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Player not found with id: " + id));
@@ -64,6 +65,7 @@ public class PlayerService implements IPlayerService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<PlayerDTO> getPlayersByIds(List<Long> playerIds) {
         return playerRepository.findByIdIn(playerIds).stream()
                 .map(this::mapToDTO)
@@ -71,6 +73,7 @@ public class PlayerService implements IPlayerService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<PlayerDTO> getAllPlayers() {
         return playerRepository.findAll().stream()
                 .map(this::mapToDTO)
@@ -78,7 +81,7 @@ public class PlayerService implements IPlayerService {
     }
 
     @Override
-    @Transactional
+    @Transactional("transactionManager")
     public PlayerDTO updatePlayer(Long id, PlayerDTO playerDTO) {
         Player player = playerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Player not found with id: " + id));
@@ -101,7 +104,7 @@ public class PlayerService implements IPlayerService {
     }
 
     @Override
-    @Transactional
+    @Transactional("transactionManager")
     public void deletePlayer(Long id) {
         if (!playerRepository.existsById(id)) {
             throw new RuntimeException("Cannot delete. Player not found with id: " + id);
@@ -111,6 +114,7 @@ public class PlayerService implements IPlayerService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<PlayerDTO> searchPlayers(String keyword) {
         return playerRepository.findByNameContainingIgnoreCaseOrSurnameContainingIgnoreCase(keyword, keyword)
                 .stream()
@@ -119,6 +123,7 @@ public class PlayerService implements IPlayerService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<PlayerDTO> advancedSearch(SearchParameters searchParameters) {
         List<Player> players = playerRepository.findAll()
                 .stream()

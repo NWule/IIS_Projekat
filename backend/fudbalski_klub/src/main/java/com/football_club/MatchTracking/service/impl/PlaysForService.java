@@ -35,7 +35,7 @@ public class PlaysForService implements IPlaysForService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public PlaysForDTO createContract(PlaysForDTO dto) {
         Player player = playerRepository.findById(dto.getPlayerId())
                 .orElseThrow(() -> new RuntimeException("Player not found with id: " + dto.getPlayerId()));
@@ -63,6 +63,7 @@ public class PlaysForService implements IPlaysForService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public PlaysForDTO getContractById(Long id) {
         PlaysFor contract = playsForRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Contract not found with id: " + id));
@@ -70,7 +71,7 @@ public class PlaysForService implements IPlaysForService {
     }
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public PlaysForDTO updateContract(Long id, PlaysForDTO dto) {
         PlaysFor contract = playsForRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Contract not found with id: " + id));
@@ -84,7 +85,7 @@ public class PlaysForService implements IPlaysForService {
     }
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public void deleteContract(Long id) {
         if (!playsForRepository.existsById(id)) {
             throw new RuntimeException("Cannot delete. Contract not found with id: " + id);
@@ -94,6 +95,7 @@ public class PlaysForService implements IPlaysForService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<PlaysForDTO> getPlayerHistory(Long playerId) {
         return playsForRepository.findByPlayerId(playerId).stream()
                 .map(this::mapToDTO)
@@ -101,6 +103,7 @@ public class PlaysForService implements IPlaysForService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<PlaysForDTO> getClubHistory(int clubId) {
         return playsForRepository.findByClubId(clubId).stream()
                 .map(this::mapToDTO)
@@ -108,6 +111,7 @@ public class PlaysForService implements IPlaysForService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public PlaysForDTO getCurrentContract(Long playerId) {
         PlaysFor currentContract = playsForRepository.findCurrentContract(playerId, LocalDate.now())
                 .orElseThrow(() -> new RuntimeException("No active contract found for player id: " + playerId));
@@ -115,6 +119,7 @@ public class PlaysForService implements IPlaysForService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<PlaysForDTO> getCurrentRoster(int clubId) {
         return playsForRepository.findCurrentRoster(clubId, LocalDate.now()).stream()
                 .map(this::mapToDTO)

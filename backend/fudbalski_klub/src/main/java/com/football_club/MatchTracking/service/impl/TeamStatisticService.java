@@ -28,7 +28,7 @@ public class TeamStatisticService implements ITeamStatisticService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public TeamStatisticDTO saveFinalStatistic(TeamStatisticDTO dto) {
         Game game = gameRepository.findById(dto.getGameId())
                 .orElseThrow(() -> new RuntimeException("Game not found with id: " + dto.getGameId()));
@@ -74,6 +74,7 @@ public class TeamStatisticService implements ITeamStatisticService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public TeamStatisticDTO getStatisticByGameId(Long gameId) {
         TeamStatistic statistic = teamStatisticRepository.findByGameId(gameId)
                 .orElseThrow(() -> new RuntimeException("Statistic not found for game id: " + gameId));
@@ -81,7 +82,7 @@ public class TeamStatisticService implements ITeamStatisticService {
     }
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public void deleteStatistic(Long id) {
         if (!teamStatisticRepository.existsById(id)) {
             throw new RuntimeException("Cannot delete. Statistic not found with id: " + id);

@@ -23,10 +23,13 @@ public class FudbalskiKlubApplication {
 	    "com.football_club.MatchTracking.repository.jpa",
 	    "com.football_club.Scouting.repository",
 	    "com.football_club.TicketSales.repository"
-	})
+	},
+			transactionManagerRef = "transactionManager"
+	)
 	@EnableNeo4jRepositories(basePackages = {
 	    "com.football_club.MatchTracking.repository.graph"
-	})
+	},
+			transactionManagerRef = "neo4jTransactionManager")
 	public class DatabaseConfig {
 	}
 

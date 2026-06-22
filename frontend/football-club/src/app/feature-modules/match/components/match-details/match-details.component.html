@@ -11,7 +11,7 @@
     <div class="team-name away">{{ awayClub?.name }}</div>
   </div>
   
-  <div class="match-date">
+  <div class="match-date" *ngIf="!loading && game">
     {{ game.dateTime | date: 'dd.MM.yyyy HH:mm' }}
   </div>
 

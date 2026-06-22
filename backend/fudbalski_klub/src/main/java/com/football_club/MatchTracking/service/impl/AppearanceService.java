@@ -42,7 +42,7 @@ public class AppearanceService implements IAppearanceService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public AppearanceDTO createAppearance(AppearanceDTO dto) {
         PlaysFor playsFor = playsForRepository.findById(dto.getPlaysForId())
                 .orElseThrow(() -> new RuntimeException("PlaysFor record not found with id: " + dto.getPlaysForId()));
@@ -79,6 +79,7 @@ public class AppearanceService implements IAppearanceService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public AppearanceDTO getAppearanceById(Long id) {
         Appearance appearance = appearanceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appearance not found with id: " + id));
@@ -86,6 +87,7 @@ public class AppearanceService implements IAppearanceService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<AppearanceDTO> getAppearancesByGame(Long gameId) {
         return appearanceRepository.findAppearancesWithPlayerInfoByGameId(gameId).stream()
                 .map(this::mapToDTO)
@@ -93,6 +95,7 @@ public class AppearanceService implements IAppearanceService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<AppearanceDTO> getAppearancesByPlayer(Long playsForId) {
         return appearanceRepository.findByPlaysForId(playsForId).stream()
                 .map(this::mapToDTO)
@@ -100,7 +103,7 @@ public class AppearanceService implements IAppearanceService {
     }
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public AppearanceDTO updateAppearance(Long id, AppearanceDTO dto) {
         Appearance appearance = appearanceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appearance not found with id: " + id));
@@ -129,7 +132,7 @@ public class AppearanceService implements IAppearanceService {
     }
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public void deleteAppearance(Long id) {
         if (!appearanceRepository.existsById(id)) {
             throw new RuntimeException("Cannot delete. Appearance not found with id: " + id);
@@ -139,7 +142,7 @@ public class AppearanceService implements IAppearanceService {
     }
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public GameLineupResponseDTO saveLineup(Long gameId, Long clubId, List<AppearanceDTO> lineupDTOs){
         Game game = gameRepository.findById(gameId).orElseThrow(
                 () -> new RuntimeException("Game not found with id: " + gameId));
@@ -200,17 +203,17 @@ public class AppearanceService implements IAppearanceService {
         return new GameLineupResponseDTO(startingXi, bench);
     }
 
-    private void mapStatsToGraph(Appearance source, AppearanceGraph target) {
-        target.setMatchRole(source.getMatchRole() != null ? source.getMatchRole().name() : null);
-        target.setMinutesPlayed(source.getMinutesPlayed());
-        target.setGoals(source.getGoals());
-        target.setAssists(source.getAssists());
-        target.setFouls(source.getFouls());
-        target.setYellowCards(source.getYellowCards());
-        target.setRedCard(source.isRedCard());
-        target.setRating(source.getRating());
-        target.setPassingAccuracy(source.getPassingAccuracy());
-    }
+    //private void mapStatsToGraph(Appearance source, AppearanceGraph target) {
+    //    target.setMatchRole(source.getMatchRole() != null ? source.getMatchRole().name() : null);
+    //    target.setMinutesPlayed(source.getMinutesPlayed());
+    //    target.setGoals(source.getGoals());
+    //    target.setAssists(source.getAssists());
+    //    target.setFouls(source.getFouls());
+    //    target.setYellowCards(source.getYellowCards());
+    //    target.setRedCard(source.isRedCard());
+    //    target.setRating(source.getRating());
+    //    target.setPassingAccuracy(source.getPassingAccuracy());
+    //}
 
     private AppearanceDTO mapToDTO(Appearance appearance) {
         return AppearanceDTO.builder()

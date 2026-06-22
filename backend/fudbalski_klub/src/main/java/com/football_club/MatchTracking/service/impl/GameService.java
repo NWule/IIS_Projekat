@@ -37,7 +37,7 @@ public class GameService implements IGameService {
     private final TeamStatisticRepository teamStatisticRepository;
 
     @Override
-    @Transactional
+    @Transactional("transactionManager")
     public GameDTO createGame(GameDTO gameDTO) {
         if (gameDTO.getHomeClubId() == gameDTO.getAwayClubId()) {
             throw new RuntimeException("Home and away clubs cannot be the same!");
@@ -90,6 +90,7 @@ public class GameService implements IGameService {
     }
 
     @Override
+    @Transactional(value = "transactionManager", readOnly = true)
     public GameDTO getGameById(Long id) {
         Game game = gameRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Game not found with id: " + id));
@@ -97,6 +98,7 @@ public class GameService implements IGameService {
     }
 
     @Override
+    @Transactional(value = "transactionManager", readOnly = true)
     public List<GameDTO> getAllGames() {
         return gameRepository.findAll().stream()
                 .map(this::mapToDTO)
@@ -104,7 +106,7 @@ public class GameService implements IGameService {
     }
 
     @Override
-    @Transactional
+    @Transactional("transactionManager")
     public GameDTO updateGame(Long id, GameDTO gameDTO) {
         if (gameDTO.getHomeClubId() == gameDTO.getAwayClubId()) {
             throw new RuntimeException("Home and away clubs cannot be the same!");
@@ -140,7 +142,7 @@ public class GameService implements IGameService {
     }
 
     @Override
-    @Transactional
+    @Transactional("transactionManager")
     public void deleteGame(Long id) {
         if (!gameRepository.existsById(id)) {
             throw new RuntimeException("Cannot delete. Game not found with id: " + id);
@@ -150,6 +152,7 @@ public class GameService implements IGameService {
     }
 
     @Override
+    @Transactional(value = "transactionManager", readOnly = true)
     public List<GameDTO> getGamesInPeriod(LocalDateTime startDate, LocalDateTime endDate) {
         return gameRepository.findGamesWithClubsInPeriod(startDate, endDate).stream()
                 .map(this::mapToDTO)
@@ -157,6 +160,7 @@ public class GameService implements IGameService {
     }
 
     @Override
+    @Transactional(value = "transactionManager", readOnly = true)
     public List<GameDTO> getGamesByClub(int clubId) {
         return gameRepository.findByHomeClubIdOrAwayClubId(clubId, clubId).stream()
                 .map(this::mapToDTO)
@@ -164,6 +168,7 @@ public class GameService implements IGameService {
     }
 
     @Override
+    @Transactional(value = "transactionManager", readOnly = true)
     public List<GameDTO> getHeadToHeadMatches(int club1Id, int club2Id) {
         return gameRepository.findHeadToHeadMatches(club1Id, club2Id).stream()
                 .map(this::mapToDTO)
@@ -171,6 +176,7 @@ public class GameService implements IGameService {
     }
 
     @Override
+    @Transactional(value = "transactionManager", readOnly = true)
     public List<GameDTO> getUpcomingGames() {
         return gameRepository.findUpcomingGames().stream()
                 .map(this::mapToDTO)
@@ -178,6 +184,7 @@ public class GameService implements IGameService {
     }
 
     @Override
+    @Transactional(value = "transactionManager", readOnly = true)
     public List<GameDTO> getLiveGames() {
         return gameRepository.findLiveGames().stream()
                 .map(this::mapToDTO)
@@ -185,6 +192,7 @@ public class GameService implements IGameService {
     }
 
     @Override
+    @Transactional(value = "transactionManager", readOnly = true)
     public List<GameDTO> getPlayedGames() {
         return gameRepository.findPlayedGames().stream()
                 .map(this::mapToDTO)

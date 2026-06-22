@@ -8,6 +8,7 @@ import com.football_club.MatchTracking.repository.graph.*;
 import com.football_club.MatchTracking.repository.jpa.AppearanceRepository;
 import com.football_club.MatchTracking.repository.jpa.GameRepository;
 import com.football_club.MatchTracking.repository.jpa.TeamStatisticRepository;
+import com.football_club.MatchTracking.service.ITacticalAnalysisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.transaction.support.TransactionTemplate;
+
 
 import java.util.concurrent.CompletableFuture;
 
@@ -34,9 +36,10 @@ public class Neo4jEventListener {
     private final GameRepository gameRepository;
     private final TeamStatisticRepository teamStatisticRepository;
     private final AppearanceRepository appearanceRepository;
+    private final ITacticalAnalysisService tacticalAnalysisService;
 
-    //@Autowired
-    //@Qualifier("neo4jTransactionManager")
+    @Autowired
+    @Qualifier("neo4jTransactionManager")
     private final PlatformTransactionManager transactionManager;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -369,6 +372,18 @@ public class Neo4jEventListener {
                         }
                         appearanceGraphRepository.save(appGraph);
                     }
+                    if (jpaGame.getHomeClub() != null && jpaGame.getAwayClub() != null) {
+                        ClubGraph hc = new ClubGraph();
+                        hc.setId((long) jpaGame.getHomeClub().getId());
+                        gameGraph.setHomeClub(hc);
+
+                        ClubGraph ac = new ClubGraph();
+                        ac.setId((long) jpaGame.getAwayClub().getId());
+                        gameGraph.setAwayClub(ac);
+
+                        tacticalAnalysisService.runAnalysis((long) jpaGame.getHomeClub().getId(), statGraph, gameGraph);
+                        tacticalAnalysisService.runAnalysis((long) jpaGame.getAwayClub().getId(), statGraph, gameGraph);
+                    }
                 } catch (Exception e) {
                     System.err.println("Neo4j Background Sync Error: " + e.getMessage());
                     e.printStackTrace(); // Ostavljamo ovo da u slučaju problema vidimo tačnu liniju
@@ -376,5 +391,6 @@ public class Neo4jEventListener {
                 return null;
             });
         });
+
     }
 }
