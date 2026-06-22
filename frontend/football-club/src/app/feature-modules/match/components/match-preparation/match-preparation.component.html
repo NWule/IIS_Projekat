@@ -1,5 +1,14 @@
-<div class="page-container" *ngIf="!isLoading">
-  <h1 class="page-title">Priprema utakmice</h1>
+<div class="page-container" *ngIf="!isLoading; else loadingTpl">
+  
+  <div class="step-indicator">
+    <div class="step" [class.active]="currentStep === 'my-club'">
+      <span class="step-number">1</span> Sastav: {{ myClub?.name || 'Moj tim' }}
+    </div>
+    <div class="step-line"></div>
+    <div class="step" [class.active]="currentStep === 'opponent-club'">
+      <span class="step-number">2</span> Sastav: {{ opponentClub?.name || 'Protivnik' }}
+    </div>
+  </div>
 
   <div class="layout-grid">
     <div class="pitch-section">
@@ -8,8 +17,11 @@
         <select id="formation" [(ngModel)]="formation">
           <option value="4-4-2">4-4-2</option>
           <option value="4-3-3">4-3-3</option>
+          <option value="4-2-3-1">4-2-3-1</option>
         </select>
-        <button class="btn-save" (click)="saveMatchSquad()">Sačuvaj sastav</button>
+        <button class="btn-save" (click)="saveMatchSquad()">
+           {{ currentStep === 'my-club' ? 'Potvrdi moj sastav ➜' : '💾 Završi pripremu' }}
+        </button>
       </div>
 
       <div class="pitch-container">
@@ -46,11 +58,14 @@
               <button class="action-btn add-bench" (click)="addToBench(player)">Klp</button>
             </div>
           </div>
+          <div *ngIf="roster.length === 0" class="empty-message" style="padding: 10px; color: #666; font-style: italic;">
+            Nema više igrača u rosteru.
+          </div>
         </div>
       </div>
 
       <div class="list-container bench">
-        <h3>Klupa</h3>
+        <h3>Klupa ({{ bench.length }})</h3>
         <div class="players-list scrollable">
           <div class="player-card" *ngFor="let player of bench">
             <div class="player-info">
@@ -67,3 +82,9 @@
     </div>
   </div>
 </div>
+
+<ng-template #loadingTpl>
+  <div class="loading-container" style="text-align: center; padding: 50px; font-family: sans-serif; color: #64748b;">
+    Učitavanje podataka za pripremu protokola...
+  </div>
+</ng-template>

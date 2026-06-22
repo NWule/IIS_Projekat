@@ -46,6 +46,11 @@ import { MetricsDashboardComponent } from 'src/app/feature-modules/scouting/comp
 import { WishlistsComponent } from 'src/app/feature-modules/scouting/components/wishlists/wishlists.component';
 import { ScoutingRequestsComponent } from 'src/app/feature-modules/scouting/components/scouting-requests/scouting-requests.component';
 import { PlayerRecommendationComponent } from 'src/app/feature-modules/scouting/components/player-recommendation/player-recommendation.component';
+import { UpcomingMatchesComponent } from 'src/app/feature-modules/match/components/upcoming-matches/upcoming-matches.component';
+import { LiveMatchCoachComponent } from 'src/app/feature-modules/match/components/live-match-coach/live-match-coach.component';
+import { LiveTrackingComponent } from 'src/app/feature-modules/match/components/live-tracking/live-tracking.component';
+import { LiveMatchFinderComponent } from 'src/app/feature-modules/match/components/live-match-finder/live-match-finder.component';
+
 import { SearchTemplateManagementComponent } from 'src/app/feature-modules/scouting/components/search-template-management/search-template-management.component';
 
 const routes: Routes = [
@@ -70,7 +75,11 @@ const routes: Routes = [
   { path: 'matches',                 component: MatchListComponent },
   { path: 'add-match',               component: MatchEntryComponent },
   { path: 'match-details/:id',       component: MatchDetailsComponent },
-  { path: 'match-preparation',   component: MatchPreparationComponent },
+  { path: 'match-preparation/:id',   component: MatchPreparationComponent },
+  { path: 'upcoming-matches',          component: UpcomingMatchesComponent },
+  { path: 'live-tracking/:id',       component: LiveTrackingComponent }, 
+  { path: 'live-match-coach/:id',    component: LiveMatchCoachComponent },
+  { path: 'live-match-finder', component: LiveMatchFinderComponent },
 
   // Performanse
   { path: 'add-performance',         component: PlayerPerformanceEntryComponent },

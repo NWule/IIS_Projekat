@@ -3,4 +3,5 @@ export interface Game {
   homeClubId: number;
   awayClubId: number;
   dateTime: string; 
+  status: 'UPCOMING' | 'LIVE' | 'FINISHED';
 }

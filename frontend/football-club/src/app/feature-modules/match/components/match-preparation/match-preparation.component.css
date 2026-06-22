@@ -5,9 +5,44 @@
   font-family: sans-serif;
 }
 
-.page-title {
-  text-align: center;
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 30px;
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+.step.active { color: #0b133d; }
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #64748b;
+  font-size: 14px;
+}
+.step.active .step-number {
+  background: #0b133d;
+  color: white;
+}
+.step-line {
+  flex: 0 1 100px;
+  height: 2px;
+  background: #e2e8f0;
+  margin: 0 20px;
 }
 
 .layout-grid {
@@ -21,6 +56,12 @@
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .formation-selector {
@@ -42,26 +83,26 @@
   background-color: #0b133d;
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
+  font-weight: bold;
 }
 
-.sidebar-section {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.btn-save:hover {
+  background-color: #1e293b;
 }
 
 .list-container {
   background-color: #fff;
-  border: 1px solid #ddd;
   border-radius: 8px;
   padding: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .list-container h3 {
   margin-top: 0;
+  margin-bottom: 15px;
   border-bottom: 2px solid #0b133d;
   padding-bottom: 10px;
 }
@@ -114,9 +155,7 @@
   padding: 2px 6px;
   border-radius: 4px;
   display: inline-block;
-  width: fit-content;
-  text-transform: uppercase;
-  font-weight: bold;
+  width: max-content;
 }
 
 .card-actions {
@@ -126,15 +165,15 @@
 
 .action-btn {
   border: none;
+  padding: 5px 8px;
   border-radius: 4px;
-  padding: 5px 10px;
   cursor: pointer;
-  font-size: 12px;
   font-weight: bold;
+  font-size: 12px;
 }
 
 .add-start {
-  background-color: #10b981;
+  background-color: #0ea5e9;
   color: white;
 }
 
@@ -146,18 +185,4 @@
 .remove {
   background-color: #ef4444;
   color: white;
-}
-
-.empty-state {
-  text-align: center;
-  color: #666;
-  padding: 20px 0;
-  font-style: italic;
-}
-
-.loading {
-  text-align: center;
-  font-size: 18px;
-  color: #555;
-  margin-top: 50px;
 }

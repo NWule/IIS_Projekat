@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/tactical-analysis")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+@CrossOrigin(originPatterns = "*")
 public class TacticalAnalysisController {
 
     private final ITacticalAnalysisService analysisService;

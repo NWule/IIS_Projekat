@@ -1,4 +1,4 @@
-package com.football_club.MatchTracking.repository;
+package com.football_club.MatchTracking.repository.jpa;
 
 import com.football_club.MatchTracking.model.PlaysFor;
 import com.football_club.MatchTracking.model.Player;

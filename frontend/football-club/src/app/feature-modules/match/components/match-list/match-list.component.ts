@@ -18,7 +18,7 @@ export class MatchListComponent implements OnInit {
   constructor(private gameService: GameService, private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.gameService.getAllGames().subscribe({
+    this.gameService.getPlayedGames().subscribe({
       next: (data) => {
         this.matches = data;
       },

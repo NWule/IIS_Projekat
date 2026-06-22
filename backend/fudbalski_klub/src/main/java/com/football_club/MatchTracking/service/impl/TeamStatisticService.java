@@ -1,18 +1,19 @@
 package com.football_club.MatchTracking.service.impl;
 
 import com.football_club.MatchTracking.dto.TeamStatisticDTO;
+import com.football_club.MatchTracking.event.TeamStatisticDeletedEvent;
+import com.football_club.MatchTracking.event.TeamStatisticSaveEvent;
 import com.football_club.MatchTracking.model.Game;
 import com.football_club.MatchTracking.model.TeamStatistic;
 import com.football_club.MatchTracking.model.graph.GameGraph;
 import com.football_club.MatchTracking.model.graph.TeamStatisticGraph;
-import com.football_club.MatchTracking.repository.GameRepository;
-import com.football_club.MatchTracking.repository.TeamStatisticRepository;
-import com.football_club.MatchTracking.repository.graph.AppearanceGraphRepository;
+import com.football_club.MatchTracking.repository.jpa.GameRepository;
+import com.football_club.MatchTracking.repository.jpa.TeamStatisticRepository;
 import com.football_club.MatchTracking.repository.graph.GameGraphRepository;
-import com.football_club.MatchTracking.repository.graph.PlayerGraphRepository;
 import com.football_club.MatchTracking.repository.graph.TeamStatisticGraphRepository;
 import com.football_club.MatchTracking.service.ITeamStatisticService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,15 +25,17 @@ public class TeamStatisticService implements ITeamStatisticService {
     private final GameRepository gameRepository;
     private final TeamStatisticGraphRepository teamStatisticGraphRepository;
     private final GameGraphRepository gameGraphRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public TeamStatisticDTO saveFinalStatistic(TeamStatisticDTO dto) {
         Game game = gameRepository.findById(dto.getGameId())
                 .orElseThrow(() -> new RuntimeException("Game not found with id: " + dto.getGameId()));
 
         TeamStatistic statistic = teamStatisticRepository.findByGameId(dto.getGameId())
                 .orElse(new TeamStatistic());
+        boolean exists = teamStatisticRepository.findByGameId(dto.getGameId()).isPresent();
 
         statistic.setGame(game);
         statistic.setHomeGoals(dto.getHomeGoals());
@@ -54,23 +57,24 @@ public class TeamStatisticService implements ITeamStatisticService {
 
         TeamStatistic savedStatistic = teamStatisticRepository.save(statistic);
 
-        TeamStatisticGraph statGraph = teamStatisticGraphRepository.findById(savedStatistic.getId())
-                .orElse(new TeamStatisticGraph());
+        teamStatisticRepository.flush();
 
-        statGraph.setId(savedStatistic.getId());
-        mapFieldsToGraph(savedStatistic, statGraph);
-
-        if (statGraph.getGameGraph() == null) {
-            GameGraph gameGraph = gameGraphRepository.findById(savedStatistic.getGame().getId())
-                    .orElseThrow(() -> new RuntimeException("GameGraph node not found with id: " + savedStatistic.getGame().getId()));
-            statGraph.setGameGraph(gameGraph);
-        }
-
-        teamStatisticGraphRepository.save(statGraph);
+        eventPublisher.publishEvent(new TeamStatisticSaveEvent(
+                savedStatistic.getId(), savedStatistic.getGame().getId(),
+                savedStatistic.getHomeGoals(), savedStatistic.getAwayGoals(),
+                savedStatistic.getHomeShots(), savedStatistic.getAwayShots(),
+                savedStatistic.getHomeShotsOnTarget(), savedStatistic.getAwayShotsOnTarget(),
+                savedStatistic.getHomeFouls(), savedStatistic.getAwayFouls(),
+                savedStatistic.getHomeCorners(), savedStatistic.getAwayCorners(),
+                savedStatistic.getHomeOffsides(), savedStatistic.getAwayOffsides(),
+                savedStatistic.getHomePassSuccessRate(), savedStatistic.getAwayPassSuccessRate(),
+                exists
+        ));
         return mapToDTO(savedStatistic);
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public TeamStatisticDTO getStatisticByGameId(Long gameId) {
         TeamStatistic statistic = teamStatisticRepository.findByGameId(gameId)
                 .orElseThrow(() -> new RuntimeException("Statistic not found for game id: " + gameId));
@@ -78,33 +82,16 @@ public class TeamStatisticService implements ITeamStatisticService {
     }
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public void deleteStatistic(Long id) {
         if (!teamStatisticRepository.existsById(id)) {
             throw new RuntimeException("Cannot delete. Statistic not found with id: " + id);
         }
         teamStatisticRepository.deleteById(id);
-        teamStatisticGraphRepository.deleteById(id);
+        eventPublisher.publishEvent(new TeamStatisticDeletedEvent(id));
     }
 
-    private void mapFieldsToGraph(TeamStatistic source, TeamStatisticGraph target) {
-        target.setHomeGoals(source.getHomeGoals());
-        target.setAwayGoals(source.getAwayGoals());
-        target.setHomeShots(source.getHomeShots());
-        target.setAwayShots(source.getAwayShots());
-        //target.setHomePossession(source.getHomePossession());
-        //target.setAwayPossession(source.getAwayPossession());
-        target.setHomeShotsOnTarget(source.getHomeShotsOnTarget());
-        target.setAwayShotsOnTarget(source.getAwayShotsOnTarget());
-        target.setHomeFouls(source.getHomeFouls());
-        target.setAwayFouls(source.getAwayFouls());
-        target.setHomeCorners(source.getHomeCorners());
-        target.setAwayCorners(source.getAwayCorners());
-        target.setHomeOffsides(source.getHomeOffsides());
-        target.setAwayOffsides(source.getAwayOffsides());
-        target.setHomePassSuccessRate(source.getHomePassSuccessRate());
-        target.setAwayPassSuccessRate(source.getAwayPassSuccessRate());
-    }
+
 
     private TeamStatisticDTO mapToDTO(TeamStatistic statistic) {
         return TeamStatisticDTO.builder()

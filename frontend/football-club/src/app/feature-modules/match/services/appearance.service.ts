@@ -19,4 +19,7 @@ export class AppearanceService {
   getAppearancesByGame(gameId: number): Observable<Appearance[]> {
     return this.http.get<Appearance[]>(`${this.apiUrl}/game/${gameId}`);
   }
+  saveLineup(gameId: number, clubId: number, lineup: Appearance[]): Observable<any> {
+    return this.http.post(`${this.apiUrl}/game/${gameId}/lineup?clubId=${clubId}`, lineup);
+  }
 }

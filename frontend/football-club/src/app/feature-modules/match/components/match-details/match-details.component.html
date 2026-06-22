@@ -3,105 +3,125 @@
   <div class="score-header">
     <div class="team-name home">{{ homeClub?.name }}</div>
     <div class="score-display">
-      {{ statistike?.homeGoals ?? '–' }} : {{ statistike?.awayGoals ?? '–' }}
+      <span *ngIf="isUpcoming" class="vs-text">VS</span>
+      <span *ngIf="!isUpcoming">
+        {{ statistics?.homeGoals ?? '–' }} : {{ statistics?.awayGoals ?? '–' }}
+      </span>
     </div>
     <div class="team-name away">{{ awayClub?.name }}</div>
   </div>
   
-  <div class="match-date">
+  <div class="match-date" *ngIf="!loading && game">
     {{ game.dateTime | date: 'dd.MM.yyyy HH:mm' }}
   </div>
 
-  <div class="tabs">
-    <button [class.active]="activeTab === 'statistike'" (click)="activeTab = 'statistike'">
-      Statistike meča
-    </button>
-    <button [class.active]="activeTab === 'performanse'" (click)="activeTab = 'performanse'">
-      Performanse igrača
-    </button>
-  </div>
+  <div *ngIf="isUpcoming" class="upcoming-box">
+    <p class="upcoming-message">
+      Ova utakmica tek treba da se odigra. Pređite na stranicu za pripremu meča kako biste postavili timove i konfiguraciju.
+    </p>
+    <div class="submit-container" style="display: flex; gap: 15px; justify-content: center;">
+      <button class="btn-submit" (click)="goToMatchPreparation()">
+        📋 Idi na pripremu meča
+      </button>
 
-  <div *ngIf="activeTab === 'statistike'">
-    <form [formGroup]="statsForm" (ngSubmit)="sacuvajStatistike()">
-      <table class="stats-table">
-        <thead>
-          <tr>
-            <th>{{ homeClub?.name }}</th>
-            <th>Statistika</th>
-            <th>{{ awayClub?.name }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let red of [
-            { naziv: 'Golovi',                home: 'homeGoals',          away: 'awayGoals'         },
-            { naziv: 'Šutevi',                home: 'homeShots',          away: 'awayShots'         },
-            { naziv: 'Šutevi u okvir',        home: 'homeShotsOnTarget',  away: 'awayShotsOnTarget' },
-            { naziv: 'Posed (%)',             home: 'homePossession',     away: 'awayPossession'    },
-            { naziv: 'Korneri',               home: 'homeCorners',        away: 'awayCorners'       },
-            { naziv: 'Faulovi',               home: 'homeFouls',          away: 'awayFouls'         },
-            { naziv: 'Ofsajdi',               home: 'homeOffsides',       away: 'awayOffsides'      },
-            { naziv: 'Tačnost dodavanja (%)', home: 'homePassAccuracy',   away: 'awayPassAccuracy'  }
-          ]">
-            <td><input type="number" [formControlName]="red.home" min="0" class="stat-input" /></td>
-            <td>{{ red.naziv }}</td>
-            <td><input type="number" [formControlName]="red.away" min="0" class="stat-input" /></td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <div class="submit-container">
-        <button type="submit" [disabled]="statsForm.invalid" class="btn-submit">
-          {{ statsPostoji ? 'Ažuriraj statistike' : 'Sačuvaj statistike' }}
-        </button>
-      </div>
-    </form>
-  </div>
-
-  <div *ngIf="activeTab === 'performanse'">
-    <div class="teams-container">
-
-      <div class="team-section">
-        <h3>{{ homeClub?.name }}</h3>
-
-        <div class="player-row" *ngFor="let p of homePerformanse">
-          <strong>{{ p.playerName }} {{ p.playerSurname }}</strong> &nbsp;|&nbsp;
-          ⏱ {{ p.minutesPlayed }}' &nbsp; ⚽ {{ p.goals }} &nbsp; 🎯 {{ p.assists }} &nbsp;
-          🦵 {{ p.fouls }}
-          <span *ngIf="p.yellowCards > 0"> &nbsp; 🟨 {{ p.yellowCards }}</span>
-          <span *ngIf="p.redCard"> &nbsp; 🟥</span>
-          &nbsp; | &nbsp; {{ p.passingAccuracy }}% dodavanja
-        </div>
-        <p *ngIf="homePerformanse.length === 0" class="empty-message">
-          Nema unetih performansi.
-        </p>
-
-        <button class="btn-add" *ngIf="isStatistician && isHomeClub" (click)="goToAddPerformance()">
-          + Dodaj performansu
-        </button>
-      </div>
-
-      <div class="team-section">
-        <h3>{{ awayClub?.name }}</h3>
-
-        <div class="player-row" *ngFor="let p of awayPerformanse">
-          <strong>{{ p.playerName }} {{ p.playerSurname }}</strong> &nbsp;|&nbsp;
-          ⏱ {{ p.minutesPlayed }}' &nbsp; ⚽ {{ p.goals }} &nbsp; 🎯 {{ p.assists }} &nbsp;
-          🦵 {{ p.fouls }}
-          <span *ngIf="p.yellowCards > 0"> &nbsp; 🟨 {{ p.yellowCards }}</span>
-          <span *ngIf="p.redCard"> &nbsp; 🟥</span>
-          &nbsp; | &nbsp; {{ p.passingAccuracy }}% dodavanja
-        </div>
-        <p *ngIf="awayPerformanse.length === 0" class="empty-message">
-          Nema unetih performansi.
-        </p>
-
-        <button class="btn-add" *ngIf="isStatistician && !isHomeClub" (click)="goToAddPerformance()">
-          + Dodaj performansu
-        </button>
-      </div>
-
+      <button *ngIf="isStatistician" class="btn-start-match" (click)="startMatch()">
+        ▶ Pokreni utakmicu uživo
+      </button>
     </div>
   </div>
+
+  <ng-container *ngIf="!isUpcoming">
+    <div class="tabs">
+      <button [class.active]="activeTab === 'statistics'" (click)="activeTab = 'statistics'">
+        Statistike meča
+      </button>
+      <button [class.active]="activeTab === 'performances'" (click)="activeTab = 'performances'">
+        Performanse igrača
+      </button>
+    </div>
+
+    <div *ngIf="activeTab === 'statistics'">
+      <form [formGroup]="statsForm" (ngSubmit)="saveStatistics()">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>{{ homeClub?.name }}</th>
+              <th>Statistika</th>
+              <th>{{ awayClub?.name }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of [
+              { label: 'Golovi', home: 'homeGoals', away: 'awayGoals' },
+              { label: 'Šutevi', home: 'homeShots', away: 'awayShots' },
+              { label: 'Šutevi u okvir', home: 'homeShotsOnTarget', away: 'awayShotsOnTarget' },
+              { label: 'Posed (%)', home: 'homePossession', away: 'awayPossession' },
+              { label: 'Korneri', home: 'homeCorners', away: 'awayCorners' },
+              { label: 'Faulovi', home: 'homeFouls', away: 'awayFouls' },
+              { label: 'Ofsajdi', home: 'homeOffsides', away: 'awayOffsides' },
+              { label: 'Tačnost dodavanja (%)', home: 'homePassAccuracy', away: 'awayPassAccuracy' }
+            ]">
+              <td><input type="number" [formControlName]="row.home" min="0" class="stat-input" /></td>
+              <td>{{ row.label }}</td>
+              <td><input type="number" [formControlName]="row.away" min="0" class="stat-input" /></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="submit-container">
+          <button type="submit" [disabled]="statsForm.invalid" class="btn-submit">
+            {{ statsExists ? 'Ažuriraj statistike' : 'Sačuvaj statistike' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div *ngIf="activeTab === 'performances'">
+      <div class="teams-container">
+
+        <div class="team-section">
+          <h3>{{ homeClub?.name }}</h3>
+
+          <div class="player-row" *ngFor="let p of homePerformances">
+            <strong>{{ p.playerName }} {{ p.playerSurname }}</strong> &nbsp;|&nbsp;
+            ⏱ {{ p.minutesPlayed }}' &nbsp; ⚽ {{ p.goals }} &nbsp; 🎯 {{ p.assists }} &nbsp;
+            🦵 {{ p.fouls }}
+            <span *ngIf="p.yellowCards > 0"> &nbsp; 🟨 {{ p.yellowCards }}</span>
+            <span *ngIf="p.redCard"> &nbsp; 🟥</span>
+            &nbsp; | &nbsp; {{ p.passingAccuracy }}% dodavanja
+          </div>
+          <p *ngIf="homePerformances.length === 0" class="empty-message">
+            Nema unetih performansi.
+          </p>
+
+          <button class="btn-add" *ngIf="isStatistician && isHomeClub" (click)="goToAddPerformance()">
+            + Dodaj performansu
+          </button>
+        </div>
+
+        <div class="team-section">
+          <h3>{{ awayClub?.name }}</h3>
+
+          <div class="player-row" *ngFor="let p of awayPerformances">
+            <strong>{{ p.playerName }} {{ p.playerSurname }}</strong> &nbsp;|&nbsp;
+            ⏱ {{ p.minutesPlayed }}' &nbsp; ⚽ {{ p.goals }} &nbsp; 🎯 {{ p.assists }} &nbsp;
+            🦵 {{ p.fouls }}
+            <span *ngIf="p.yellowCards > 0"> &nbsp; 🟨 {{ p.yellowCards }}</span>
+            <span *ngIf="p.redCard"> &nbsp; 🟥</span>
+            &nbsp; | &nbsp; {{ p.passingAccuracy }}% dodavanja
+          </div>
+          <p *ngIf="awayPerformances.length === 0" class="empty-message">
+            Nema unetih performansi.
+          </p>
+
+          <button class="btn-add" *ngIf="isStatistician && !isHomeClub" (click)="goToAddPerformance()">
+            + Dodaj performansu
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </ng-container>
 </div>
 
 <ng-template #loadingTpl>

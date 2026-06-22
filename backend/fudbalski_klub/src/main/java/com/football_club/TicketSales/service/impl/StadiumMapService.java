@@ -1,7 +1,7 @@
 package com.football_club.TicketSales.service.impl;
 
 import com.football_club.MatchTracking.model.Game;
-import com.football_club.MatchTracking.repository.GameRepository;
+import com.football_club.MatchTracking.repository.jpa.GameRepository;
 import com.football_club.TicketSales.dto.*;
 import com.football_club.TicketSales.model.TicketType;
 import com.football_club.TicketSales.model.Zone;

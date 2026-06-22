@@ -19,7 +19,10 @@ import { ContractService } from './services/playsFor.service';
 import { PlayerDetailsComponent } from './components/player-details/player-details.component';
 import { ClubDetailsComponent } from './components/club-details/club-details.component';
 import { MatchPreparationComponent } from './components/match-preparation/match-preparation.component';
-
+import { UpcomingMatchesComponent } from './components/upcoming-matches/upcoming-matches.component';
+import { LiveTrackingComponent } from './components/live-tracking/live-tracking.component';
+import { LiveMatchCoachComponent } from './components/live-match-coach/live-match-coach.component'; 
+import { LiveMatchFinderComponent } from './components/live-match-finder/live-match-finder.component';
 
 
 @NgModule({
@@ -35,7 +38,11 @@ import { MatchPreparationComponent } from './components/match-preparation/match-
     PlayerDetailsComponent,
     MatchPreparationComponent,
     MatchDetailsComponent,
-    MatchListComponent
+    MatchListComponent,
+    UpcomingMatchesComponent,
+    LiveTrackingComponent,
+    LiveMatchCoachComponent,
+    LiveMatchFinderComponent
   ],
   imports: [
     CommonModule,
@@ -54,7 +61,11 @@ import { MatchPreparationComponent } from './components/match-preparation/match-
     PlayerDetailsComponent,
     MatchPreparationComponent,
     MatchDetailsComponent,
-    MatchListComponent
+    MatchListComponent,
+    UpcomingMatchesComponent,
+    LiveTrackingComponent,
+    LiveMatchCoachComponent,
+    LiveMatchFinderComponent
   ]
 })
 export class MatchModule { }

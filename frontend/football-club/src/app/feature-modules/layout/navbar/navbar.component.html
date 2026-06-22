@@ -12,8 +12,9 @@
       <button class="nav-btn" (click)="router.navigate(['/matches'])">Mečevi</button>
     </ng-container>
 
-    <ng-container *ngIf="isLoggedIn && (userRole === 'ROLE_HEAD_COACH')">
-      <button class="nav-btn" (click)="router.navigate(['/match-preparation'])">Priprema utakmice</button>
+    <ng-container *ngIf="isLoggedIn && (userRole === 'ROLE_HEAD_COACH' || userRole === 'ROLE_STATISTICIAN')">
+      <button class="nav-btn" (click)="router.navigate(['/upcoming-matches'])">Predstojeći mečevi</button>
+      <button class="nav-btn" (click)="router.navigate(['/live-match-finder'])">Utakmica uživo</button>
     </ng-container>
 
     <ng-container *ngIf="isLoggedIn && userRole === 'ROLE_ASSISTANT_COACH'">

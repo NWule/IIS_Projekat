@@ -1,21 +1,27 @@
 package com.football_club.MatchTracking.service.impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.football_club.MatchTracking.event.PlayerCreatedEvent;
+import com.football_club.MatchTracking.event.PlayerDeletedEvent;
+import com.football_club.MatchTracking.event.PlayerUpdatedEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.football_club.MatchTracking.dto.PlayerDTO;
 import com.football_club.MatchTracking.model.Player;
 import com.football_club.MatchTracking.model.graph.PlayerGraph;
-import com.football_club.MatchTracking.repository.PlayerRepository;
 import com.football_club.MatchTracking.repository.graph.PlayerGraphRepository;
+import com.football_club.MatchTracking.repository.jpa.PlayerRepository;
 import com.football_club.MatchTracking.service.IPlayerService;
 import com.football_club.Scouting.dto.SearchParameters;
 import com.football_club.Scouting.model.Report;
 import com.football_club.Scouting.model.ValuedMetric;
 import com.football_club.Scouting.repository.ReportRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -24,29 +30,34 @@ public class PlayerService implements IPlayerService {
     private final PlayerRepository playerRepository;
     private final PlayerGraphRepository playerGraphRepository;
     private final ReportRepository reportRepository;
+    private final org.springframework.transaction.support.TransactionTemplate transactionTemplate;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
-    @Transactional
+    @Transactional("transactionManager")
     public PlayerDTO createPlayer(PlayerDTO playerDTO) {
         Player player = new Player();
         player.setName(playerDTO.getName());
         player.setSurname(playerDTO.getSurname());
         player.setDateOfBirth(playerDTO.getDateOfBirth());
         player.setPosition(playerDTO.getPlayerPosition());
+        System.out.println("DEBUG: Postgres ID: " + player.getId());
 
-        Player savedPlayer = playerRepository.save(player);
+        Player savedPlayer = playerRepository.saveAndFlush(player);
+        playerRepository.flush();
 
-        PlayerGraph graphPlayer = new PlayerGraph();
-        graphPlayer.setPlayerId(savedPlayer.getId());
-        graphPlayer.setName(savedPlayer.getName());
-        graphPlayer.setSurname(savedPlayer.getSurname());
-        graphPlayer.setPosition(savedPlayer.getPosition());
+        eventPublisher.publishEvent(new PlayerCreatedEvent(
+                savedPlayer.getId(),
+                savedPlayer.getName(),
+                savedPlayer.getSurname(),
+                savedPlayer.getPosition()
+        ));
 
-        playerGraphRepository.save(graphPlayer);
         return mapToDTO(savedPlayer);
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public PlayerDTO getPlayerById(Long id) {
         Player player = playerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Player not found with id: " + id));
@@ -54,6 +65,7 @@ public class PlayerService implements IPlayerService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<PlayerDTO> getPlayersByIds(List<Long> playerIds) {
         return playerRepository.findByIdIn(playerIds).stream()
                 .map(this::mapToDTO)
@@ -61,6 +73,7 @@ public class PlayerService implements IPlayerService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<PlayerDTO> getAllPlayers() {
         return playerRepository.findAll().stream()
                 .map(this::mapToDTO)
@@ -68,7 +81,7 @@ public class PlayerService implements IPlayerService {
     }
 
     @Override
-    @Transactional
+    @Transactional("transactionManager")
     public PlayerDTO updatePlayer(Long id, PlayerDTO playerDTO) {
         Player player = playerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Player not found with id: " + id));
@@ -80,30 +93,28 @@ public class PlayerService implements IPlayerService {
 
         Player updatedPlayer = playerRepository.save(player);
 
-        PlayerGraph graphPlayer = playerGraphRepository.findById(id)
-                .orElse(new PlayerGraph());
-
-        graphPlayer.setPlayerId(updatedPlayer.getId());
-        graphPlayer.setName(updatedPlayer.getName());
-        graphPlayer.setSurname(updatedPlayer.getSurname());
-        graphPlayer.setPosition(updatedPlayer.getPosition());
-
-        playerGraphRepository.save(graphPlayer);
+        eventPublisher.publishEvent(new PlayerUpdatedEvent(
+                updatedPlayer.getId(),
+                updatedPlayer.getName(),
+                updatedPlayer.getSurname(),
+                updatedPlayer.getPosition()
+        ));
 
         return mapToDTO(updatedPlayer);
     }
 
     @Override
-    @Transactional
+    @Transactional("transactionManager")
     public void deletePlayer(Long id) {
         if (!playerRepository.existsById(id)) {
             throw new RuntimeException("Cannot delete. Player not found with id: " + id);
         }
         playerRepository.deleteById(id);
-        playerGraphRepository.deleteById(id);
+        eventPublisher.publishEvent(new PlayerDeletedEvent(id));
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<PlayerDTO> searchPlayers(String keyword) {
         return playerRepository.findByNameContainingIgnoreCaseOrSurnameContainingIgnoreCase(keyword, keyword)
                 .stream()
@@ -112,6 +123,7 @@ public class PlayerService implements IPlayerService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<PlayerDTO> advancedSearch(SearchParameters searchParameters) {
         List<Player> players = playerRepository.findAll()
                 .stream()

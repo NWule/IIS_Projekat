@@ -40,6 +40,10 @@ public class TacticalAnalysisService implements ITacticalAnalysisService {
         kSession.insert(fact);
 
         kSession.fireAllRules();
+
+        int brojOkinutihPravila = kSession.fireAllRules();
+        System.out.println(">>> [DROOLS] IZVRŠENO PRAVILA ZA TIM " + targetTeamId + ": " + brojOkinutihPravila);
+
         kSession.dispose();
 
         if (fact.getAnalysisText() != null) {

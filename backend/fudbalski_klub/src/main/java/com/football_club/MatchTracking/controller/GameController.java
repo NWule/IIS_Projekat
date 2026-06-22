@@ -31,7 +31,7 @@ public class GameController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('HEAD_COACH','ASSISTANT_COACH', 'SPORTS_DIRECTOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HEAD_COACH','ASSISTANT_COACH', 'SPORTS_DIRECTOR', 'ADMIN', 'STATISTICIAN')")
     public ResponseEntity<?> updateGame(@PathVariable Long id, @RequestBody GameDTO gameDTO, @AuthenticationPrincipal User userDetails) {
 
 

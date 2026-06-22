@@ -1,6 +1,8 @@
 package com.football_club.MatchTracking.service.impl;
 
 import com.football_club.MatchTracking.dto.MatchEventRequestDTO;
+import com.football_club.MatchTracking.dto.TeamStatisticDTO;
+import com.football_club.MatchTracking.event.LiveMatchSyncEvent;
 import com.football_club.MatchTracking.model.Appearance;
 import com.football_club.MatchTracking.model.Game;
 import com.football_club.MatchTracking.model.MatchEvent;
@@ -9,18 +11,18 @@ import com.football_club.MatchTracking.model.graph.AppearanceGraph;
 import com.football_club.MatchTracking.model.graph.GameGraph;
 import com.football_club.MatchTracking.model.graph.PlayerGraph;
 import com.football_club.MatchTracking.model.graph.TeamStatisticGraph;
-import com.football_club.MatchTracking.repository.AppearanceRepository;
-import com.football_club.MatchTracking.repository.GameRepository;
-import com.football_club.MatchTracking.repository.MatchEventRepository;
-import com.football_club.MatchTracking.repository.TeamStatisticRepository;
+import com.football_club.MatchTracking.repository.jpa.AppearanceRepository;
+import com.football_club.MatchTracking.repository.jpa.GameRepository;
+import com.football_club.MatchTracking.repository.jpa.MatchEventRepository;
+import com.football_club.MatchTracking.repository.jpa.TeamStatisticRepository;
 import com.football_club.MatchTracking.repository.graph.AppearanceGraphRepository;
 import com.football_club.MatchTracking.repository.graph.GameGraphRepository;
 import com.football_club.MatchTracking.repository.graph.PlayerGraphRepository;
 import com.football_club.MatchTracking.repository.graph.TeamStatisticGraphRepository;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,14 +39,11 @@ public class LiveMatchService {
     private final GameRepository gameRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    private final TeamStatisticGraphRepository teamStatisticGraphRepository;
-    private final AppearanceGraphRepository appearanceGraphRepository;
-    private final PlayerGraphRepository playerGraphRepository;
-    private final GameGraphRepository gameGraphRepository;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void processLiveEvent(Long gameId, MatchEventRequestDTO dto) {
-
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new RuntimeException("Utakmica nije pronađena"));
 
@@ -63,21 +62,30 @@ public class LiveMatchService {
 
         updateTeamStatistic(teamStat, game, dto);
         TeamStatistic savedTeamStat = teamStatisticRepository.save(teamStat);
-        Appearance savedAppearance = new Appearance();
+
+        Appearance savedAppearance = null;
         if (dto.getPlaysForId() != null) {
-            Appearance appearance = appearanceRepository.findByPlaysForIdAndGameId(dto.getPlaysForId(), gameId)
+            Appearance appearance = appearanceRepository.findAppearancesWithPlayerInfoByGameId(gameId)
+                    .stream()
+                    .filter(a -> a.getPlaysFor().getId().equals(dto.getPlaysForId()))
+                    .findFirst()
                     .orElseThrow(() -> new RuntimeException("Nastup igrača nije pronađen"));
 
             updatePlayerAppearance(appearance, gameId, dto);
             savedAppearance = appearanceRepository.save(appearance);
         }
-        syncLiveEventWithGraph(savedTeamStat, savedAppearance, game);
 
-        messagingTemplate.convertAndSend("/topic/game/" + gameId + "/team-stats", teamStat);
+        TeamStatisticDTO statDTO = mapToDTO(savedTeamStat);
+        messagingTemplate.convertAndSend("/topic/game/" + gameId + "/team-stats", statDTO);
+
+        Long appId = (savedAppearance != null) ? savedAppearance.getId() : null;
+        eventPublisher.publishEvent(new LiveMatchSyncEvent(savedTeamStat.getId(), appId, game.getId()));
     }
 
+
+
     private void updateTeamStatistic(TeamStatistic stats, Game game, MatchEventRequestDTO dto) {
-        boolean isHomeTeam = game.getHomeClub().getId().equals(dto.getClubId());
+        boolean isHomeTeam = game.getHomeClub().getId() == dto.getClubId().intValue();
 
         switch (dto.getEventType()) {
             case "GOAL":
@@ -90,7 +98,7 @@ public class LiveMatchService {
                 break;
             case "SHOT_ON_TARGET":
                 if (isHomeTeam) {
-                    stats.setHomeShots(stats.getHomeShots() + 1); // Šut u okvir je takođe i šut
+                    stats.setHomeShots(stats.getHomeShots() + 1);
                     stats.setHomeShotsOnTarget(stats.getHomeShotsOnTarget() + 1);
                 } else {
                     stats.setAwayShots(stats.getAwayShots() + 1);
@@ -113,8 +121,6 @@ public class LiveMatchService {
             case "PASS_FAIL":
                 recalculateTeamPassingRate(stats, game, dto.getClubId());
                 break;
-            case "TACKLE":
-                break;
         }
     }
 
@@ -135,13 +141,11 @@ public class LiveMatchService {
             case "RED_CARD":
                 app.setRedCard(true);
                 break;
+            case "PASS_SUCCESS":
             case "PASS_FAIL":
                 recalculatePlayerPassingRate(app, gameId, dto.getPlaysForId());
                 break;
-            case "TACKLE":
-                break;
         }
-
         recalculatePlayerRating(app, gameId, dto.getPlaysForId());
     }
 
@@ -153,13 +157,15 @@ public class LiveMatchService {
 
         for (FluxTable table : tables) {
             for (FluxRecord record : table.getRecords()) {
+                if (record.getValueByKey("clubId") == null || record.getValue() == null) continue;
+
                 String cId = String.valueOf(record.getValueByKey("clubId"));
                 String eventType = String.valueOf(record.getValueByKey("eventType"));
-                long count = ((Number) record.getValue()).longValue();
 
                 if (cId.equals(targetClubId)) {
-                    if ("PASS_SUCCESS".equals(eventType)) success = count;
-                    if ("PASS_FAIL".equals(eventType)) fail = count;
+                    long value = Long.parseLong(String.valueOf(record.getValue()));
+                    if ("PASS_SUCCESS".equals(eventType)) success = value;
+                    if ("PASS_FAIL".equals(eventType)) fail = value;
                 }
             }
         }
@@ -167,7 +173,7 @@ public class LiveMatchService {
         long total = success + fail;
         double rate = total > 0 ? ((double) success / total) * 100.0 : 0.0;
 
-        if (game.getHomeClub().getId().equals(clubId)) {
+        if (game.getHomeClub().getId() == clubId.intValue()) {
             stats.setHomePassSuccessRate(rate);
         } else {
             stats.setAwayPassSuccessRate(rate);
@@ -181,11 +187,11 @@ public class LiveMatchService {
 
         for (FluxTable table : tables) {
             for (FluxRecord record : table.getRecords()) {
+                if (record.getValue() == null) continue;
                 String eventType = String.valueOf(record.getValueByKey("eventType"));
-                long count = ((Number) record.getValue()).longValue();
-
-                if ("PASS_SUCCESS".equals(eventType)) success = count;
-                if ("PASS_FAIL".equals(eventType)) fail = count;
+                long value = Long.parseLong(String.valueOf(record.getValue()));
+                if ("PASS_SUCCESS".equals(eventType)) success = value;
+                if ("PASS_FAIL".equals(eventType)) fail = value;
             }
         }
 
@@ -209,15 +215,15 @@ public class LiveMatchService {
 
         for (FluxTable table : tables) {
             for (FluxRecord record : table.getRecords()) {
+                if (record.getValue() == null) continue;
                 String eventType = String.valueOf(record.getValueByKey("eventType"));
-                long count = ((Number) record.getValue()).longValue();
-                if ("PASS_SUCCESS".equals(eventType)) successPasses = count;
-                if ("PASS_FAIL".equals(eventType)) failPasses = count;
+                long value = Long.parseLong(String.valueOf(record.getValue()));
+                if ("PASS_SUCCESS".equals(eventType)) successPasses = value;
+                if ("PASS_FAIL".equals(eventType)) failPasses = value;
             }
         }
 
         double passingPoints = (successPasses * 0.02) - (failPasses * 0.04);
-
         double finalRating = baseRating + goalPoints + assistPoints + passingPoints - foulPenalty - yellowCardPenalty - redCardPenalty;
 
         if (finalRating > 10.0) finalRating = 10.0;
@@ -226,61 +232,25 @@ public class LiveMatchService {
         app.setRating(Math.round(finalRating * 10.0) / 10.0);
     }
 
-    private void syncLiveEventWithGraph(TeamStatistic relStat, Appearance relApp, Game jpaGame) {
-        TeamStatisticGraph statGraph = teamStatisticGraphRepository.findById(relStat.getId())
-                .orElse(new TeamStatisticGraph());
 
-        statGraph.setId(relStat.getId());
-        statGraph.setHomeGoals(relStat.getHomeGoals());
-        statGraph.setAwayGoals(relStat.getAwayGoals());
-        statGraph.setHomeShots(relStat.getHomeShots());
-        statGraph.setAwayShots(relStat.getAwayShots());
-        //statGraph.setHomePossession(relStat.getHomePossession());
-        //statGraph.setAwayPossession(relStat.getAwayPossession());
-        statGraph.setHomeShotsOnTarget(relStat.getHomeShotsOnTarget());
-        statGraph.setAwayShotsOnTarget(relStat.getAwayShotsOnTarget());
-        statGraph.setHomeFouls(relStat.getHomeFouls());
-        statGraph.setAwayFouls(relStat.getAwayFouls());
-        statGraph.setHomeCorners(relStat.getHomeCorners());
-        statGraph.setAwayCorners(relStat.getAwayCorners());
-        statGraph.setHomeOffsides(relStat.getHomeOffsides());
-        statGraph.setAwayOffsides(relStat.getAwayOffsides());
-        statGraph.setHomePassSuccessRate(relStat.getHomePassSuccessRate());
-        statGraph.setAwayPassSuccessRate(relStat.getAwayPassSuccessRate());
-
-        if (statGraph.getGameGraph() == null) {
-            GameGraph gameGraph = gameGraphRepository.findById(jpaGame.getId())
-                    .orElseThrow(() -> new RuntimeException("GameGraph nije pronađen sa ID: " + jpaGame.getId()));
-            statGraph.setGameGraph(gameGraph);
-        }
-        teamStatisticGraphRepository.save(statGraph);
-
-        if (relApp != null) {
-            AppearanceGraph appGraph = appearanceGraphRepository.findById(relApp.getId())
-                    .orElse(new AppearanceGraph());
-
-            appGraph.setId(relApp.getId());
-            appGraph.setMatchRole(relApp.getMatchRole() != null ? relApp.getMatchRole().name() : null);
-            appGraph.setMinutesPlayed(relApp.getMinutesPlayed());
-            appGraph.setGoals(relApp.getGoals());
-            appGraph.setAssists(relApp.getAssists());
-            appGraph.setFouls(relApp.getFouls());
-            appGraph.setYellowCards(relApp.getYellowCards());
-            appGraph.setRedCard(relApp.isRedCard());
-            appGraph.setRating(relApp.getRating());
-            appGraph.setPassingAccuracy(relApp.getPassingAccuracy());
-
-            if (appGraph.getPlayerGraph() == null) {
-                PlayerGraph playerGraph = playerGraphRepository.findById(relApp.getPlaysFor().getPlayer().getId())
-                        .orElseThrow(() -> new RuntimeException("PlayerGraph nije pronađen sa ID: " + relApp.getPlaysFor().getPlayer().getId()));
-                appGraph.setPlayerGraph(playerGraph);
-            }
-            if (appGraph.getGameGraph() == null) {
-                GameGraph gameGraph = gameGraphRepository.findById(jpaGame.getId())
-                        .orElseThrow(() -> new RuntimeException("GameGraph nije pronađen sa ID: " + jpaGame.getId()));
-                appGraph.setGameGraph(gameGraph);
-            }
-            appearanceGraphRepository.save(appGraph);
-        }
+    private TeamStatisticDTO mapToDTO(TeamStatistic statistic) {
+        return TeamStatisticDTO.builder()
+                .id(statistic.getId())
+                .gameId(statistic.getGame().getId())
+                .homeGoals(statistic.getHomeGoals())
+                .awayGoals(statistic.getAwayGoals())
+                .homeShots(statistic.getHomeShots())
+                .awayShots(statistic.getAwayShots())
+                .homeShotsOnTarget(statistic.getHomeShotsOnTarget())
+                .awayShotsOnTarget(statistic.getAwayShotsOnTarget())
+                .homeFouls(statistic.getHomeFouls())
+                .awayFouls(statistic.getAwayFouls())
+                .homeCorners(statistic.getHomeCorners())
+                .awayCorners(statistic.getAwayCorners())
+                .homeOffsides(statistic.getHomeOffsides())
+                .awayOffsides(statistic.getAwayOffsides())
+                .homePassSuccessRate(statistic.getHomePassSuccessRate())
+                .awayPassSuccessRate(statistic.getAwayPassSuccessRate())
+                .build();
     }
 }

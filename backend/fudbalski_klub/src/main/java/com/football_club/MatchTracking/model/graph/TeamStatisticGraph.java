@@ -1,5 +1,6 @@
 package com.football_club.MatchTracking.model.graph;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -31,6 +32,7 @@ public class TeamStatisticGraph {
     private double homePassSuccessRate;
     private double awayPassSuccessRate;
 
+    @JsonIgnore
     @Relationship(type = "STATS_FOR_GAME", direction = Relationship.Direction.OUTGOING)
     private GameGraph gameGraph;
 }

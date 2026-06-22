@@ -1,18 +1,21 @@
 package com.football_club.MatchTracking.service.impl;
 
 import com.football_club.MatchTracking.dto.PlaysForDTO;
+import com.football_club.MatchTracking.event.ContractCreatedEvent;
+import com.football_club.MatchTracking.event.ContractDeletedEvent;
 import com.football_club.MatchTracking.model.Club;
 import com.football_club.MatchTracking.model.Player;
 import com.football_club.MatchTracking.model.PlaysFor;
 import com.football_club.MatchTracking.model.graph.ClubGraph;
 import com.football_club.MatchTracking.model.graph.PlayerGraph;
-import com.football_club.MatchTracking.repository.ClubRepository;
-import com.football_club.MatchTracking.repository.PlayerRepository;
-import com.football_club.MatchTracking.repository.PlaysForRepository;
+import com.football_club.MatchTracking.repository.jpa.ClubRepository;
+import com.football_club.MatchTracking.repository.jpa.PlayerRepository;
+import com.football_club.MatchTracking.repository.jpa.PlaysForRepository;
 import com.football_club.MatchTracking.repository.graph.ClubGraphRepository;
 import com.football_club.MatchTracking.repository.graph.PlayerGraphRepository;
 import com.football_club.MatchTracking.service.IPlaysForService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,9 +32,10 @@ public class PlaysForService implements IPlaysForService {
     private final ClubRepository clubRepository;
     private final PlayerGraphRepository playerGraphRepository;
     private final ClubGraphRepository clubGraphRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public PlaysForDTO createContract(PlaysForDTO dto) {
         Player player = playerRepository.findById(dto.getPlayerId())
                 .orElseThrow(() -> new RuntimeException("Player not found with id: " + dto.getPlayerId()));
@@ -48,19 +52,18 @@ public class PlaysForService implements IPlaysForService {
 
         PlaysFor savedContract = playsForRepository.save(contract);
 
-        PlayerGraph graphPlayer = playerGraphRepository.findById(savedContract.getPlayer().getId())
-                .orElseThrow(() -> new RuntimeException("PlayerGraph node not found"));
 
-        ClubGraph graphClub = clubGraphRepository.findById((long) savedContract.getClub().getId())
-                .orElseThrow(() -> new RuntimeException("ClubGraph node not found"));
 
-        graphPlayer.setClubGraph(graphClub);
-        playerGraphRepository.save(graphPlayer);
+        eventPublisher.publishEvent(new ContractCreatedEvent(
+                savedContract.getPlayer().getId(),
+                (long) savedContract.getClub().getId()
+        ));
 
         return mapToDTO(savedContract);
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public PlaysForDTO getContractById(Long id) {
         PlaysFor contract = playsForRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Contract not found with id: " + id));
@@ -68,7 +71,7 @@ public class PlaysForService implements IPlaysForService {
     }
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public PlaysForDTO updateContract(Long id, PlaysForDTO dto) {
         PlaysFor contract = playsForRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Contract not found with id: " + id));
@@ -82,20 +85,17 @@ public class PlaysForService implements IPlaysForService {
     }
 
     @Override
-    @Transactional
+    @Transactional(value="transactionManager")
     public void deleteContract(Long id) {
         if (!playsForRepository.existsById(id)) {
             throw new RuntimeException("Cannot delete. Contract not found with id: " + id);
         }
         playsForRepository.deleteById(id);
-
-        playerGraphRepository.findById(id).ifPresent(graphPlayer -> {
-            graphPlayer.setClubGraph(null);
-            playerGraphRepository.save(graphPlayer);
-        });
+        eventPublisher.publishEvent(new ContractDeletedEvent(id));
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<PlaysForDTO> getPlayerHistory(Long playerId) {
         return playsForRepository.findByPlayerId(playerId).stream()
                 .map(this::mapToDTO)
@@ -103,6 +103,7 @@ public class PlaysForService implements IPlaysForService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<PlaysForDTO> getClubHistory(int clubId) {
         return playsForRepository.findByClubId(clubId).stream()
                 .map(this::mapToDTO)
@@ -110,6 +111,7 @@ public class PlaysForService implements IPlaysForService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public PlaysForDTO getCurrentContract(Long playerId) {
         PlaysFor currentContract = playsForRepository.findCurrentContract(playerId, LocalDate.now())
                 .orElseThrow(() -> new RuntimeException("No active contract found for player id: " + playerId));
@@ -117,6 +119,7 @@ public class PlaysForService implements IPlaysForService {
     }
 
     @Override
+    @Transactional(value="transactionManager", readOnly = true)
     public List<PlaysForDTO> getCurrentRoster(int clubId) {
         return playsForRepository.findCurrentRoster(clubId, LocalDate.now()).stream()
                 .map(this::mapToDTO)

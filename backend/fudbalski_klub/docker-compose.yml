@@ -26,7 +26,7 @@ services:
       - postgres-db
 
   neo4j-db:
-    image: neo4j:5.12-community
+    image: neo4j:5.26.27-community
     container_name: neo4j-fudbal
     ports:
       - "7474:7474"
