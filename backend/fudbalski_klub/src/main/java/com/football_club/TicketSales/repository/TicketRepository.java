@@ -18,4 +18,14 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     Set<Long> findSeatIdsByGameId(@Param("gameId") Long gameId);
 
     long countByGameIdAndSeat_ZoneId(Long gameId, Long zoneId);
+    long countByGameId(Long gameId);
+
+    @Query("SELECT COALESCE(SUM(t.price), 0) FROM Ticket t WHERE t.game.id = :gameId")
+    java.math.BigDecimal sumPriceByGameId(@Param("gameId") Long gameId);
+
+    @Query("SELECT COALESCE(SUM(t.price), 0) FROM Ticket t WHERE t.game.id = :gameId AND t.seat.zone.id = :zoneId")
+    java.math.BigDecimal sumPriceByGameIdAndZoneId(@Param("gameId") Long gameId, @Param("zoneId") Long zoneId);
+
+    @Query("SELECT t.ticketType.name, COUNT(t), COALESCE(SUM(t.price), 0) FROM Ticket t WHERE t.game.id = :gameId GROUP BY t.ticketType.name")
+    List<Object[]> countAndSumByTicketType(@Param("gameId") Long gameId);
 }

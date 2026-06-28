@@ -1,6 +1,6 @@
 package com.football_club.TicketSales.service.impl;
 
-import com.football_club.MatchTracking.repository.GameRepository;
+import com.football_club.MatchTracking.repository.jpa.GameRepository;
 import com.football_club.TicketSales.dto.PriceChangeLogDTO;
 import com.football_club.TicketSales.model.PriceChangeLog;
 import com.football_club.TicketSales.repository.PriceChangeLogRepository;
