@@ -16,6 +16,7 @@ import { AuthModule } from './infrastructure/auth/components/auth.module';
 import { LayoutModule } from './feature-modules/layout/layout.module';
 import { ScoutingPlayerListComponent } from './feature-modules/scouting/components/scouting-player-list/scouting-player-list.component';
 import { ScoutingModule } from './feature-modules/scouting/scouting.module';
+import { NgChartsModule } from 'ng2-charts';
 
 export function tokenGetter() {
   return localStorage.getItem('access-token');
@@ -37,6 +38,7 @@ export function tokenGetter() {
     AuthModule,
     LayoutModule,
     ScoutingModule,
+    NgChartsModule,
     JwtModule.forRoot({
       config: {
         tokenGetter,

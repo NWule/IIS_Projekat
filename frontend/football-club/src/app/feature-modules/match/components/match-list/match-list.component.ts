@@ -16,6 +16,7 @@ export class MatchListComponent implements OnInit {
   canViewDetails: boolean = false;
   isStatistician: boolean = false;
   canGenerateReport: boolean = false;
+  
 
   constructor(private gameService: GameService, private router: Router, private authService: AuthService,
     private reportService: ReportService) {}

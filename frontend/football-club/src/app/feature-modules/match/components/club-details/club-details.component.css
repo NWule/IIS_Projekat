@@ -179,6 +179,26 @@
   margin-top: 40px;
 }
 
+.chart-section {
+  margin-top: 50px;
+  padding-top: 30px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.chart-container {
+  display: block;
+  width: 100%;
+  max-width: 1000px;
+  height: 400px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
 .loading-placeholder {
   text-align: center;
   margin-top: 100px;

@@ -4,7 +4,10 @@ import { ClubService } from '../../services/club.service';
 import { ContractService } from '../../services/playsFor.service';
 import { Club } from '../../models/club.model';
 import { PlaysFor } from '../../models/player.model';
+import { TeamStatisticService } from '../../services/team-statistic.service';
 import { AuthService } from '../../../../infrastructure/auth/auth.service';
+import { ChartConfiguration, ChartType } from 'chart.js';
+
 
 @Component({
   selector: 'app-club-details',
@@ -19,12 +22,65 @@ export class ClubDetailsComponent implements OnInit {
   isAssistantCoach: boolean = false;
   isHeadCoach: boolean = false;
 
+  public showChart: boolean = false;
+  public lineChartData: ChartConfiguration['data'] = {
+    datasets: [
+      {
+        data: [], 
+        label: 'Golovi',
+        backgroundColor: 'rgba(31, 58, 86, 0.8)', 
+        borderColor: 'rgba(31, 58, 86, 1)',
+        yAxisID: 'y-axis-1',
+        type: 'bar',
+        borderRadius: 4
+      },
+      {
+        data: [], 
+        label: 'Pasovi (%)',
+        backgroundColor: 'rgba(220, 53, 69, 0.2)',
+        borderColor: 'rgba(220, 53, 69, 1)',
+        yAxisID: 'y-axis-2',
+        type: 'line',
+        tension: 0.4,
+        borderWidth: 3,
+        pointBackgroundColor: 'rgba(220, 53, 69, 1)'
+      }
+    ],
+    labels: [] 
+  };
+
+  public lineChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      'y-axis-1': {
+        position: 'left',
+        beginAtZero: true,
+        title: { display: true, text: 'Broj golova' },
+        ticks: { stepSize: 1 }
+      },
+      'y-axis-2': {
+        position: 'right',
+        beginAtZero: true,
+        max: 100,
+        title: { display: true, text: 'Preciznost pasova (%)' },
+        grid: { drawOnChartArea: false } 
+      }
+    },
+    plugins: {
+      legend: { position: 'top' }
+    }
+  };
+  
+  public lineChartType: ChartType = 'line';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private clubService: ClubService,
     private contractService: ContractService,
-    private authService: AuthService
+    private authService: AuthService,
+    private teamStatService: TeamStatisticService
   ) {}
 
   ngOnInit(): void {
@@ -83,6 +139,8 @@ export class ClubDetailsComponent implements OnInit {
             this.isLoading = false;
           }
         });
+
+        this.loadChartData(clubId);
       },
       error: (err) => {
         console.error('Greška pri dobavljanju podataka o klubu:', err);
@@ -90,4 +148,21 @@ export class ClubDetailsComponent implements OnInit {
       }
     });
   }
+
+  private loadChartData(clubId: number): void {
+    this.teamStatService.getClubChartData(clubId).subscribe({
+      next: (data: any[]) => {
+        if (data && data.length > 0) {
+          this.lineChartData.labels = data.map(item => new Date(item.matchDate).toLocaleDateString('sr-RS'));
+          this.lineChartData.datasets[0].data = data.map(item => item.goals);
+          this.lineChartData.datasets[1].data = data.map(item => item.passSuccessRate);
+          
+          this.lineChartData = { ...this.lineChartData };
+          this.showChart = true;
+        }
+      },
+      error: (err) => console.error('Greška pri učitavanju analitike tima:', err)
+    });
+  }
+
 }

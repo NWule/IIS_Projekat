@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/reports")
 @RequiredArgsConstructor
-public class ReportController {
+public class MatchReportController {
     private final IReportService reportService;
 
     @GetMapping("/game/{gameId}/pdf")

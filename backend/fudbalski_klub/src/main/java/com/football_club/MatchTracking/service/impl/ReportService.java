@@ -13,7 +13,7 @@ import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
-@Service
+@Service("matchTrackingReportService")
 @RequiredArgsConstructor
 public class ReportService implements IReportService {
     private final AppearanceRepository appearanceRepository;
@@ -41,14 +41,14 @@ public class ReportService implements IReportService {
             subtitle.setSpacingAfter(30);
             document.add(subtitle);
 
-            PdfPTable table = new PdfPTable(8); // Sada imamo 8 kolona
+            PdfPTable table = new PdfPTable(9);
             table.setWidthPercentage(100);
-            table.setWidths(new float[]{2.5f, 2f, 1.2f, 1f, 1f, 1.2f, 2f, 1.8f});
+            table.setWidths(new float[]{2.5f, 1.8f, 1f, 1f, 1.2f, 1.2f, 1.5f, 1.8f, 1.6f});
 
-            String[] headers = {"Igrac", "Uloga", "Min", "Gol", "Asist", "Ocena", "+/- Tim", "Risk Indeks"};
+            String[] headers = {"Igrac", "Uloga", "Min", "Gol", "Asist", "Ocena", "Pasovi", "+/- Tim", "Risk Indeks"};
             for (String headerTitle : headers) {
                 PdfPCell header = new PdfPCell(new Phrase(headerTitle, headerFont));
-                header.setBackgroundColor(new Color(31, 58, 86)); // Tamno plava moderna nijansa
+                header.setBackgroundColor(new Color(31, 58, 86));
                 header.setHorizontalAlignment(Element.ALIGN_CENTER);
                 header.setPadding(8);
                 table.addCell(header);
@@ -61,13 +61,15 @@ public class ReportService implements IReportService {
                 table.addCell(createCell(row[3] != null ? row[3].toString() : "0", bodyFont));
                 table.addCell(createCell(row[4] != null ? row[4].toString() : "0", bodyFont));
                 table.addCell(createCell(row[5] != null ? row[5].toString() : "0.0", bodyFont));
+                String dodavanja = row[6] != null ? row[6].toString() + "%" : "0.0%";
+                table.addCell(createCell(dodavanja, bodyFont));
 
-                String deviation = row[6] != null ? row[6].toString() : "0.0";
+                String deviation = row[6] != null ? row[7].toString() : "0.0";
                 double val = Double.parseDouble(deviation);
                 Color tColor = val >= 0 ? new Color(0, 128, 64) : Color.RED;
                 table.addCell(createCell(val >= 0 ? "+" + deviation : deviation, FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, tColor)));
 
-                table.addCell(createCell(row[7] != null ? row[7].toString() : "0", bodyFont));
+                table.addCell(createCell(row[8] != null ? row[7].toString() : "0", bodyFont));
             }
 
             document.add(table);
