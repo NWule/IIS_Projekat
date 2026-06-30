@@ -1,5 +1,6 @@
 package com.football_club.MatchTracking.service.impl;
 
+import com.football_club.MatchTracking.dto.TeamChartDTO;
 import com.football_club.MatchTracking.dto.TeamStatisticDTO;
 import com.football_club.MatchTracking.event.TeamStatisticDeletedEvent;
 import com.football_club.MatchTracking.event.TeamStatisticSaveEvent;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -89,6 +92,22 @@ public class TeamStatisticService implements ITeamStatisticService {
         }
         teamStatisticRepository.deleteById(id);
         eventPublisher.publishEvent(new TeamStatisticDeletedEvent(id));
+    }
+
+    @Override
+    @Transactional(value="transactionManager", readOnly = true)
+    public List<TeamChartDTO> getClubChartStatistics(Long clubId) {
+        List<TeamStatistic> stats = teamStatisticRepository.findAllByClubIdOrderByMatchDate(clubId);
+
+        return stats.stream().map(stat -> {
+            boolean isHome = stat.getGame().getHomeClub().getId().longValue() == clubId.longValue();
+
+            return TeamChartDTO.builder()
+                    .matchDate(stat.getGame().getMatchDate())
+                    .goals(isHome ? stat.getHomeGoals() : stat.getAwayGoals())
+                    .passSuccessRate(isHome ? stat.getHomePassSuccessRate() : stat.getAwayPassSuccessRate())
+                    .build();
+        }).toList();
     }
 
 

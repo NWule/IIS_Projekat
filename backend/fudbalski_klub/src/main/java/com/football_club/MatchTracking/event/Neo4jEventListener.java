@@ -386,7 +386,7 @@ public class Neo4jEventListener {
                     }
                 } catch (Exception e) {
                     System.err.println("Neo4j Background Sync Error: " + e.getMessage());
-                    e.printStackTrace(); // Ostavljamo ovo da u slučaju problema vidimo tačnu liniju
+                    e.printStackTrace();
                 }
                 return null;
             });

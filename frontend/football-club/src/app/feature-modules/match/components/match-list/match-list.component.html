@@ -27,6 +27,8 @@
         <td>{{ match.awayClubName }}</td>
         <td *ngIf="canViewDetails">
           <button class="btn-details" (click)="viewMatchDetails(match.id)">Pregled detalja</button>
+          <button *ngIf="canGenerateReport" class="btn-report" style="margin-left: 8px;" 
+            (click)="downloadReport(match.id)"> 📄 Preuzmi izveštaj </button>
         </td>
       </tr>
     </tbody>

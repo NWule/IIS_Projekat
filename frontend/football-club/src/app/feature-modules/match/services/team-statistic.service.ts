@@ -19,4 +19,8 @@ export class TeamStatisticService {
   getStatisticByGameId(gameId: number): Observable<TeamStatistic> {
     return this.http.get<TeamStatistic>(`${this.apiUrl}/game/${gameId}`);
   }
+
+  getClubChartData(clubId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/club/${clubId}/chart`);
+  }
 }

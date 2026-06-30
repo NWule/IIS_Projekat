@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
+import { NgChartsModule } from 'ng2-charts';
 
 import { ClubEntryComponent } from './components/club-entry/club-entry.component';
 import { ClubEditComponent } from './components/club-edit/club-edit.component'; 
@@ -47,7 +48,8 @@ import { LiveMatchFinderComponent } from './components/live-match-finder/live-ma
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgChartsModule
   ],
   exports: [
     ClubEntryComponent,

@@ -21,5 +21,6 @@ public interface AppearanceRepository extends JpaRepository<Appearance, Long> {
     @Query("SELECT a FROM Appearance a JOIN FETCH a.playsFor pf JOIN FETCH pf.player WHERE a.game.id = :gameId")
     List<Appearance> findAppearancesWithPlayerInfoByGameId(@Param("gameId") Long gameId);
 
-
+    @Query(value = "SELECT * FROM get_advanced_match_report(:gameId)", nativeQuery = true)
+    List<Object[]> getAdvancedMatchReportData(@Param("gameId") Long gameId);
 }

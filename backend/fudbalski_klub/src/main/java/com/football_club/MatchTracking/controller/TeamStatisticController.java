@@ -1,6 +1,7 @@
 package com.football_club.MatchTracking.controller;
 
 import com.football_club.MatchTracking.dto.GameDTO;
+import com.football_club.MatchTracking.dto.TeamChartDTO;
 import com.football_club.MatchTracking.dto.TeamStatisticDTO;
 import com.football_club.MatchTracking.service.IGameService;
 import com.football_club.MatchTracking.service.ITeamStatisticService;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/statistics")
@@ -54,5 +57,12 @@ public class TeamStatisticController {
 
         teamStatisticService.deleteStatistic(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/club/{clubId}/chart")
+    @PreAuthorize("hasAnyRole('HEAD_COACH', 'STATISTICIAN', 'ADMIN', 'SPORTS_DIRECTOR')")
+    public ResponseEntity<List<TeamChartDTO>> getClubChartData(@PathVariable Long clubId) {
+        List<TeamChartDTO> chartData = teamStatisticService.getClubChartStatistics(clubId);
+        return ResponseEntity.ok(chartData);
     }
 }
