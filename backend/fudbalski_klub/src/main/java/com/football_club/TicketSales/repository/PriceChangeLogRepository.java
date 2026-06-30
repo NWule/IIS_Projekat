@@ -9,4 +9,5 @@ public interface PriceChangeLogRepository extends JpaRepository<PriceChangeLog, 
     List<PriceChangeLog> findAllByOrderByChangedAtDesc();
     List<PriceChangeLog> findByGameIdOrderByChangedAtDesc(Long gameId);
     List<PriceChangeLog> findByRuleIdOrderByChangedAtDesc(Long ruleId);
+    long countByGameId(Long gameId);
 }
