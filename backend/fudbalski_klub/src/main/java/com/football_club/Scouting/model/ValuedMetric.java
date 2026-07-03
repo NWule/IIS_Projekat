@@ -29,5 +29,4 @@ public class ValuedMetric {
 
     @Column(name = "value", nullable = false)
     private double value;
-
 }

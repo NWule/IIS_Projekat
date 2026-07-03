@@ -1,5 +1,6 @@
 package com.football_club.Scouting.dto;
 
+import com.football_club.Scouting.model.enums.MetricType;
 import lombok.*;
 
 @Getter
@@ -12,5 +13,6 @@ public class ValuedMetricDTO {
     private Long reportId;
     private Long metricId;
     private String metricName;
+    private MetricType type;
     private double value;
 }
