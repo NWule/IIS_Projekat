@@ -26,6 +26,9 @@
       <button class="btn btn-outline" (click)="showHistoryModal = !showHistoryModal">
         <i class="icon-history"></i> Istorija klubova
       </button>
+      <button class="btn btn-secondary" (click)="openCompareModal()">
+        <i class="icon-compare"></i> Uporedi Igrača
+      </button>
       <button class="btn btn-secondary" *ngIf="isDirector" (click)="addToWishlist()">
         <i class="icon-star"></i> Dodaj na Listu Želja
       </button>
