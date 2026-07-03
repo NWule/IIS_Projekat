@@ -14,6 +14,7 @@ import { Wishlist } from '../../models/wishlist.model';
 import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 
 import { Chart } from 'chart.js/auto';
+import { PdfReportService } from '../../services/pdf-report.service';
 
 interface GroupedGame {
   gameId: number;
@@ -69,6 +70,7 @@ export class ViewPlayerComponent implements OnInit {
     private wishlistService: WishlistService,
     private authService: AuthService,
     private router: Router,
+    private pdfReportService: PdfReportService
   ) {}
 
   ngOnInit(): void {
@@ -325,6 +327,20 @@ export class ViewPlayerComponent implements OnInit {
       }
     });
   }
+
+  downloadReport(): void {
+  this.pdfReportService.downloadPlayerPdf(this.playerId).subscribe({
+    next: (blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Scouting_Report_${this.player.name}_${this.player.surname}.pdf`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+    },
+    error: (err) => console.error('Failed to download PDF report:', err)
+  });
+}
 
   formatPosition(position: string | undefined): string {
     if (!position) return '';
