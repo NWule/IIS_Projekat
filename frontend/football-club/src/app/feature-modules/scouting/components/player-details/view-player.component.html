@@ -23,6 +23,9 @@
       <button class="btn btn-outline" (click)="showHistoryModal = !showHistoryModal">
         <i class="icon-history"></i> Istorija klubova
       </button>
+      <button class="btn btn-outline" (click)="openCompareModal()">
+        <i class="icon-compare"></i> Uporedi Igrača
+      </button>
       <button class="btn btn-secondary" *ngIf="isDirector" (click)="addToWishlist()">
         <i class="icon-star"></i> Dodaj na Listu Želja
       </button>
@@ -156,6 +159,48 @@
     
     <div class="modal-actions">
       <button type="button" class="btn btn-secondary" (click)="showWishlistModal = false">Zatvori</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showCompareModal">
+  <div class="modal-content text-left">
+    <div class="modal-header">
+      <h3>Izaberi igrača za poređenje</h3>
+      <button class="close-btn" (click)="showCompareModal = false">&times;</button>
+    </div>
+    
+    <div *ngIf="isCompareLoading" class="modal-loading">
+      <p>Učitavanje igrača...</p>
+    </div>
+
+    <div *ngIf="!isCompareLoading" class="wishlist-selection-list" style="overflow-y: auto;">
+      <div 
+        class="wishlist-option-item" 
+        *ngFor="let p of allPlayers" 
+        (click)="selectPlayerForComparison(p.id)">
+        <div class="wishlist-option-info">
+          <div class="placeholder-image">
+            <span>{{ p.name.charAt(0) }}{{ p.surname.charAt(0) }}</span>
+          </div>
+          <div class="player-info-text">
+            <span class="player-info-name">{{ p.name }} {{ p.surname }}</span>
+            <div class="player-details">
+              <span class="tag club-tag">({{ p.dateOfBirth | date:'yyyy.' }})</span>
+              <span class="tag position-tag">{{ formatPosition(p.playerPosition) }}</span>
+            </div>
+          </div>
+        </div>
+        <span class="arrow-indicator">&rarr;</span>
+      </div>
+
+      <div *ngIf="allPlayers.length === 0" class="empty-modal-state">
+        <p>Nema drugih dostupnih igrača za poređenje.</p>
+      </div>
+    </div>
+    
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" (click)="showCompareModal = false">Zatvori</button>
     </div>
   </div>
 </div>

@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { PlayerService } from '../../../match/services/player.service';
 import { ContractService } from '../../../match/services/playsFor.service';
 import { ReportService } from '../../services/report.service';
 import { MetricService } from '../../services/metric.service';
-import { WishlistService } from '../../services/wishlist.service'; // NOVO
+import { WishlistService } from '../../services/wishlist.service';
 
 import { Player, PlaysFor } from '../../../match/models/player.model';
 import { Report } from '../../models/report.model';
 import { Metric, GameMetric } from '../../models/metric.model';
-import { Wishlist } from '../../models/wishlist.model'; // NOVO
+import { Wishlist } from '../../models/wishlist.model';
 import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 
 interface GroupedGame {
@@ -35,7 +35,7 @@ export class ViewPlayerComponent implements OnInit {
   activeTab: 'reports' | 'stats' = 'reports';
   showHistoryModal = false;
   showScoutRequestModal = false;
-  showWishlistModal = false; // NOVO
+  showWishlistModal = false;
 
   reports: Report[] = [];
   selectedReportId: number | null = null;
@@ -46,10 +46,14 @@ export class ViewPlayerComponent implements OnInit {
   allMetrics: Metric[] = [];
 
   gameStats: GroupedGame[] = [];
-  myWishlists: Wishlist[] = []; // NOVO
+  myWishlists: Wishlist[] = [];
 
   isLoading = true;
-  isWishlistLoading = false; // NOVO
+  isWishlistLoading = false;
+
+  showCompareModal = false;
+  allPlayers: Player[] = [];
+  isCompareLoading = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -57,8 +61,9 @@ export class ViewPlayerComponent implements OnInit {
     private contractService: ContractService,
     private reportService: ReportService,
     private metricService: MetricService,
-    private wishlistService: WishlistService, // NOVO
-    private authService: AuthService
+    private wishlistService: WishlistService,
+    private authService: AuthService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -210,6 +215,30 @@ export class ViewPlayerComponent implements OnInit {
         console.error('Greška pri dodavanju igrača na listu želja', err);
         alert('Došlo je do greške. ' + err.error.message);
       }
+    });
+  }
+
+  openCompareModal(): void {
+    this.showCompareModal = true;
+    this.isCompareLoading = true;
+    
+    this.playerService.getAllPlayers().subscribe({
+      next: (data) => {
+        this.allPlayers = data.filter(p => p.id !== this.playerId);
+        this.isCompareLoading = false;
+      },
+      error: (err) => {
+        console.error('Greška pri učitavanju svih igrača za poređenje:', err);
+        this.isCompareLoading = false;
+      }
+    });
+  }
+
+  selectPlayerForComparison(selectedPlayerId: number | undefined): void {
+    this.showCompareModal = false;
+    
+    this.router.navigate(['/player-comparison'], {
+      queryParams: { ids: [this.playerId, selectedPlayerId] }
     });
   }
 

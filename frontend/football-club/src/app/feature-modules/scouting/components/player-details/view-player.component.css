@@ -1,4 +1,3 @@
-/* Glavni kontejner */
 .player-container {
   max-width: 1000px;
   margin: 2rem auto;
@@ -6,7 +5,6 @@
   color: #334155;
 }
 
-/* Zaglavlje (Header) */
 .profile-header {
   display: flex;
   justify-content: space-between;
@@ -27,7 +25,6 @@
   align-items: center;
 }
 
-/* Placeholder Slika */
 .placeholder-image {
   width: 90px;
   height: 90px;
@@ -66,7 +63,6 @@
 
 .dob { margin: 0; font-size: 0.9rem; color: #64748b; }
 
-/* Dugmići */
 .profile-actions {
   display: flex;
   gap: 0.75rem;
@@ -80,7 +76,6 @@
 .btn-primary { background: #2563eb; color: white; }
 .btn-primary:hover { background: #1d4ed8; }
 
-/* Istorija (Inline toggle panel) */
 .history-panel {
   background: white; padding: 1.5rem; border-radius: 12px;
   border: 1px solid #e2e8f0; margin-bottom: 1.5rem; animation: fadeIn 0.3s;
@@ -91,7 +86,6 @@
 .history-table th { color: #64748b; font-size: 0.85rem; text-transform: uppercase; }
 .text-center { text-align: center; color: #94a3b8; }
 
-/* Tabovi */
 .tabs-nav {
   display: flex; gap: 1rem; border-bottom: 2px solid #e2e8f0; margin-bottom: 1.5rem;
 }
@@ -103,7 +97,6 @@
 .tabs-nav button:hover { color: #0f172a; }
 .tabs-nav button.active { color: #2563eb; border-bottom-color: #2563eb; }
 
-/* Sadržaj Tabova */
 .tab-content {
   background: white; padding: 2rem; border-radius: 12px;
   border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
@@ -111,7 +104,6 @@
 
 .empty-state { text-align: center; color: #64748b; padding: 2rem; font-style: italic; }
 
-/* Izveštaji Tab */
 .report-selector { margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; }
 .report-selector label { font-weight: 600; color: #334155; }
 .form-control { padding: 0.5rem; border-radius: 6px; border: 1px solid #cbd5e1; width: 300px; }
@@ -123,7 +115,6 @@
 .commentary-box h4 { margin-top: 0; color: #0f172a; font-size: 1.1rem; }
 .commentary-box p { margin: 0; line-height: 1.6; white-space: pre-wrap; }
 
-/* Metrike / Statistika Grid (Reusable) */
 .category-title {
   color: #475569; font-size: 0.95rem; text-transform: uppercase;
   border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; margin-bottom: 1rem;
@@ -140,7 +131,6 @@
 .metric-name, .stat-name { font-size: 0.8rem; color: #64748b; margin-bottom: 0.5rem; }
 .metric-value, .stat-value { font-size: 1.25rem; font-weight: 700; color: #2563eb; }
 
-/* Utakmice Kartice */
 .game-card {
   border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;
 }
@@ -156,14 +146,13 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Stilovi za modal izbora liste želja */
 .wishlist-selection-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   margin: 1.5rem 0;
-  max-height: 250px;
-  overflow-y: hidden;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .wishlist-option-item {
@@ -176,7 +165,7 @@
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  overflow: hidden;
+  overflow:visible;
 }
 
 .wishlist-option-item:hover {
@@ -249,3 +238,21 @@ label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9r
 .btn-secondary { background: #f1f5f9; color: #475569; }
 .btn-primary { background: #2563eb; color: white; }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.player-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.player-details {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.player-info-name {
+  font-weight: 600;
+  font-size: 18px;
+  color: #1e293b;
+}
