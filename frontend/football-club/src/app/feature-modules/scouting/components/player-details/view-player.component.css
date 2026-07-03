@@ -256,3 +256,14 @@ label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9r
   font-size: 18px;
   color: #1e293b;
 }
+
+.chart-wrapper {
+  position: relative;
+  height: 450px;
+  width: 100%;
+  margin-top: 1.5rem;
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}

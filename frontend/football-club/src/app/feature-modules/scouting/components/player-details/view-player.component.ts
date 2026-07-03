@@ -13,6 +13,8 @@ import { Metric, GameMetric } from '../../models/metric.model';
 import { Wishlist } from '../../models/wishlist.model';
 import { AuthService } from 'src/app/infrastructure/auth/auth.service';
 
+import { Chart } from 'chart.js/auto';
+
 interface GroupedGame {
   gameId: number;
   matchInfo: string;
@@ -32,7 +34,7 @@ export class ViewPlayerComponent implements OnInit {
   currentClubName: string = 'Slobodan igrač (Bez kluba)';
   playerHistory: PlaysFor[] = [];
   
-  activeTab: 'reports' | 'stats' = 'reports';
+  activeTab: 'reports' | 'stats' | 'chart' = 'reports';
   showHistoryModal = false;
   showScoutRequestModal = false;
   showWishlistModal = false;
@@ -54,6 +56,9 @@ export class ViewPlayerComponent implements OnInit {
   showCompareModal = false;
   allPlayers: Player[] = [];
   isCompareLoading = false;
+
+  selectedChartMetricId: number | null = null;
+  performanceChart: any = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -126,6 +131,11 @@ export class ViewPlayerComponent implements OnInit {
     this.reports = reports.sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
+
+    // Automatsko postavljanje prve metrike iz liste kao selektovane
+    if (this.allMetrics.length > 0) {
+      this.selectedChartMetricId = this.allMetrics[0].id;
+    }
 
     if (this.reports.length > 0) {
       this.selectedReportId = this.reports[0].id;
@@ -239,6 +249,80 @@ export class ViewPlayerComponent implements OnInit {
     
     this.router.navigate(['/player-comparison'], {
       queryParams: { ids: [this.playerId, selectedPlayerId] }
+    });
+  }
+
+  setActiveTab(tab: 'reports' | 'stats' | 'chart'): void {
+    this.activeTab = tab;
+    if (tab === 'chart') {
+      setTimeout(() => {
+        this.updateChart();
+      }, 0);
+    }
+  }
+
+  updateChart(): void {
+    const ctx = document.getElementById('performanceChart') as HTMLCanvasElement;
+    if (!ctx || this.selectedChartMetricId === null) return;
+
+    if (this.performanceChart) {
+      this.performanceChart.destroy();
+    }
+
+    const chronologicalReports = [...this.reports].sort((a, b) =>
+      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+
+    const labels = chronologicalReports.map(r => 
+      new Date(r.createdAt).toLocaleDateString('sr-RS', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })
+    );
+
+    const metricId = +this.selectedChartMetricId;
+    const metric = this.allMetrics.find(m => m.id === metricId);
+    let datasets: any[] = [];
+    
+    if (metric) {
+      const data = chronologicalReports.map(r => {
+        const vm = r.valuedMetrics?.find((m: any) => m.metricId === metricId);
+        return vm ? vm.value : null;
+      });
+
+      datasets.push({
+        label: metric.name,
+        data: data,
+        borderColor: '#2563eb',
+        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+        tension: 0.25,
+        fill: true,
+        spanGaps: true
+      });
+    }
+
+    this.performanceChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
     });
   }
 
