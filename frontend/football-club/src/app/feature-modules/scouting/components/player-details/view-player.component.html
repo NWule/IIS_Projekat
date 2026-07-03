@@ -20,6 +20,9 @@
     </div>
 
     <div class="profile-actions">
+      <button class="btn btn-outline" (click)="downloadReport()">
+        <i class="icon-download"></i> Izvezi PDF Izveštaj
+      </button>
       <button class="btn btn-outline" (click)="showHistoryModal = !showHistoryModal">
         <i class="icon-history"></i> Istorija klubova
       </button>
@@ -60,6 +63,7 @@
   <div class="tabs-nav">
     <button [class.active]="activeTab === 'reports'" (click)="activeTab = 'reports'">Skauting Izveštaji</button>
     <button [class.active]="activeTab === 'stats'" (click)="activeTab = 'stats'">Statistika (Zadnjih 5 utakmica)</button>
+    <button [class.active]="activeTab === 'chart'" (click)="setActiveTab('chart')">Grafik Performansi</button>
   </div>
 
   <div class="tab-content" *ngIf="activeTab === 'reports'">
@@ -118,6 +122,25 @@
     </div>
   </div>
 
+  <div class="tab-content" *ngIf="activeTab === 'chart'">
+    <div class="empty-state" *ngIf="reports.length === 0">
+      <p>Nema dostupnih izveštaja za prikaz grafikona performansi.</p>
+    </div>
+
+    <div *ngIf="reports.length > 0">
+      <div class="report-selector">
+        <label for="metricChartSelect">Izaberi metriku:</label>
+        <select id="metricChartSelect" class="form-control" [(ngModel)]="selectedChartMetricId" (change)="updateChart()">
+          <option *ngFor="let m of allMetrics" [value]="m.id">{{ m.name }}</option>
+        </select>
+      </div>
+
+      <div class="chart-wrapper">
+        <canvas id="performanceChart"></canvas>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <app-scout-request-modal 
@@ -156,6 +179,48 @@
     
     <div class="modal-actions">
       <button type="button" class="btn btn-secondary" (click)="showWishlistModal = false">Zatvori</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showCompareModal">
+  <div class="modal-content text-left">
+    <div class="modal-header">
+      <h3>Izaberi igrača za poređenje</h3>
+      <button class="close-btn" (click)="showCompareModal = false">&times;</button>
+    </div>
+    
+    <div *ngIf="isCompareLoading" class="modal-loading">
+      <p>Učitavanje igrača...</p>
+    </div>
+
+    <div *ngIf="!isCompareLoading" class="wishlist-selection-list" style="overflow-y: auto;">
+      <div 
+        class="wishlist-option-item" 
+        *ngFor="let p of allPlayers" 
+        (click)="selectPlayerForComparison(p.id)">
+        <div class="wishlist-option-info">
+          <div class="placeholder-image">
+            <span>{{ p.name.charAt(0) }}{{ p.surname.charAt(0) }}</span>
+          </div>
+          <div class="player-info-text">
+            <span class="player-info-name">{{ p.name }} {{ p.surname }}</span>
+            <div class="player-details">
+              <span class="tag club-tag">({{ p.dateOfBirth | date:'yyyy.' }})</span>
+              <span class="tag position-tag">{{ formatPosition(p.playerPosition) }}</span>
+            </div>
+          </div>
+        </div>
+        <span class="arrow-indicator">&rarr;</span>
+      </div>
+
+      <div *ngIf="allPlayers.length === 0" class="empty-modal-state">
+        <p>Nema drugih dostupnih igrača za poređenje.</p>
+      </div>
+    </div>
+    
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" (click)="showCompareModal = false">Zatvori</button>
     </div>
   </div>
 </div>

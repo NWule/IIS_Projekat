@@ -26,4 +26,10 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
             "AND r.createdAt = (SELECT MAX(r2.createdAt) FROM Report r2 WHERE r2.player = p)")
     List<Report> findLatestReportsWithMetrics(@Param("position")PlayerPosition position,
                                               @Param("metricIds") Set<Long> metricIds);
+    @Query("SELECT DISTINCT r FROM Report r " +
+            "LEFT JOIN FETCH r.valuedMetrics vm " +
+            "LEFT JOIN FETCH vm.metric " +
+            "WHERE r.player.id IN :playerIds " +
+            "AND r.createdAt = (SELECT MAX(r2.createdAt) FROM Report r2 WHERE r2.player.id = r.player.id)")
+    List<Report> findLatestReportsForPlayers(@Param("playerIds") List<Long> playerIds);
 }

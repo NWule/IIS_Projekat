@@ -1,17 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { PlayerService } from '../../../match/services/player.service';
 import { ContractService } from '../../../match/services/playsFor.service';
 import { ReportService } from '../../services/report.service';
 import { MetricService } from '../../services/metric.service';
-import { WishlistService } from '../../services/wishlist.service'; // NOVO
+import { WishlistService } from '../../services/wishlist.service';
 
 import { Player, PlaysFor } from '../../../match/models/player.model';
 import { Report } from '../../models/report.model';
 import { Metric, GameMetric } from '../../models/metric.model';
-import { Wishlist } from '../../models/wishlist.model'; // NOVO
+import { Wishlist } from '../../models/wishlist.model';
 import { AuthService } from 'src/app/infrastructure/auth/auth.service';
+
+import { Chart } from 'chart.js/auto';
+import { PdfReportService } from '../../services/pdf-report.service';
 
 interface GroupedGame {
   gameId: number;
@@ -32,10 +35,10 @@ export class ViewPlayerComponent implements OnInit {
   currentClubName: string = 'Slobodan igrač (Bez kluba)';
   playerHistory: PlaysFor[] = [];
   
-  activeTab: 'reports' | 'stats' = 'reports';
+  activeTab: 'reports' | 'stats' | 'chart' = 'reports';
   showHistoryModal = false;
   showScoutRequestModal = false;
-  showWishlistModal = false; // NOVO
+  showWishlistModal = false;
 
   reports: Report[] = [];
   selectedReportId: number | null = null;
@@ -46,10 +49,17 @@ export class ViewPlayerComponent implements OnInit {
   allMetrics: Metric[] = [];
 
   gameStats: GroupedGame[] = [];
-  myWishlists: Wishlist[] = []; // NOVO
+  myWishlists: Wishlist[] = [];
 
   isLoading = true;
-  isWishlistLoading = false; // NOVO
+  isWishlistLoading = false;
+
+  showCompareModal = false;
+  allPlayers: Player[] = [];
+  isCompareLoading = false;
+
+  selectedChartMetricId: number | null = null;
+  performanceChart: any = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -57,8 +67,10 @@ export class ViewPlayerComponent implements OnInit {
     private contractService: ContractService,
     private reportService: ReportService,
     private metricService: MetricService,
-    private wishlistService: WishlistService, // NOVO
-    private authService: AuthService
+    private wishlistService: WishlistService,
+    private authService: AuthService,
+    private router: Router,
+    private pdfReportService: PdfReportService
   ) {}
 
   ngOnInit(): void {
@@ -121,6 +133,11 @@ export class ViewPlayerComponent implements OnInit {
     this.reports = reports.sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
+
+    // Automatsko postavljanje prve metrike iz liste kao selektovane
+    if (this.allMetrics.length > 0) {
+      this.selectedChartMetricId = this.allMetrics[0].id;
+    }
 
     if (this.reports.length > 0) {
       this.selectedReportId = this.reports[0].id;
@@ -212,6 +229,118 @@ export class ViewPlayerComponent implements OnInit {
       }
     });
   }
+
+  openCompareModal(): void {
+    this.showCompareModal = true;
+    this.isCompareLoading = true;
+    
+    this.playerService.getAllPlayers().subscribe({
+      next: (data) => {
+        this.allPlayers = data.filter(p => p.id !== this.playerId);
+        this.isCompareLoading = false;
+      },
+      error: (err) => {
+        console.error('Greška pri učitavanju svih igrača za poređenje:', err);
+        this.isCompareLoading = false;
+      }
+    });
+  }
+
+  selectPlayerForComparison(selectedPlayerId: number | undefined): void {
+    this.showCompareModal = false;
+    
+    this.router.navigate(['/player-comparison'], {
+      queryParams: { ids: [this.playerId, selectedPlayerId] }
+    });
+  }
+
+  setActiveTab(tab: 'reports' | 'stats' | 'chart'): void {
+    this.activeTab = tab;
+    if (tab === 'chart') {
+      setTimeout(() => {
+        this.updateChart();
+      }, 0);
+    }
+  }
+
+  updateChart(): void {
+    const ctx = document.getElementById('performanceChart') as HTMLCanvasElement;
+    if (!ctx || this.selectedChartMetricId === null) return;
+
+    if (this.performanceChart) {
+      this.performanceChart.destroy();
+    }
+
+    const chronologicalReports = [...this.reports].sort((a, b) =>
+      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+
+    const labels = chronologicalReports.map(r => 
+      new Date(r.createdAt).toLocaleDateString('sr-RS', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })
+    );
+
+    const metricId = +this.selectedChartMetricId;
+    const metric = this.allMetrics.find(m => m.id === metricId);
+    let datasets: any[] = [];
+    
+    if (metric) {
+      const data = chronologicalReports.map(r => {
+        const vm = r.valuedMetrics?.find((m: any) => m.metricId === metricId);
+        return vm ? vm.value : null;
+      });
+
+      datasets.push({
+        label: metric.name,
+        data: data,
+        borderColor: '#2563eb',
+        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+        tension: 0.25,
+        fill: true,
+        spanGaps: true
+      });
+    }
+
+    this.performanceChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }
+
+  downloadReport(): void {
+  this.pdfReportService.downloadPlayerPdf(this.playerId).subscribe({
+    next: (blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Scouting_Report_${this.player.name}_${this.player.surname}.pdf`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+    },
+    error: (err) => console.error('Failed to download PDF report:', err)
+  });
+}
 
   formatPosition(position: string | undefined): string {
     if (!position) return '';

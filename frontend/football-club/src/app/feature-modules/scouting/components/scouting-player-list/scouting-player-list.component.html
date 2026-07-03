@@ -26,7 +26,7 @@
           <select [(ngModel)]="filter.searchType" class="filter-select">
             <option *ngFor="let st of searchTypes" [value]="st.value">{{ st.label }}</option>
           </select>
-          <input type="number" [(ngModel)]="filter.value" class="filter-value-input" />
+          <input type="number" min="0" [(ngModel)]="filter.value" class="filter-value-input" />
         </div>
       </div>
     </div>

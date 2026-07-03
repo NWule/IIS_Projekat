@@ -1,11 +1,17 @@
 package com.football_club.MatchTracking.service.impl;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.football_club.MatchTracking.dto.PlayerWithReportDTO;
 import com.football_club.MatchTracking.event.PlayerCreatedEvent;
 import com.football_club.MatchTracking.event.PlayerDeletedEvent;
 import com.football_club.MatchTracking.event.PlayerUpdatedEvent;
+import com.football_club.Scouting.dto.ReportDTO;
+import com.football_club.Scouting.dto.ValuedMetricDTO;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -167,6 +173,62 @@ public class PlayerService implements IPlayerService {
             if (!match) return false;
         }
         return true;
+    }
+
+    @Override
+    @Transactional(value="transactionManager", readOnly = true)
+    public List<PlayerWithReportDTO> getPlayersForComparison(List<Long> ids) {
+        List<Player> players = playerRepository.findAllById(ids);
+
+        List<Report> reports = reportRepository.findLatestReportsForPlayers(ids);
+
+        Map<Long, Report> playerReportMap = reports.stream()
+                .collect(Collectors.toMap(r -> r.getPlayer().getId(), r -> r));
+
+        return players.stream()
+                .map(player -> {
+                    PlayerDTO playerDTO = mapToDTO(player);
+                    Report latestReport = playerReportMap.get(player.getId());
+                    ReportDTO reportDTO = latestReport != null ? mapToReportDTO(latestReport, player) : null;
+
+                    return PlayerWithReportDTO.builder()
+                            .player(playerDTO)
+                            .latestReport(reportDTO)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    private ReportDTO mapToReportDTO(Report report, Player player) {
+        List<ValuedMetricDTO> metricDTOs = Collections.emptyList();
+        if (report.getValuedMetrics() != null) {
+            metricDTOs = report.getValuedMetrics().stream()
+                    .filter(Objects::nonNull)
+                    .map(vm -> ValuedMetricDTO.builder()
+                            .id(vm.getId())
+                            .reportId(report.getId())
+                            .metricId(vm.getMetric().getId())
+                            .metricName(vm.getMetric().getName())
+                            .type(vm.getMetric().getType())
+                            .value(vm.getValue())
+                            .build())
+                    .collect(Collectors.toList());
+        }
+
+        return ReportDTO.builder()
+                .id(report.getId())
+                .playerId(player.getId())
+                .playerName(player.getName())
+                .playerSurname(player.getSurname())
+                .scoutId(report.getScout() != null ? report.getScout().getId() : null)
+                .scoutUsername(report.getScout() != null ? report.getScout().getUsername() : null)
+                .createdAt(report.getCreatedAt())
+                .overallCommentary(report.getOverallCommentary())
+                .clubAtTimeId(report.getClubAtTime() != null ? report.getClubAtTime().getId() : null)
+                .clubAtTimeName(report.getClubAtTime() != null ? report.getClubAtTime().getName() : null)
+                .leagueMultiplierAtTime(report.getLeagueMultiplierAtTime())
+                .valuedMetrics(metricDTOs)
+                .build();
     }
 
     private PlayerDTO mapToDTO(Player player) {

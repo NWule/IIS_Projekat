@@ -6,6 +6,7 @@ export interface ValuedMetric {
   metricId: number;
   metricName: string;
   value: number;
+  type: string;
 }
 
 export interface Report {

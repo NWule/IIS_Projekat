@@ -15,6 +15,7 @@ import { WishlistsComponent } from './components/wishlists/wishlists.component';
 import { ScoutingRequestsComponent } from './components/scouting-requests/scouting-requests.component';
 import { PlayerRecommendationComponent } from './components/player-recommendation/player-recommendation.component';
 import { SearchTemplateManagementComponent } from './components/search-template-management/search-template-management.component';
+import { PlayerComparisonComponent } from './components/player-comparison/player-comparison.component';
 
 
 
@@ -33,6 +34,7 @@ import { SearchTemplateManagementComponent } from './components/search-template-
     ScoutingRequestsComponent,
     PlayerRecommendationComponent,
     SearchTemplateManagementComponent,
+    PlayerComparisonComponent,
   ],
   imports: [
     CommonModule,

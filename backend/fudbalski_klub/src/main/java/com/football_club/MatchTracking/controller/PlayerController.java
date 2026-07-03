@@ -1,6 +1,7 @@
 package com.football_club.MatchTracking.controller;
 
 import com.football_club.MatchTracking.dto.PlayerDTO;
+import com.football_club.MatchTracking.dto.PlayerWithReportDTO;
 import com.football_club.MatchTracking.service.IPlayerService;
 import com.football_club.Auth.model.User;
 import com.football_club.Scouting.dto.SearchParameters;
@@ -76,5 +77,11 @@ public class PlayerController {
     @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
     public ResponseEntity<List<PlayerDTO>> advancedSearch(@RequestBody() SearchParameters searchParameters) {
         return ResponseEntity.ok(playerService.advancedSearch(searchParameters));
+    }
+
+    @GetMapping("/compare")
+    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
+    public ResponseEntity<List<PlayerWithReportDTO>> getPlayersForComparison(@RequestParam("ids") List<Long> ids) {
+        return ResponseEntity.ok(playerService.getPlayersForComparison(ids));
     }
 }
