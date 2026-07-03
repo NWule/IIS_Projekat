@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/env/environment';
-import { Player, SearchParameters } from '../models/player.model'; 
+import { Player, PlayerWithReport, SearchParameters } from '../models/player.model'; 
 
 @Injectable({
   providedIn: 'root'
@@ -44,5 +44,10 @@ export class PlayerService {
 
   advancedSearch(searchParameters: SearchParameters): Observable<Player[]> {
     return this.http.post<Player[]>(`${this.apiUrl}/advanced-search`, searchParameters);
+  }
+
+  getPlayersForComparison(ids: number[]): Observable<PlayerWithReport[]> {
+    const params = new HttpParams().set('ids', ids.join(','));
+    return this.http.get<PlayerWithReport[]>(`${this.apiUrl}/compare`, { params });
   }
 }

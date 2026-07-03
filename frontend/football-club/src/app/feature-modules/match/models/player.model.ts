@@ -1,3 +1,5 @@
+import { Report } from "src/app/feature-modules/scouting/models/report.model";
+
 export interface Player {
   id?: number;
   name: string;
@@ -34,4 +36,9 @@ export interface SearchMetric {
 export interface SearchParameters {
   searchTerm: string;
   metrics: SearchMetric[];
+}
+
+export interface PlayerWithReport {
+  player: Player;
+  latestReport: Report | null;
 }

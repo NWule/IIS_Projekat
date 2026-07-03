@@ -53,6 +53,7 @@ import { LiveTrackingComponent } from 'src/app/feature-modules/match/components/
 import { LiveMatchFinderComponent } from 'src/app/feature-modules/match/components/live-match-finder/live-match-finder.component';
 
 import { SearchTemplateManagementComponent } from 'src/app/feature-modules/scouting/components/search-template-management/search-template-management.component';
+import { PlayerComparisonComponent } from 'src/app/feature-modules/scouting/components/player-comparison/player-comparison.component';
 
 const routes: Routes = [
   { path: '',                     redirectTo: 'login', pathMatch: 'full' },
@@ -124,6 +125,7 @@ const routes: Routes = [
   { path: 'wishlists',              component: WishlistsComponent },
   { path: 'player-recommendation',  component: PlayerRecommendationComponent },
   { path: 'search-templates',       component: SearchTemplateManagementComponent },
+  { path: 'player-comparison',       component: PlayerComparisonComponent },
 
   { path: '**',                      redirectTo: 'matches' }
 ];
