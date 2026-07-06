@@ -18,7 +18,7 @@ export class TicketAnalyticsService {
     return this.http.get<GameAnalyticsDTO[]>(`${this.baseUrl}/all`);
   }
 
-  downloadCsvReport(gameId: number): Observable<Blob> {
-    return this.http.get(`${this.baseUrl}/game/${gameId}/csv`, { responseType: 'blob' });
+  downloadPdfReport(gameId: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/game/${gameId}/pdf`, { responseType: 'blob' });
   }
 }

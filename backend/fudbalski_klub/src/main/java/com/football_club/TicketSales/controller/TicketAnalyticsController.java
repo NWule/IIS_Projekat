@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -31,14 +30,13 @@ public class TicketAnalyticsController {
         return ResponseEntity.ok(ticketAnalyticsService.getAllGamesAnalytics());
     }
 
-    @GetMapping("/game/{gameId}/csv")
+    @GetMapping("/game/{gameId}/pdf")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<byte[]> downloadCsvReport(@PathVariable Long gameId) {
-        String csv = ticketAnalyticsService.generateCsvReport(gameId);
-        byte[] bytes = csv.getBytes(StandardCharsets.UTF_8);
+    public ResponseEntity<byte[]> downloadPdfReport(@PathVariable Long gameId) {
+        byte[] pdf = ticketAnalyticsService.generatePdfReport(gameId);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"izvestaj-utakmica-" + gameId + ".csv\"")
-                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
-                .body(bytes);
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"izvestaj-utakmica-" + gameId + ".pdf\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
     }
 }
