@@ -37,14 +37,14 @@ export class TicketAnalyticsComponent implements OnInit {
     });
   }
 
-  downloadCsv(): void {
+  downloadPdf(): void {
     if (!this.selectedGameId) return;
-    this.analyticsService.downloadCsvReport(this.selectedGameId).subscribe({
+    this.analyticsService.downloadPdfReport(this.selectedGameId).subscribe({
       next: (blob) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `izvestaj-utakmica-${this.selectedGameId}.csv`;
+        a.download = `izvestaj-utakmica-${this.selectedGameId}.pdf`;
         a.click();
         URL.revokeObjectURL(url);
       },

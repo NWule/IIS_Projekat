@@ -9,7 +9,7 @@
         <option *ngFor="let game of games" [ngValue]="game.id">{{ getGameLabel(game) }}</option>
       </select>
     </div>
-    <button *ngIf="analytics" class="btn-csv" (click)="downloadCsv()">Preuzmi CSV izveštaj</button>
+    <button *ngIf="analytics" class="btn-pdf" (click)="downloadPdf()">Preuzmi PDF izveštaj</button>
   </div>
 
   <div *ngIf="loading" class="loading">Učitavanje...</div>
