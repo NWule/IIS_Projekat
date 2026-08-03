@@ -11,6 +11,8 @@ import { AuthService } from '../../../../infrastructure/auth/auth.service';
 export class UpcomingMatchesComponent implements OnInit {
   upcomingMatches: any[] = []; 
   canViewUpcoming: boolean = false;
+  searchQuery: string = '';
+  filteredUpcomingMatches: any[] = [];
 
   constructor(
     private gameService: GameService, 
@@ -22,6 +24,7 @@ export class UpcomingMatchesComponent implements OnInit {
     this.gameService.getUpcomingGames().subscribe({
       next: (data) => {
         this.upcomingMatches = data;
+        this.filteredUpcomingMatches = [...this.upcomingMatches];
       },
       error: (err) => console.error('Greška pri učitavanju predstojećih mečeva:', err)
     });
@@ -49,5 +52,19 @@ export class UpcomingMatchesComponent implements OnInit {
     if (this.canViewUpcoming) {
       this.router.navigate(['/match-details', matchId]);
     }
+  }
+
+  onSearchChange(query: string): void {
+    const lowerQuery = query.toLowerCase().trim();
+    
+    if (!lowerQuery) {
+      this.filteredUpcomingMatches = [...this.upcomingMatches];
+      return;
+    }
+
+    this.filteredUpcomingMatches = this.upcomingMatches.filter(match => 
+      (match.homeClubName || '').toLowerCase().includes(lowerQuery) || 
+      (match.awayClubName || '').toLowerCase().includes(lowerQuery)
+    );
   }
 }

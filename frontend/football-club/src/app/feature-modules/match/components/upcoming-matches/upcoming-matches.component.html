@@ -2,6 +2,16 @@
   
   <div class="header-row">
     <h1>Predstojeće utakmice (Raspored)</h1>
+
+    <div class="search-wrapper">
+      <input 
+        type="text" 
+        placeholder="Pretraži po timovima..." 
+        [(ngModel)]="searchQuery" 
+        (input)="onSearchChange(searchQuery)" 
+      />
+      <span class="search-icon">🔍</span>
+    </div>
   </div>
   
   <table class="match-table">
@@ -14,7 +24,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let match of upcomingMatches">
+      <tr *ngFor="let match of filteredUpcomingMatches">
         <td>{{ match.dateTime | date:'dd.MM.yyyy HH:mm' }}</td>
         <td>{{ match.homeClubName }}</td>
         <td>{{ match.awayClubName }}</td>
@@ -28,7 +38,7 @@
     </tbody>
   </table>
 
-  <div *ngIf="upcomingMatches.length === 0" class="no-matches">
-    Trenutno nema zakazanih predstojećih utakmica.
+  <div *ngIf="filteredUpcomingMatches.length === 0" class="no-matches">
+    Trenutno nema zakazanih predstojećih utakmica ili nema rezultata pretrage.
   </div>
 </div>

@@ -202,3 +202,29 @@
 .btn-start-match:hover {
   background-color: #15803d;
 }
+
+.actions-header {
+  display: flex; 
+  align-items: center; 
+}
+
+.search-wrapper {
+  position: relative;
+  margin-bottom: 0;
+}
+
+.search-wrapper input {
+  padding: 10px 40px 10px 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  width: 300px;
+  font-size: 14px;
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}

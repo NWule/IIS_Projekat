@@ -48,6 +48,10 @@ export class MatchDetailsComponent implements OnInit {
 
   loading = true;
 
+  searchQuery: string = '';
+  filteredHomePerformances: Appearance[] = [];
+  filteredAwayPerformances: Appearance[] = [];
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -117,6 +121,9 @@ export class MatchDetailsComponent implements OnInit {
 
         this.homePerformances = performances.filter(p => p.clubId === this.game.homeClubId);
         this.awayPerformances = performances.filter(p => p.clubId === this.game.awayClubId);
+
+        this.filteredHomePerformances = [...this.homePerformances];
+        this.filteredAwayPerformances = [...this.awayPerformances];
 
         if (isMyClubParticipating) {
           this.contractService.getCurrentRoster(myClub.id!).subscribe({
@@ -257,6 +264,7 @@ export class MatchDetailsComponent implements OnInit {
         } else {
           this.awayPerformances = [...this.awayPerformances, created];
         }
+        this.onSearchChange(this.searchQuery);
         alert('Performance successfully saved!');
         this.toggleAddForm();
       },
@@ -265,6 +273,26 @@ export class MatchDetailsComponent implements OnInit {
         alert('An error occurred while saving player performance!');
       }
     });
+  }
+
+ onSearchChange(query: string): void {
+    const lowerQuery = query.toLowerCase().trim();
+    
+    if (!lowerQuery) {
+      this.filteredHomePerformances = [...this.homePerformances];
+      this.filteredAwayPerformances = [...this.awayPerformances];
+      return;
+    }
+
+    this.filteredHomePerformances = this.homePerformances.filter(p => 
+      (p.playerName || '').toLowerCase().includes(lowerQuery) || 
+      (p.playerSurname || '').toLowerCase().includes(lowerQuery)
+    );
+
+    this.filteredAwayPerformances = this.awayPerformances.filter(p => 
+      (p.playerName || '').toLowerCase().includes(lowerQuery) || 
+      (p.playerSurname || '').toLowerCase().includes(lowerQuery)
+    );
   }
 
   goToAddPerformance(): void {

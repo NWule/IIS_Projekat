@@ -77,12 +77,25 @@
     </div>
 
     <div *ngIf="activeTab === 'performances'">
-      <div class="teams-container">
+      
+      <!-- Search bar -->
+      <div class="actions-header" style="justify-content: center; margin-bottom: 20px;">
+        <div class="search-wrapper">
+          <input 
+            type="text" 
+            placeholder="Pretraži igrače (ime ili prezime)..." 
+            [(ngModel)]="searchQuery" 
+            (input)="onSearchChange(searchQuery)" 
+          />
+          <span class="search-icon">🔍</span>
+        </div>
+      </div>
 
+      <div class="teams-container">
         <div class="team-section">
           <h3>{{ homeClub?.name }}</h3>
 
-          <div class="player-row" *ngFor="let p of homePerformances">
+          <div class="player-row" *ngFor="let p of filteredHomePerformances">
             <strong>{{ p.playerName }} {{ p.playerSurname }}</strong> &nbsp;|&nbsp;
             ⏱ {{ p.minutesPlayed }}' &nbsp; ⚽ {{ p.goals }} &nbsp; 🎯 {{ p.assists }} &nbsp;
             🦵 {{ p.fouls }}
@@ -90,8 +103,9 @@
             <span *ngIf="p.redCard"> &nbsp; 🟥</span>
             &nbsp; | &nbsp; {{ p.passingAccuracy }}% dodavanja
           </div>
-          <p *ngIf="homePerformances.length === 0" class="empty-message">
-            Nema unetih performansi.
+          
+          <p *ngIf="filteredHomePerformances.length === 0" class="empty-message">
+            Nema pronađenih performansi.
           </p>
 
           <button class="btn-add" *ngIf="isStatistician && isHomeClub" (click)="goToAddPerformance()">
@@ -102,7 +116,7 @@
         <div class="team-section">
           <h3>{{ awayClub?.name }}</h3>
 
-          <div class="player-row" *ngFor="let p of awayPerformances">
+          <div class="player-row" *ngFor="let p of filteredAwayPerformances">
             <strong>{{ p.playerName }} {{ p.playerSurname }}</strong> &nbsp;|&nbsp;
             ⏱ {{ p.minutesPlayed }}' &nbsp; ⚽ {{ p.goals }} &nbsp; 🎯 {{ p.assists }} &nbsp;
             🦵 {{ p.fouls }}
@@ -110,15 +124,15 @@
             <span *ngIf="p.redCard"> &nbsp; 🟥</span>
             &nbsp; | &nbsp; {{ p.passingAccuracy }}% dodavanja
           </div>
-          <p *ngIf="awayPerformances.length === 0" class="empty-message">
-            Nema unetih performansi.
+          
+          <p *ngIf="filteredAwayPerformances.length === 0" class="empty-message">
+            Nema pronađenih performansi.
           </p>
 
           <button class="btn-add" *ngIf="isStatistician && !isHomeClub" (click)="goToAddPerformance()">
             + Dodaj performansu
           </button>
         </div>
-
       </div>
     </div>
   </ng-container>

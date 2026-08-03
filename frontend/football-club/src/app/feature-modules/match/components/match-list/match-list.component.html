@@ -3,6 +3,16 @@
   <div class="header-row">
     <h1>Raspored i pregled utakmica</h1>
     
+    <div class="search-wrapper">
+      <input 
+        type="text" 
+        placeholder="Pretraži po timovima..." 
+        [(ngModel)]="searchQuery" 
+        (input)="onSearchChange(searchQuery)" 
+      />
+      <span class="search-icon">🔍</span>
+    </div>
+
     <button 
       *ngIf="isStatistician" 
       (click)="goToMatchEntry()"
@@ -21,7 +31,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let match of matches">
+      <tr *ngFor="let match of filteredMatches">
         <td>{{ match.dateTime | date:'dd.MM.yyyy HH:mm' }}</td>
         <td>{{ match.homeClubName }}</td>
         <td>{{ match.awayClubName }}</td>
@@ -29,6 +39,12 @@
           <button class="btn-details" (click)="viewMatchDetails(match.id)">Pregled detalja</button>
           <button *ngIf="canGenerateReport" class="btn-report" style="margin-left: 8px;" 
             (click)="downloadReport(match.id)"> 📄 Preuzmi izveštaj </button>
+        </td>
+      </tr>
+
+      <tr *ngIf="filteredMatches.length === 0">
+        <td colspan="4" style="text-align: center; color: #999; font-style: italic;">
+          Nema pronađenih utakmica za zadati kriterijum.
         </td>
       </tr>
     </tbody>
