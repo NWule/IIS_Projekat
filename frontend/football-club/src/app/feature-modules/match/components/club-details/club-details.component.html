@@ -50,10 +50,24 @@
 
     <div class="players-column">
       <h2 class="section-title">Igrači</h2>
+
+      <div class="players-header-row">
+        <h2 class="section-title" style="margin-bottom: 0;">Igrači</h2>
+        
+        <div class="search-wrapper">
+          <input 
+            type="text" 
+            placeholder="Pretraži igrače..." 
+            [(ngModel)]="searchQuery" 
+            (input)="onSearchChange(searchQuery)" 
+          />
+          <span class="search-icon">🔍</span>
+        </div>
+      </div>
       
       <div class="roster-scroll-container">
         <div class="players-grid">
-          <div class="player-card" (click)="goToPlayerDetails(item.playerId)" *ngFor="let item of roster">
+          <div class="player-card" (click)="goToPlayerDetails(item.playerId)" *ngFor="let item of filteredRoster">
             <div class="player-photo-placeholder">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" class="player-icon">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -67,7 +81,7 @@
           </div>
         </div>
         
-        <div class="empty-roster" *ngIf="roster.length === 0">
+        <div class="empty-roster" *ngIf="filteredRoster.length === 0">
           Trenutno nema registrovanih igrača u ovom timu.
         </div>
       </div>

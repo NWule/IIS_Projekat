@@ -15,6 +15,12 @@
     {{ game.dateTime | date: 'dd.MM.yyyy HH:mm' }}
   </div>
 
+  <div class="report-container" *ngIf="!loading && !isUpcoming && canGenerateReport">
+    <button class="btn-report-main" (click)="downloadReport()">
+      📄 Preuzmi izveštaj meča
+    </button>
+  </div>
+
   <div *ngIf="isUpcoming" class="upcoming-box">
     <p class="upcoming-message">
       Ova utakmica tek treba da se odigra. Pređite na stranicu za pripremu meča kako biste postavili timove i konfiguraciju.

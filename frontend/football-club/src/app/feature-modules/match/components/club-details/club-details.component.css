@@ -205,3 +205,35 @@
   font-size: 18px;
   color: #555;
 }
+
+.players-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 15px;
+}
+
+.search-wrapper {
+  position: relative;
+  margin-bottom: 0;
+  width: 280px; 
+}
+
+.search-wrapper input {
+  padding: 8px 35px 8px 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  width: 100%;
+  font-size: 13px;
+  box-sizing: border-box; 
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 14px;
+}

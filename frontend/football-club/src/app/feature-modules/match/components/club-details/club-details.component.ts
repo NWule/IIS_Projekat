@@ -22,6 +22,9 @@ export class ClubDetailsComponent implements OnInit {
   isAssistantCoach: boolean = false;
   isHeadCoach: boolean = false;
 
+  searchQuery: string = '';
+  filteredRoster: PlaysFor[] = [];
+
   public showChart: boolean = false;
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [
@@ -132,6 +135,7 @@ export class ClubDetailsComponent implements OnInit {
         this.contractService.getCurrentRoster(clubId).subscribe({
           next: (rosterData) => {
             this.roster = rosterData;
+            this.filteredRoster = [...this.roster];
             this.isLoading = false;
           },
           error: (err) => {
@@ -165,4 +169,17 @@ export class ClubDetailsComponent implements OnInit {
     });
   }
 
+
+  onSearchChange(query: string): void {
+    const lowerQuery = query.toLowerCase().trim();
+    
+    if (!lowerQuery) {
+      this.filteredRoster = [...this.roster];
+      return;
+    }
+    this.filteredRoster = this.roster.filter(item => 
+      (item.playerName || '').toLowerCase().includes(lowerQuery) || 
+      (item.playerSurname || '').toLowerCase().includes(lowerQuery)
+    );
+  }
 }

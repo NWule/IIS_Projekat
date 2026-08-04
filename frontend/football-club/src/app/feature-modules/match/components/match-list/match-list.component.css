@@ -119,3 +119,21 @@ h1 {
     gap: 10px;
   }
 }
+
+.btn-report {
+  background-color: transparent;
+  color: #0b133d;
+  border: 1px solid #0b133d;
+  padding: 7px 15px; 
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 8px; 
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-report:hover {
+  background-color: #0b133d;
+  color: white;
+}

@@ -10,6 +10,7 @@ import { TeamStatisticService } from '../../services/team-statistic.service';
 import { ContractService } from '../../services/playsFor.service';
 import { ClubService } from '../../services/club.service';
 import { AuthService } from '../../../../infrastructure/auth/auth.service';
+import { ReportService } from 'src/app/feature-modules/match/services/report.service';
 
 import { Game } from '../../models/game.model';
 import { Appearance } from '../../models/appearance.model';
@@ -48,6 +49,8 @@ export class MatchDetailsComponent implements OnInit {
 
   loading = true;
 
+  canGenerateReport: boolean = false;
+
   searchQuery: string = '';
   filteredHomePerformances: Appearance[] = [];
   filteredAwayPerformances: Appearance[] = [];
@@ -61,7 +64,8 @@ export class MatchDetailsComponent implements OnInit {
     private statisticService: TeamStatisticService,
     private contractService: ContractService,
     private clubService: ClubService,
-    private authService: AuthService
+    private authService: AuthService,
+    private reportService: ReportService
   ) {}
 
   ngOnInit(): void {
@@ -75,9 +79,16 @@ export class MatchDetailsComponent implements OnInit {
   private checkUserRole(): void {
     this.authService.user$.subscribe(user => {
       this.isStatistician = user?.role === 'ROLE_STATISTICIAN';
+      if (user) {
+         this.canGenerateReport = user.role === 'ROLE_HEAD_COACH' ||  user.role === 'ROLE_STATISTICIAN' || 
+                                  user.role === 'ROLE_ADMIN';
+      } else {
+         this.canGenerateReport = false;
+      }
       console.log('ROLE DIAGNOSTICS:', {
         currentRole: user?.role,
-        isStatistician: this.isStatistician
+        isStatistician: this.isStatistician,
+        canGenerateReport: this.canGenerateReport
       });
     });
   }
@@ -302,4 +313,23 @@ export class MatchDetailsComponent implements OnInit {
   goToMatchPreparation(): void {
     this.router.navigate(['/match-preparation', this.gameId]);
   }
+
+  downloadReport(): void {
+    if (this.canGenerateReport && this.gameId) {
+      this.reportService.downloadGameReportPdf(this.gameId).subscribe({
+        next: (blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `report-${this.gameId}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        },
+        error: (err) => console.error('Greška pri generisanju izveštaja:', err)
+      });
+    }
+  }
+
 }
