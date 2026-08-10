@@ -4,7 +4,8 @@ export interface Appearance {
   playerName?: string;     
   playerSurname?: string;   
   gameId: number;   
-  clubId?: number;      
+  clubId?: number;  
+  matchRole?: string;    
   minutesPlayed: number;
   goals: number;
   assists: number;

@@ -25,11 +25,15 @@ export class LiveTrackingComponent implements OnInit, OnDestroy {
   homeClub!: Club;
   awayClub!: Club;
 
-  homeLineup: Appearance[] = [];
-  awayLineup: Appearance[] = [];
+  homeStartingXI: Appearance[] = [];
+  homeBench: Appearance[] = [];
+  
+  awayStartingXI: Appearance[] = [];
+  awayBench: Appearance[] = [];
 
   selectedPlayer: Appearance | null = null;
   isPassMode = false;
+  isSubMode = false;
 
   matchSeconds = 0;
   displayTime = '00:00';
@@ -71,8 +75,14 @@ export class LiveTrackingComponent implements OnInit, OnDestroy {
         this.homeClub = homeClub;
         this.awayClub = awayClub;
 
-        this.homeLineup = appearances.filter(p => p.clubId === this.game.homeClubId);
-        this.awayLineup = appearances.filter(p => p.clubId === this.game.awayClubId);
+        const homeApps = appearances.filter(p => p.clubId === this.game.homeClubId);
+        const awayApps = appearances.filter(p => p.clubId === this.game.awayClubId);
+
+        this.homeStartingXI = homeApps.filter(p => p.matchRole === 'STARTING_XI');
+        this.homeBench = homeApps.filter(p => p.matchRole === 'BENCH');
+        
+        this.awayStartingXI = awayApps.filter(p => p.matchRole === 'STARTING_XI');
+        this.awayBench = awayApps.filter(p => p.matchRole === 'BENCH');
         
         this.isLoading = false;
       },
@@ -131,7 +141,67 @@ export class LiveTrackingComponent implements OnInit, OnDestroy {
       this.handlePassExecution(this.selectedPlayer, player);
       return;
     }
+
+    if (this.isSubMode && this.selectedPlayer) {
+      if (this.selectedPlayer.clubId !== player.clubId) {
+        alert('Izmena mora biti unutar istog tima!');
+        return;
+      }
+      if (player.matchRole !== 'BENCH') {
+        alert('Igrač koji ulazi mora biti na klupi!');
+        return;
+      }
+      this.handleSubstitutionExecution(this.selectedPlayer, player);
+      return;
+    }
+
     this.selectedPlayer = player;
+  }
+
+  activateSubMode(): void {
+    if (!this.selectedPlayer) {
+      alert('Molimo vas da prvo izaberete igrača iz prve postave koji izlazi iz igre.');
+      return;
+    }
+    if (this.selectedPlayer.matchRole !== 'STARTING_XI') {
+      alert('Igrač koji izlazi mora biti u prvoj postavi.');
+      return;
+    }
+    this.isSubMode = true;
+    this.isPassMode = false; 
+  }
+
+  private handleSubstitutionExecution(playerOut: Appearance, playerIn: Appearance): void {
+    playerOut.matchRole = 'BENCH';
+    playerIn.matchRole = 'STARTING_XI';
+
+    if (playerOut.clubId === this.game.homeClubId) {
+      this.homeStartingXI = this.homeStartingXI.filter(p => p.id !== playerOut.id);
+      this.homeStartingXI.push(playerIn);
+      this.homeBench = this.homeBench.filter(p => p.id !== playerIn.id);
+      this.homeBench.push(playerOut);
+    } else {
+      this.awayStartingXI = this.awayStartingXI.filter(p => p.id !== playerOut.id);
+      this.awayStartingXI.push(playerIn);
+      this.awayBench = this.awayBench.filter(p => p.id !== playerIn.id);
+      this.awayBench.push(playerOut);
+    }
+
+    forkJoin([
+      this.appearanceService.updateAppearance(playerOut.id!, playerOut),
+      this.appearanceService.updateAppearance(playerIn.id!, playerIn)
+    ]).subscribe({
+      next: () => {
+        alert('Izmena je uspešno evidentirana i upisana u bazu!');
+      },
+      error: (err) => {
+        console.error('Greška pri čuvanju izmene:', err);
+        alert('Greška na serveru prilikom čuvanja izmene. Osvežite stranicu.');
+      }
+    });
+
+    this.isSubMode = false;
+    this.selectedPlayer = null;
   }
 
   activatePassMode(): void {
