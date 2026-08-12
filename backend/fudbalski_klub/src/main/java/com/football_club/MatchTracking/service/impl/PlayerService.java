@@ -10,6 +10,7 @@ import com.football_club.MatchTracking.dto.PlayerWithReportDTO;
 import com.football_club.MatchTracking.event.PlayerCreatedEvent;
 import com.football_club.MatchTracking.event.PlayerDeletedEvent;
 import com.football_club.MatchTracking.event.PlayerUpdatedEvent;
+import com.football_club.MatchTracking.service.IFileStorageService;
 import com.football_club.Scouting.dto.ReportDTO;
 import com.football_club.Scouting.dto.ValuedMetricDTO;
 import org.springframework.context.ApplicationEventPublisher;
@@ -26,6 +27,7 @@ import com.football_club.Scouting.dto.SearchParameters;
 import com.football_club.Scouting.model.Report;
 import com.football_club.Scouting.model.ValuedMetric;
 import com.football_club.Scouting.repository.ReportRepository;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +40,7 @@ public class PlayerService implements IPlayerService {
     private final ReportRepository reportRepository;
     private final org.springframework.transaction.support.TransactionTemplate transactionTemplate;
     private final ApplicationEventPublisher eventPublisher;
+    private final IFileStorageService fileStorageService;
 
     @Override
     @Transactional("transactionManager")
@@ -47,6 +50,7 @@ public class PlayerService implements IPlayerService {
         player.setSurname(playerDTO.getSurname());
         player.setDateOfBirth(playerDTO.getDateOfBirth());
         player.setPosition(playerDTO.getPlayerPosition());
+        player.setImagePath(playerDTO.getImagePath());
         System.out.println("DEBUG: Postgres ID: " + player.getId());
 
         Player savedPlayer = playerRepository.saveAndFlush(player);
@@ -96,6 +100,9 @@ public class PlayerService implements IPlayerService {
         player.setSurname(playerDTO.getSurname());
         player.setDateOfBirth(playerDTO.getDateOfBirth());
         player.setPosition(playerDTO.getPlayerPosition());
+        if (playerDTO.getImagePath() != null) {
+            player.setImagePath(playerDTO.getImagePath());
+        }
 
         Player updatedPlayer = playerRepository.save(player);
 
@@ -231,6 +238,19 @@ public class PlayerService implements IPlayerService {
                 .build();
     }
 
+    @Transactional("transactionManager")
+    public PlayerDTO uploadPlayerImage(Long id, MultipartFile file) {
+        Player player = playerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Player not found with id: " + id));
+
+        String imagePath = fileStorageService.storeFile(file, "players");
+
+        player.setImagePath(imagePath);
+        Player updatedPlayer = playerRepository.save(player);
+
+        return mapToDTO(updatedPlayer);
+    }
+
     private PlayerDTO mapToDTO(Player player) {
         return PlayerDTO.builder()
                 .id(player.getId())
@@ -238,6 +258,7 @@ public class PlayerService implements IPlayerService {
                 .surname(player.getSurname())
                 .dateOfBirth(player.getDateOfBirth())
                 .playerPosition(player.getPosition())
+                .imagePath(player.getImagePath())
                 .build();
     }
 }

@@ -16,6 +16,8 @@ import { switchMap, of } from 'rxjs';
 export class PlayerEntryComponent implements OnInit {
   playerForm!: FormGroup;
   clubs: Club[] = []; 
+  selectedFile: File | null = null;
+  imagePreview: string | ArrayBuffer | null = null;
 
   playerPositions: string[] = [
   'GOALKEEPER',
@@ -80,6 +82,16 @@ export class PlayerEntryComponent implements OnInit {
     });
   }
 
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = e => this.imagePreview = reader.result;
+      reader.readAsDataURL(file);
+    }
+  }
+
   onSubmit(): void {
     if (this.playerForm.valid) {
       const formValue = this.playerForm.value;
@@ -91,46 +103,38 @@ export class PlayerEntryComponent implements OnInit {
         playerPosition: formValue.pozicija 
       };
 
-      console.log('1. Kreiram igrača:', playerData);
-
       this.playerService.createPlayer(playerData).pipe(
         switchMap((savedPlayer) => {
-          console.log('Igrač kreiran na bekend-u. Dobijeni objekat:', savedPlayer);
-
-          if (formValue.trenutniKlubId && formValue.trenutniKlubId !== 'null' && savedPlayer.id) {
-            
-            const contractData = {
-              playerId: savedPlayer.id, 
-              clubId: Number(formValue.trenutniKlubId),
-              jerseyNumber: Number(formValue.brojNaDresu),
-              contractStart: formValue.contractStart,
-              contractEnd: formValue.contractEnd
-            };
-
-            console.log('2. Kreiram ugovor sa dobijenim ID-jem igrača:', contractData);
-            return this.contractService.createContract(contractData);
-          } else {
-            return of(null);
+          let imageUploadObs = of(savedPlayer); 
+          if (this.selectedFile && savedPlayer.id) {
+            const formData = new FormData();
+            formData.append('file', this.selectedFile);
+            imageUploadObs = this.playerService.uploadPlayerImage(savedPlayer.id, formData);
           }
+
+          return imageUploadObs.pipe(
+            switchMap(() => {
+              if (formValue.trenutniKlubId && formValue.trenutniKlubId !== 'null' && savedPlayer.id) {
+                const contractData = {
+                  playerId: savedPlayer.id, 
+                  clubId: Number(formValue.trenutniKlubId),
+                  jerseyNumber: Number(formValue.brojNaDresu),
+                  contractStart: formValue.contractStart,
+                  contractEnd: formValue.contractEnd
+                };
+                return this.contractService.createContract(contractData);
+              } else {
+                return of(null);
+              }
+            })
+          );
         })
       ).subscribe({
         next: (contractRes) => {
-          if (contractRes) {
-            alert('Igrač i ugovor su uspešno sačuvani u bazi!');
-          } else {
-            alert('Igrač je uspešno kreiran (slobodan igrač, bez ugovora)!');
-          }
-          
-          this.playerForm.reset({
-            ime: '',
-            prezime: '',
-            datumRodjenja: '',
-            pozicija: '',
-            trenutniKlubId: null,
-            brojNaDresu: null,
-            contractStart: '',
-            contractEnd: ''
-          });
+          alert('Igrač, slika (opciono) i ugovor su uspešno sačuvani u bazi!');
+          this.playerForm.reset();
+          this.selectedFile = null;
+          this.imagePreview = null;
         },
         error: (err) => {
           alert(err.error?.message || 'Došlo je do greške prilikom čuvanja.');

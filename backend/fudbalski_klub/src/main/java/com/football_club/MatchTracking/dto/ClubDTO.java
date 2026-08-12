@@ -16,4 +16,5 @@ public class ClubDTO {
     private int draws;
     private int goalsScored;
     private int goalsConceded;
+    private String imagePath;
 }

@@ -4,6 +4,7 @@ import { PlayerService } from '../../services/player.service';
 import { ContractService } from '../../services/playsFor.service';
 import { Player, PlaysFor } from '../../models/player.model';
 import { AuthService } from '../../../../infrastructure/auth/auth.service';
+import { environment } from 'src/env/environment'; 
 
 // tre, ptre
 
@@ -17,6 +18,8 @@ export class PlayerDetailsComponent implements OnInit {
   currentContract: PlaysFor | null = null;
   isLoading: boolean = true;
   isAssistantCoach: boolean = false;
+  
+  playerImageUrl: string | null = null; 
 
   constructor(
     private route: ActivatedRoute,
@@ -57,6 +60,16 @@ export class PlayerDetailsComponent implements OnInit {
     this.playerService.getPlayerById(playerId).subscribe({
       next: (playerData) => {
         this.player = playerData;
+
+        if (this.player.imagePath) {
+          let baseUrl = environment.apiHost.replace('/api/', '/').replace('api/', '');
+          
+          if (!baseUrl.endsWith('/')) {
+            baseUrl += '/';
+          }
+          
+          this.playerImageUrl = baseUrl + 'images' + this.player.imagePath;
+        }
         
         this.contractService.getCurrentContract(playerId).subscribe({
           next: (contractData) => {

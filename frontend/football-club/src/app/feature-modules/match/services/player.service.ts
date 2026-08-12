@@ -50,4 +50,8 @@ export class PlayerService {
     const params = new HttpParams().set('ids', ids.join(','));
     return this.http.get<PlayerWithReport[]>(`${this.apiUrl}/compare`, { params });
   }
+
+  uploadPlayerImage(playerId: number, formData: FormData): Observable<Player> {
+    return this.http.post<Player>(`${this.apiUrl}/${playerId}/image`, formData);
+  }
 }

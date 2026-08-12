@@ -74,6 +74,7 @@ public class WebSecurityConfig {
                         "/swagger-ui/**",
                         "/swagger-ui.html"
                 ).permitAll()
+                .requestMatchers("/images/**").permitAll()
                 .anyRequest().authenticated()
         );
         http.cors(Customizer.withDefaults());

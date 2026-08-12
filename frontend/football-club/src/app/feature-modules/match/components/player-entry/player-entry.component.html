@@ -31,6 +31,15 @@
         </div>
       </div>
 
+      <div class="input-group align-top">
+          <label>Fotografija</label>
+          <div class="image-upload-wrapper">
+            <img *ngIf="imagePreview" [src]="imagePreview" class="preview-image" alt="Preview">
+            <div *ngIf="!imagePreview" class="empty-image-box">Nema slike</div>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" />
+          </div>
+        </div>
+
       <div class="column right-column">
         <div class="input-group">
           <label for="trenutniKlub">Trenutni klub</label>

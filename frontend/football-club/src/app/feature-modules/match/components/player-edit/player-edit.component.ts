@@ -5,8 +5,9 @@ import { ClubService } from '../../services/club.service';
 import { PlayerService } from '../../services/player.service';
 import { ContractService } from '../../services/playsFor.service';
 import { Club } from '../../models/club.model';
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, of, Observable } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
+import { environment } from 'src/env/environment';
 
 // ptre
 
@@ -21,6 +22,8 @@ export class PlayerEditComponent implements OnInit {
   playerId!: number;
   currentContractId: number | null = null; 
   isLoading = true;
+  selectedFile: File | null = null;
+  imagePreview: string | ArrayBuffer | null = null;
 
   playerPositions: string[] = [
     'Goalkeeper',
@@ -113,6 +116,21 @@ export class PlayerEditComponent implements OnInit {
           });
         }
 
+        if (res.player.imagePath) {
+          const baseUrl = environment.apiHost.replace('/api/', ''); 
+          this.imagePreview = baseUrl + res.player.imagePath;
+        }
+
+        if (res.contract) {
+          this.currentContractId = res.contract.id || null;
+          this.playerForm.patchValue({
+            trenutniKlubId: res.contract.clubId,
+            brojNaDresu: res.contract.jerseyNumber,
+            contractStart: res.contract.contractStart,
+            contractEnd: res.contract.contractEnd
+          });
+        }
+
         this.isLoading = false;
       },
       error: (err) => {
@@ -121,6 +139,16 @@ export class PlayerEditComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = e => this.imagePreview = reader.result;
+      reader.readAsDataURL(file);
+    }
   }
 
   onSubmit(): void {
@@ -137,30 +165,40 @@ export class PlayerEditComponent implements OnInit {
 
       this.playerService.updatePlayer(this.playerId, updatedPlayerData).pipe(
         switchMap(() => {
-          const hasSelectedClub = formValue.trenutniKlubId && formValue.trenutniKlubId !== 'null';
-
-          if (hasSelectedClub) {
-            const contractPayload: any = {
-              playerId: this.playerId,
-              clubId: Number(formValue.trenutniKlubId),
-              jerseyNumber: Number(formValue.brojNaDresu),
-              contractStart: formValue.contractStart,
-              contractEnd: formValue.contractEnd
-            };
-
-            if (this.currentContractId) {
-              contractPayload.id = this.currentContractId;
-              return this.contractService.updateContract(this.currentContractId, contractPayload);
-            } else {
-              return this.contractService.createContract(contractPayload);
-            }
-          } else {
-            return of(null);
+          let imageUploadObs: Observable<any> = of(null);
+          if (this.selectedFile) {
+            const formData = new FormData();
+            formData.append('file', this.selectedFile);
+            imageUploadObs = this.playerService.uploadPlayerImage(this.playerId, formData);
           }
+
+          return imageUploadObs.pipe(
+            switchMap(() => {
+              const hasSelectedClub = formValue.trenutniKlubId && formValue.trenutniKlubId !== 'null';
+              if (hasSelectedClub) {
+                const contractPayload: any = {
+                  playerId: this.playerId,
+                  clubId: Number(formValue.trenutniKlubId),
+                  jerseyNumber: Number(formValue.brojNaDresu),
+                  contractStart: formValue.contractStart,
+                  contractEnd: formValue.contractEnd
+                };
+    
+                if (this.currentContractId) {
+                  contractPayload.id = this.currentContractId;
+                  return this.contractService.updateContract(this.currentContractId, contractPayload);
+                } else {
+                  return this.contractService.createContract(contractPayload);
+                }
+              } else {
+                return of(null);
+              }
+            })
+          );
         })
       ).subscribe({
         next: (contractRes) => {
-          alert('Podaci o igraču i ugovoru su uspešno ažurirani!');
+          alert('Podaci o igraču su uspešno ažurirani!');
         },
         error: (err) => {
           console.error('Greška prilikom izmene:', err);

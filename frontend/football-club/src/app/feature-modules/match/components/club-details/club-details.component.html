@@ -17,11 +17,15 @@
     
     <div class="club-stats-column">
       <div class="club-logo-placeholder">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="big-placeholder-icon">
+        
+        <img *ngIf="clubImageUrl" [src]="clubImageUrl" alt="Grb kluba" class="real-club-photo">
+
+        <svg *ngIf="!clubImageUrl" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="big-placeholder-icon">
           <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
           <circle cx="8.5" cy="8.5" r="1.5"></circle>
           <polyline points="21 15 16 10 5 21"></polyline>
         </svg>
+
       </div>
 
       <div class="stats-list">
@@ -69,7 +73,9 @@
         <div class="players-grid">
           <div class="player-card" (click)="goToPlayerDetails(item.playerId)" *ngFor="let item of filteredRoster">
             <div class="player-photo-placeholder">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" class="player-icon">
+              <img *ngIf="item.imagePath" [src]="getPlayerImageUrl(item.imagePath)" alt="Slika igrača" class="real-roster-photo">
+
+              <svg *ngIf="!item.imagePath" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" class="player-icon">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>

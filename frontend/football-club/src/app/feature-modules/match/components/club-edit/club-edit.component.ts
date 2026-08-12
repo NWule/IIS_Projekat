@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClubService } from '../../services/club.service'; 
-import { Club } from '../../models/club.model';             
+import { Club } from '../../models/club.model';   
+import { switchMap, of, Observable } from 'rxjs';
+import { environment } from 'src/env/environment';          
 
 // ptre
 
@@ -15,6 +17,8 @@ export class ClubEditComponent implements OnInit {
   clubForm!: FormGroup;
   clubId!: number;
   isLoading = true;
+  selectedFile: File | null = null;
+  imagePreview: string | ArrayBuffer | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -63,6 +67,12 @@ export class ClubEditComponent implements OnInit {
           golovi: club.goalsScored,
           primljeniGolovi: club.goalsConceded
         });
+
+        if (club.imagePath) {
+          const baseUrl = environment.apiHost.replace('/api/', ''); 
+          this.imagePreview = baseUrl + club.imagePath;
+        }
+
         this.isLoading = false;
       },
       error: (err) => {
@@ -71,6 +81,16 @@ export class ClubEditComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = e => this.imagePreview = reader.result;
+      reader.readAsDataURL(file);
+    }
   }
 
   onSubmit(): void {
@@ -88,12 +108,21 @@ export class ClubEditComponent implements OnInit {
         goalsConceded: formValue.primljeniGolovi
       };
 
-      this.clubService.updateClub(this.clubId, updatedClubData).subscribe({
+      this.clubService.updateClub(this.clubId, updatedClubData).pipe(
+        switchMap((response) => {
+          let imageUploadObs: Observable<any> = of(response);
+          if (this.selectedFile) {
+            const formData = new FormData();
+            formData.append('file', this.selectedFile);
+            imageUploadObs = this.clubService.uploadClubImage(this.clubId, formData);
+          }
+          return imageUploadObs;
+        })
+      ).subscribe({
         next: (response) => {
-          alert(`Uspešno izmenjen klub: ${response.name}`);
+          alert(`Uspešno izmenjen klub!`);
         },
         error: (err) => {
-          console.error('Greška pri izmeni kluba:', err);
           alert(err.error?.message || 'Došlo je do greške prilikom izmene.');
         }
       });

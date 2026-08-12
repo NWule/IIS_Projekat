@@ -43,4 +43,7 @@ public class Player {
 
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL)
     private List<Report> reports;
+
+    @Column(name = "image_path")
+    private String imagePath;
 }

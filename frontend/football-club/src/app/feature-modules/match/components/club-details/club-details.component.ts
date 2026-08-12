@@ -7,6 +7,8 @@ import { PlaysFor } from '../../models/player.model';
 import { TeamStatisticService } from '../../services/team-statistic.service';
 import { AuthService } from '../../../../infrastructure/auth/auth.service';
 import { ChartConfiguration, ChartType } from 'chart.js';
+import { environment } from 'src/env/environment';
+import { PlayerService } from '../../services/player.service';
 
 
 @Component({
@@ -24,6 +26,8 @@ export class ClubDetailsComponent implements OnInit {
 
   searchQuery: string = '';
   filteredRoster: PlaysFor[] = [];
+
+  clubImageUrl: string | null = null;
 
   public showChart: boolean = false;
   public lineChartData: ChartConfiguration['data'] = {
@@ -83,7 +87,8 @@ export class ClubDetailsComponent implements OnInit {
     private clubService: ClubService,
     private contractService: ContractService,
     private authService: AuthService,
-    private teamStatService: TeamStatisticService
+    private teamStatService: TeamStatisticService,
+    private playerService: PlayerService
   ) {}
 
   ngOnInit(): void {
@@ -131,12 +136,46 @@ export class ClubDetailsComponent implements OnInit {
     this.clubService.getClubById(clubId).subscribe({
       next: (clubData) => {
         this.club = clubData;
+
+        if (this.club.imagePath) {
+          let baseUrl = environment.apiHost.replace('/api/', '/').replace('api/', '');
+          
+          if (!baseUrl.endsWith('/')) {
+            baseUrl += '/';
+          }
+          
+          this.clubImageUrl = baseUrl + 'images' + this.club.imagePath;
+        }
         
-        this.contractService.getCurrentRoster(clubId).subscribe({
+       this.contractService.getCurrentRoster(clubId).subscribe({
           next: (rosterData) => {
             this.roster = rosterData;
             this.filteredRoster = [...this.roster];
-            this.isLoading = false;
+
+            const playerIds = this.roster.map(item => item.playerId)
+              .filter(id => id !== undefined) as number[];
+            
+            if (playerIds.length > 0) {
+              this.playerService.getPlayers(playerIds).subscribe({
+                next: (players) => {
+                  this.roster.forEach(rosterItem => {
+                    const matchedPlayer = players.find(p => p.id === rosterItem.playerId);
+                    if (matchedPlayer && matchedPlayer.imagePath) {
+                      rosterItem.imagePath = matchedPlayer.imagePath;
+                    }
+                  });
+                  
+                  this.filteredRoster = [...this.roster];
+                  this.isLoading = false; 
+                },
+                error: (err) => {
+                  console.error('Greška pri dobavljanju dodatnih podataka o igračima:', err);
+                  this.isLoading = false;
+                }
+              });
+            } else {
+              this.isLoading = false;
+            }
           },
           error: (err) => {
             console.error('Greška pri dobavljanju igrača:', err);
@@ -181,5 +220,16 @@ export class ClubDetailsComponent implements OnInit {
       (item.playerName || '').toLowerCase().includes(lowerQuery) || 
       (item.playerSurname || '').toLowerCase().includes(lowerQuery)
     );
+  }
+
+  getPlayerImageUrl(imagePath?: string): string | null {
+    if (!imagePath) return null;
+    
+    let baseUrl = environment.apiHost.replace('/api/', '/').replace('api/', '');
+    if (!baseUrl.endsWith('/')) {
+      baseUrl += '/';
+    }
+    
+    return baseUrl + 'images' + imagePath;
   }
 }

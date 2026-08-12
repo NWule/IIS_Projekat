@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -83,5 +84,15 @@ public class PlayerController {
     @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'SCOUT', 'SPORTS_DIRECTOR', 'ADMIN')")
     public ResponseEntity<List<PlayerWithReportDTO>> getPlayersForComparison(@RequestParam("ids") List<Long> ids) {
         return ResponseEntity.ok(playerService.getPlayersForComparison(ids));
+    }
+
+    @PostMapping("/{id}/image")
+    @PreAuthorize("hasAnyRole('ASSISTANT_COACH', 'ADMIN')")
+    public ResponseEntity<PlayerDTO> uploadPlayerImage(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+
+        PlayerDTO updatedPlayer = playerService.uploadPlayerImage(id, file);
+        return ResponseEntity.ok(updatedPlayer);
     }
 }

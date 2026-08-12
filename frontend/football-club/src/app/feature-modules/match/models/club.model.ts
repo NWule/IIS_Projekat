@@ -7,4 +7,5 @@ export interface Club {
   draws: number;
   goalsScored: number;
   goalsConceded: number;
+  imagePath?: string;
 }

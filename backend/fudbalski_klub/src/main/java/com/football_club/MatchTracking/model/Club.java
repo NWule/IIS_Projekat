@@ -39,4 +39,7 @@ public class Club {
 
     @Column(name = "goals_conceded", nullable = false)
     private int goalsConceded = 0;
+
+    @Column(name = "image_path")
+    private String imagePath;
 }

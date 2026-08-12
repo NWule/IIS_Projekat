@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -81,5 +82,15 @@ public class ClubController {
     public ResponseEntity<List<ClubDTO>> searchClubsByName(@RequestParam("name") String name) {
         List<ClubDTO> clubs = clubService.searchClubsByName(name);
         return ResponseEntity.ok(clubs);
+    }
+
+    @PostMapping("/{id}/image")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ASSISTANT_COACH', 'SPORTS_DIRECTOR')")
+    public ResponseEntity<ClubDTO> uploadClubImage(
+            @PathVariable int id,
+            @RequestParam("file") MultipartFile file) {
+
+        ClubDTO updatedClub = clubService.uploadClubImage(id, file);
+        return ResponseEntity.ok(updatedClub);
     }
 }
