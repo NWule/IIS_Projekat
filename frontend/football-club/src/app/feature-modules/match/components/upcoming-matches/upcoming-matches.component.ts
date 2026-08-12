@@ -23,7 +23,12 @@ export class UpcomingMatchesComponent implements OnInit {
   ngOnInit(): void {
     this.gameService.getUpcomingGames().subscribe({
       next: (data) => {
-        this.upcomingMatches = data;
+        const formattedData = data.map(match => ({
+          ...match,
+          matchDate: match.matchDate ? match.matchDate.replace(' ', 'T') : match.matchDate
+        }));
+
+        this.upcomingMatches = formattedData;
         this.filteredUpcomingMatches = [...this.upcomingMatches];
       },
       error: (err) => console.error('Greška pri učitavanju predstojećih mečeva:', err)

@@ -25,7 +25,11 @@ export class MatchListComponent implements OnInit {
   ngOnInit(): void {
     this.gameService.getPlayedGames().subscribe({
       next: (data) => {
-        this.matches = data;
+        const formattedData = data.map(match => ({
+          ...match,
+          matchDate: match.matchDate ? match.matchDate.replace(' ', 'T') : match.matchDate
+        }));
+        this.matches = formattedData;
         this.filteredMatches = [...this.matches];
       },
       error: (err) => console.error('Greška pri učitavanju utakmica:', err)

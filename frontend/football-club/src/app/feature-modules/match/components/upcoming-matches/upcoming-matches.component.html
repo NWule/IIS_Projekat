@@ -25,7 +25,7 @@
     </thead>
     <tbody>
       <tr *ngFor="let match of filteredUpcomingMatches">
-        <td>{{ match.dateTime | date:'dd.MM.yyyy HH:mm' }}</td>
+        <td>{{ match.matchDate | date:'dd.MM.yyyy HH:mm' }}</td>
         <td>{{ match.homeClubName }}</td>
         <td>{{ match.awayClubName }}</td>
         

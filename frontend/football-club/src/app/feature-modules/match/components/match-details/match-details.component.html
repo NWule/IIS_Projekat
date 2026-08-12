@@ -12,7 +12,7 @@
   </div>
   
   <div class="match-date" *ngIf="!loading && game">
-    {{ game.dateTime | date: 'dd.MM.yyyy HH:mm' }}
+    {{ game.matchDate | date: 'dd.MM.yyyy HH:mm' }}
   </div>
 
   <div class="report-container" *ngIf="!loading && !isUpcoming && canGenerateReport">
