@@ -16,7 +16,8 @@ export class MatchListComponent implements OnInit {
   canViewDetails: boolean = false;
   isStatistician: boolean = false;
   canGenerateReport: boolean = false;
-  
+  searchQuery: string = '';
+  filteredMatches: any[] = [];
 
   constructor(private gameService: GameService, private router: Router, private authService: AuthService,
     private reportService: ReportService) {}
@@ -24,7 +25,12 @@ export class MatchListComponent implements OnInit {
   ngOnInit(): void {
     this.gameService.getPlayedGames().subscribe({
       next: (data) => {
-        this.matches = data;
+        const formattedData = data.map(match => ({
+          ...match,
+          matchDate: match.matchDate ? match.matchDate.replace(' ', 'T') : match.matchDate
+        }));
+        this.matches = formattedData;
+        this.filteredMatches = [...this.matches];
       },
       error: (err) => console.error('Greška pri učitavanju utakmica:', err)
     });
@@ -79,6 +85,20 @@ export class MatchListComponent implements OnInit {
         error: (err) => console.error('Greška pri generisanju izveštaja:', err)
       });
     }
+  }
+
+  onSearchChange(query: string): void {
+    const lowerQuery = query.toLowerCase().trim();
+    
+    if (!lowerQuery) {
+      this.filteredMatches = [...this.matches];
+      return;
+    }
+
+    this.filteredMatches = this.matches.filter(match => 
+      (match.homeClubName || '').toLowerCase().includes(lowerQuery) || 
+      (match.awayClubName || '').toLowerCase().includes(lowerQuery)
+    );
   }
 
 }

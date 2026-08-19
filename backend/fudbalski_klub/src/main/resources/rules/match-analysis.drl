@@ -3,186 +3,552 @@ package rules;
 import com.football_club.MatchTracking.model.graph.TeamStatisticGraph;
 import com.football_club.MatchTracking.model.graph.GameGraph;
 import com.football_club.MatchTracking.model.graph.ClubGraph;
+import com.football_club.MatchTracking.model.graph.AppearanceGraph;
 import com.football_club.MatchTracking.dto.TacticalAnalysisDTO;
 
-rule "3. Previse napravljenih faulova - Domaci"
+
+
+rule "1. Hitna izmena - Rizik od crvenog kartona (Domaći)"
+    salience 110
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $app: AppearanceGraph(clubId == $mojId, matchRole == "STARTING_XI", yellowCards > 0, fouls >= 3, passingAccuracy < 65.0)
+then
+    $fact.setAnalysisText("Igrač u prvoj postavi je pod velikim rizikom od isključenja. Već ima žuti karton, napravio je " + $app.getFouls() + " faulova, a tačnost pasova mu je pala na " + $app.getPassingAccuracy() + "%.");
+    $fact.setRecommendationText("Hitna izmena! Izvedite ovog igrača iz igre kako biste izbegli crveni karton i sačuvali brojčanu ravnopravnost.");
+    $fact.setSeverity("CRITICAL");
+    System.out.println(">>> [DROOLS] Okinuto: Rizik od crvenog kartona (Domaći)");
+end
+
+rule "2. Hitna izmena - Rizik od crvenog kartona (Gosti)"
+    salience 110
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $app: AppearanceGraph(clubId == $mojId, matchRole == "STARTING_XI", yellowCards > 0, fouls >= 3, passingAccuracy < 65.0)
+then
+    $fact.setAnalysisText("Igrač u prvoj postavi je pod velikim rizikom od isključenja. Već ima žuti karton, napravio je " + $app.getFouls() + " faulova, a tačnost pasova mu je pala na " + $app.getPassingAccuracy() + "%.");
+    $fact.setRecommendationText("Hitna izmena! Izvedite ovog igrača iz igre kako biste izbegli crveni karton i sačuvali brojčanu ravnopravnost.");
+    $fact.setSeverity("CRITICAL");
+    System.out.println(">>> [DROOLS] Okinuto: Rizik od crvenog kartona (Gosti)");
+end
+
+rule "3. Katastrofalan pad forme ključnog igrača (Domaći)"
+    salience 105
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $app: AppearanceGraph(clubId == $mojId, matchRole == "STARTING_XI", minutesPlayed > 45, passingAccuracy < 45.0, rating < 5.5)
+then
+    $fact.setAnalysisText("Igrač iz prve postave beleži kritično loše parametre. Tačnost pasova mu je samo " + $app.getPassingAccuracy() + "%, a uticaj na igru je minimalan.");
+    $fact.setRecommendationText("Reagujte izmenom odmah. Igrač je verovatno iscrpljen ili taktički potpuno zatvoren od strane protivnika.");
+    $fact.setSeverity("CRITICAL");
+    System.out.println(">>> [DROOLS] Okinuto: Pad forme igrača (Domaći)");
+end
+
+rule "4. Katastrofalan pad forme ključnog igrača (Gosti)"
+    salience 105
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $app: AppearanceGraph(clubId == $mojId, matchRole == "STARTING_XI", minutesPlayed > 45, passingAccuracy < 45.0, rating < 5.5)
+then
+    $fact.setAnalysisText("Igrač iz prve postave beleži kritično loše parametre. Tačnost pasova mu je samo " + $app.getPassingAccuracy() + "%, a uticaj na igru je minimalan.");
+    $fact.setRecommendationText("Reagujte izmenom odmah. Igrač je verovatno iscrpljen ili taktički potpuno zatvoren od strane protivnika.");
+    $fact.setSeverity("CRITICAL");
+    System.out.println(">>> [DROOLS] Okinuto: Pad forme igrača (Gosti)");
+end
+
+
+
+rule "5. Sistemska nervoza - Više igrača sa kartonima (Domaći)"
+    salience 99
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $yellowCount: Number(intValue >= 3) from accumulate (
+        $a: AppearanceGraph(clubId == $mojId, matchRole == "STARTING_XI", yellowCards > 0),
+        count($a)
+    )
+then
+    $fact.setAnalysisText("Čak " + $yellowCount + " igrača prve postave ima žuti karton. Ekipa je pod velikom tenzijom i gubi kontrolu nad duelima.");
+    $fact.setRecommendationText("Naložite timu da obori tempo igre. Povećajte posed lopte i izbegavajte agresivan presing dok se ekipa ne smiri.");
+    $fact.setSeverity("HIGH");
+    System.out.println(">>> [DROOLS] Okinuto: Sistemska nervoza (Domaći)");
+end
+
+rule "6. Sistemska nervoza - Više igrača sa kartonima (Gosti)"
+    salience 99
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $yellowCount: Number(intValue >= 3) from accumulate (
+        $a: AppearanceGraph(clubId == $mojId, matchRole == "STARTING_XI", yellowCards > 0),
+        count($a)
+    )
+then
+    $fact.setAnalysisText("Čak " + $yellowCount + " igrača prve postave ima žuti karton. Ekipa je pod velikom tenzijom i gubi kontrolu nad duelima.");
+    $fact.setRecommendationText("Naložite timu da obori tempo igre. Povećajte posed lopte i izbegavajte agresivan presing dok se ekipa ne smiri.");
+    $fact.setSeverity("HIGH");
+    System.out.println(">>> [DROOLS] Okinuto: Sistemska nervoza (Gosti)");
+end
+
+rule "7. Slom veznog reda - Masovno loši pasovi (Domaći)"
+    salience 95
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $badPassers: Number(intValue >= 4) from accumulate (
+        $a: AppearanceGraph(clubId == $mojId, matchRole == "STARTING_XI", passingAccuracy > 0, passingAccuracy < 65.0),
+        count($a)
+    )
+then
+    $fact.setAnalysisText( $badPassers + " igrača iz postave ima kritično nisku preciznost dodavanja (ispod 65%). Struktura tima je razbijena.");
+    $fact.setRecommendationText("Uvedite stabilnog centralnog veznog igrača sa klupe. Približite linije tima kako bi dodavanja bila kraća i sigurnija.");
+    $fact.setSeverity("HIGH");
+    System.out.println(">>> [DROOLS] Okinuto: Masovno loši pasovi (Domaći)");
+end
+
+rule "8. Slom veznog reda - Masovno loši pasovi (Gosti)"
+    salience 95
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $badPassers: Number(intValue >= 4) from accumulate (
+        $a: AppearanceGraph(clubId == $mojId, matchRole == "STARTING_XI", passingAccuracy > 0, passingAccuracy < 65.0),
+        count($a)
+    )
+then
+    $fact.setAnalysisText( $badPassers + " igrača iz postave ima kritično nisku preciznost dodavanja (ispod 65%). Struktura tima je razbijena.");
+    $fact.setRecommendationText("Uvedite stabilnog centralnog veznog igrača sa klupe. Približite linije tima kako bi dodavanja bila kraća i sigurnija.");
+    $fact.setSeverity("HIGH");
+    System.out.println(">>> [DROOLS] Okinuto: Masovno loši pasovi (Gosti)");
+end
+
+rule "9. Potpuni gubitak poseda (Domaći)"
+    salience 90
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(homePossession > 0 && homePossession < 35.0)
+then
+    $fact.setAnalysisText("Ekipa je potpuno prepustila loptu protivniku (Posed: " + $stats.getHomePossession() + "%). Tim je pod konstantnim pritiskom.");
+    $fact.setRecommendationText("Ako ovo nije svesna taktika (bunker), morate podići poslednju liniju odbrane za 10 metara i započeti viši presing kako biste povratili kontrolu.");
+    $fact.setSeverity("HIGH");
+    System.out.println(">>> [DROOLS] Okinuto: Gubitak poseda (Domaći)");
+end
+
+rule "10. Potpuni gubitak poseda (Gosti)"
+    salience 90
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(awayPossession > 0 && awayPossession < 35.0)
+then
+    $fact.setAnalysisText("Ekipa je potpuno prepustila loptu protivniku (Posed: " + $stats.getAwayPossession() + "%). Tim je pod konstantnim pritiskom.");
+    $fact.setRecommendationText("Ako ovo nije svesna taktika (bunker), morate podići poslednju liniju odbrane za 10 metara i započeti viši presing kako biste povratili kontrolu.");
+    $fact.setSeverity("HIGH");
+    System.out.println(">>> [DROOLS] Okinuto: Gubitak poseda (Gosti)");
+end
+
+rule "11. Dominacija bez penetracije (Domaći)"
     salience 85
 when
     $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
     $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
-    $stats: TeamStatisticGraph(homeFouls > 18)
+    $stats: TeamStatisticGraph(homePossession > 65.0, homeShots <= 3)
 then
-    $fact.setAnalysisText("Napravljeno je previše prekršaja (" + $stats.getHomeFouls() + "), što protivniku daje česte prekide i secka ritam igre.");
-    $fact.setRecommendationText("Smanjiti agresivnost u duelima 1 na 1. Fokusirati se na pozicioniranje i zonsku odbranu.");
+    $fact.setAnalysisText("Imate potpunu kontrolu lopte (" + $stats.getHomePossession() + "%), ali je realizacija očajna (Samo " + $stats.getHomeShots() + " šuta). Posed je sterilan.");
+    $fact.setRecommendationText("Ubrzajte protok lopte u završnoj trećini. Uvedite krilnog igrača koji može da probije blok '1 na 1' umesto da kružite oko kaznenog prostora.");
     $fact.setSeverity("MEDIUM");
-    System.out.println(">>> [DROOLS] Okinuto: Faulovi (Domaci)");
+    System.out.println(">>> [DROOLS] Okinuto: Sterilan posed (Domaći)");
 end
 
-rule "3. Previse napravljenih faulova - Gosti"
+rule "12. Dominacija bez penetracije (Gosti)"
     salience 85
 when
     $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
     $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
-    $stats: TeamStatisticGraph(awayFouls > 18)
+    $stats: TeamStatisticGraph(awayPossession > 65.0, awayShots <= 3)
 then
-    $fact.setAnalysisText("Napravljeno je previše prekršaja (" + $stats.getAwayFouls() + "), što protivniku daje česte prekide i secka ritam igre.");
-    $fact.setRecommendationText("Smanjiti agresivnost u duelima 1 na 1. Fokusirati se na pozicioniranje i zonsku odbranu.");
+    $fact.setAnalysisText("Imate potpunu kontrolu lopte (" + $stats.getAwayPossession() + "%), ali je realizacija očajna (Samo " + $stats.getAwayShots() + " šuta). Posed je sterilan.");
+    $fact.setRecommendationText("Ubrzajte protok lopte u završnoj trećini. Uvedite krilnog igrača koji može da probije blok '1 na 1' umesto da kružite oko kaznenog prostora.");
     $fact.setSeverity("MEDIUM");
-    System.out.println(">>> [DROOLS] Okinuto: Faulovi (Gosti)");
+    System.out.println(">>> [DROOLS] Okinuto: Sterilan posed (Gosti)");
 end
 
-rule "4. Propustljiva odbrana i pritisak - Domaci"
+
+rule "13. Alibi šutevi sa distance (Domaći)"
     salience 80
 when
     $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
     $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
-    $stats: TeamStatisticGraph(awayShots > 15)
+    $stats: TeamStatisticGraph(homeShots > 12, homeShotsOnTarget <= 2)
 then
-    $fact.setAnalysisText("Odbrana dopušta preveliki broj šuteva protivnika (" + $stats.getAwayShots() + "). Vezni red ne štiti poslednju liniju.");
-    $fact.setRecommendationText("Zgusnuti sredinu terena, povući defanzivnog veznog bliže štoperima i smanjiti prostor između linija.");
-    $fact.setSeverity("HIGH");
-    System.out.println(">>> [DROOLS] Okinuto: Odbrana (Domaci)");
+    $fact.setAnalysisText("Ekipa previše forsira neizrađene šuteve (Ukupno: " + $stats.getHomeShots() + ", U okvir: " + $stats.getHomeShotsOnTarget() + "). Napadi se prerano završavaju.");
+    $fact.setRecommendationText("Zahtevajte od veznog reda da ne šutira ishitreno sa distance. Lopta mora da uđe u šesnaesterac kroz kombinatoriku.");
+    $fact.setSeverity("MEDIUM");
+    System.out.println(">>> [DROOLS] Okinuto: Loša selekcija šuta (Domaći)");
 end
 
-rule "4. Propustljiva odbrana i pritisak - Gosti"
+rule "14. Alibi šutevi sa distance (Gosti)"
     salience 80
 when
     $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
     $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
-    $stats: TeamStatisticGraph(homeShots > 15)
+    $stats: TeamStatisticGraph(awayShots > 12, awayShotsOnTarget <= 2)
 then
-    $fact.setAnalysisText("Odbrana dopušta preveliki broj šuteva protivnika (" + $stats.getHomeShots() + "). Vezni red ne štiti poslednju liniju.");
-    $fact.setRecommendationText("Zgusnuti sredinu terena, povući defanzivnog veznog bliže štoperima i smanjiti prostor između linija.");
-    $fact.setSeverity("HIGH");
-    System.out.println(">>> [DROOLS] Okinuto: Odbrana (Gosti)");
-end
-
-rule "6. Ranjivost iz prekida (Korneri) - Domaci"
-    salience 70
-when
-    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
-    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
-    $stats: TeamStatisticGraph(awayCorners > 8)
-then
-    $fact.setAnalysisText("Protivnik je izveo veliki broj kornera (" + $stats.getAwayCorners() + "), što ukazuje na loše raščišćavanje lopti na bokovima.");
-    $fact.setRecommendationText("Markirati striktno ključne skakače protivnika. Krilni igrači moraju bolje da blokiraju centaršuteve.");
+    $fact.setAnalysisText("Ekipa previše forsira neizrađene šuteve (Ukupno: " + $stats.getAwayShots() + ", U okvir: " + $stats.getAwayShotsOnTarget() + "). Napadi se prerano završavaju.");
+    $fact.setRecommendationText("Zahtevajte od veznog reda da ne šutira ishitreno sa distance. Lopta mora da uđe u šesnaesterac kroz kombinatoriku.");
     $fact.setSeverity("MEDIUM");
-    System.out.println(">>> [DROOLS] Okinuto: Korneri (Domaci)");
+    System.out.println(">>> [DROOLS] Okinuto: Loša selekcija šuta (Gosti)");
 end
 
-rule "6. Ranjivost iz prekida (Korneri) - Gosti"
-    salience 70
-when
-    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
-    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
-    $stats: TeamStatisticGraph(homeCorners > 8)
-then
-    $fact.setAnalysisText("Protivnik je izveo veliki broj kornera (" + $stats.getHomeCorners() + "), što ukazuje na loše raščišćavanje lopti na bokovima.");
-    $fact.setRecommendationText("Markirati striktno ključne skakače protivnika. Krilni igrači moraju bolje da blokiraju centaršuteve.");
-    $fact.setSeverity("MEDIUM");
-    System.out.println(">>> [DROOLS] Okinuto: Korneri (Gosti)");
-end
-
-rule "7. Potpuno bezopasan napad - Domaci"
-    salience 60
+rule "15. Upadanje u ofsajd zamke (Domaći)"
+    salience 75
 when
     $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
     $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
-    $stats: TeamStatisticGraph(homeShots <= 3)
+    $stats: TeamStatisticGraph(homeOffsides > 6)
 then
-    $fact.setAnalysisText("Napad je potpuno bezopasan. Tim je uputio svega " + $stats.getHomeShots() + " šuta ka golu tokom meča.");
-    $fact.setRecommendationText("Formacija je previše defanzivna. Bekovi moraju aktivnije da se ponavljaju u napadu, a vezni red mora da rizikuje sa pasovima unapred.");
-    $fact.setSeverity("HIGH");
-    System.out.println(">>> [DROOLS] Okinuto: Slab napad (Domaci)");
-end
-
-rule "7. Potpuno bezopasan napad - Gosti"
-    salience 60
-when
-    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
-    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
-    $stats: TeamStatisticGraph(awayShots <= 3)
-then
-    $fact.setAnalysisText("Napad je potpuno bezopasan. Tim je uputio svega " + $stats.getAwayShots() + " šuta ka golu tokom meča.");
-    $fact.setRecommendationText("Formacija je previše defanzivna. Bekovi moraju aktivnije da se ponavljaju u napadu, a vezni red mora da rizikuje sa pasovima unapred.");
-    $fact.setSeverity("HIGH");
-    System.out.println(">>> [DROOLS] Okinuto: Slab napad (Gosti)");
-end
-
-rule "8. Katastrofalna predaja lopte - Domaci"
-    salience 50
-when
-    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
-    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
-    $stats: TeamStatisticGraph(homePassSuccessRate > 0 && homePassSuccessRate < 65.0)
-then
-    $fact.setAnalysisText("Tačnost pasova je kritično niska (" + $stats.getHomePassSuccessRate() + "%). Tim konstantno gubi loptu u tranziciji.");
-    $fact.setRecommendationText("Smanjiti rizična dodavanja i duge lopte. Pojednostaviti igru sa maksimalno dva dodira po igraču.");
-    $fact.setSeverity("HIGH");
-    System.out.println(">>> [DROOLS] Okinuto: Loš pas (Domaci)");
-end
-
-rule "8. Katastrofalna predaja lopte - Gosti"
-    salience 50
-when
-    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
-    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
-    $stats: TeamStatisticGraph(awayPassSuccessRate > 0 && awayPassSuccessRate < 65.0)
-then
-    $fact.setAnalysisText("Tačnost pasova je kritično niska (" + $stats.getAwayPassSuccessRate() + "%). Tim konstantno gubi loptu u tranziciji.");
-    $fact.setRecommendationText("Smanjiti rizična dodavanja i duge lopte. Pojednostaviti igru sa maksimalno dva dodira po igraču.");
-    $fact.setSeverity("HIGH");
-    System.out.println(">>> [DROOLS] Okinuto: Loš pas (Gosti)");
-end
-
-rule "9. Loša selekcija šuteva - Domaci"
-    salience 30
-when
-    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
-    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
-    $stats: TeamStatisticGraph(homeShots > 12 && homeShotsOnTarget <= 2)
-then
-    $fact.setAnalysisText("Ispaljeno je dosta šuteva (" + $stats.getHomeShots() + "), ali je jako malo išlo u okvir gola. Šutira se iz nepovoljnih pozicija.");
-    $fact.setRecommendationText("Strpljivije graditi napad. Tražiti bolja rešenja i pasove u završnoj trećini umesto ishitrenih šuteva sa distance.");
+    $fact.setAnalysisText("Napadači su čak " + $stats.getHomeOffsides() + " puta uhvaćeni u ofsajdu. Protivnik uspešno koristi visoku zadnju liniju.");
+    $fact.setRecommendationText("Promenite pristup napadu. Umesto dugih lopti iza leđa odbrane, napadači treba da se otvaraju između linija i traže loptu u noge.");
     $fact.setSeverity("LOW");
-    System.out.println(">>> [DROOLS] Okinuto: Loši šutevi (Domaci)");
+    System.out.println(">>> [DROOLS] Okinuto: Ofsajdi (Domaći)");
 end
 
-rule "9. Loša selekcija šuteva - Gosti"
-    salience 30
+rule "16. Upadanje u ofsajd zamke (Gosti)"
+    salience 75
 when
     $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
     $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
-    $stats: TeamStatisticGraph(awayShots > 12 && awayShotsOnTarget <= 2)
+    $stats: TeamStatisticGraph(awayOffsides > 6)
 then
-    $fact.setAnalysisText("Ispaljeno je dosta šuteva (" + $stats.getAwayShots() + "), ali je jako malo išlo u okvir gola. Šutira se iz nepovoljnih pozicija.");
-    $fact.setRecommendationText("Strpljivije graditi napad. Tražiti bolja rešenja i pasove u završnoj trećini umesto ishitrenih šuteva sa distance.");
-    $fact.setSeverity("LOW");
-    System.out.println(">>> [DROOLS] Okinuto: Loši šutevi (Gosti)");
-end
-
-rule "10. Loš tajming utrčavanja (Ofsajdi) - Domaci"
-    salience 10
-when
-    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
-    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
-    $stats: TeamStatisticGraph(homeOffsides > 5)
-then
-    $fact.setAnalysisText("Napadači su prečesto u ofsajdu (" + $stats.getHomeOffsides() + "), što prekida napadački momentum.");
-    $fact.setRecommendationText("Korigovati tajming upućivanja duge lopte. Napadači moraju da uspore utrčavanje ili da menjaju smer kretanja po širini.");
-    $fact.setSeverity("LOW");
-    System.out.println(">>> [DROOLS] Okinuto: Ofsajdi (Domaci)");
-end
-
-rule "10. Loš tajming utrčavanja (Ofsajdi) - Gosti"
-    salience 10
-when
-    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
-    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
-    $stats: TeamStatisticGraph(awayOffsides > 5)
-then
-    $fact.setAnalysisText("Napadači su prečesto u ofsajdu (" + $stats.getAwayOffsides() + "), što prekida napadački momentum.");
-    $fact.setRecommendationText("Korigovati tajming upućivanja duge lopte. Napadači moraju da uspore utrčavanje ili da menjaju smer kretanja po širini.");
+    $fact.setAnalysisText("Napadači su čak " + $stats.getAwayOffsides() + " puta uhvaćeni u ofsajdu. Protivnik uspešno koristi visoku zadnju liniju.");
+    $fact.setRecommendationText("Promenite pristup napadu. Umesto dugih lopti iza leđa odbrane, napadači treba da se otvaraju između linija i traže loptu u noge.");
     $fact.setSeverity("LOW");
     System.out.println(">>> [DROOLS] Okinuto: Ofsajdi (Gosti)");
+end
+
+
+rule "17. Ekstremni pritisak protivnika (Domaći pod opsadom)"
+    salience 70
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(awayShots > 20)
+then
+    $fact.setAnalysisText("Vaš tim trpi nezapamćen pritisak. Protivnik je uputio " + $stats.getAwayShots() + " šuteva ka golu. Odbrana je pred pucanjem.");
+    $fact.setRecommendationText("Pređite u formaciju sa 5 odbrambenih igrača (npr. 5-3-2 ili 5-4-1) kako biste zatvorili centralne koridore i izdržali pritisak.");
+    $fact.setSeverity("CRITICAL");
+    System.out.println(">>> [DROOLS] Okinuto: Pod opsadom (Domaći)");
+end
+
+rule "18. Ekstremni pritisak protivnika (Gosti pod opsadom)"
+    salience 70
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(homeShots > 20)
+then
+    $fact.setAnalysisText("Vaš tim trpi nezapamćen pritisak. Protivnik je uputio " + $stats.getHomeShots() + " šuteva ka golu. Odbrana je pred pucanjem.");
+    $fact.setRecommendationText("Pređite u formaciju sa 5 odbrambenih igrača (npr. 5-3-2 ili 5-4-1) kako biste zatvorili centralne koridore i izdržali pritisak.");
+    $fact.setSeverity("CRITICAL");
+    System.out.println(">>> [DROOLS] Okinuto: Pod opsadom (Gosti)");
+end
+
+rule "19. Pucanje po bokovima / Mnogo kornera (Domaći)"
+    salience 65
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(awayCorners >= 10)
+then
+    $fact.setAnalysisText("Protivnik je izveo " + $stats.getAwayCorners() + " kornera. Bekovi gube duele '1 na 1' na bokovima, što rezultira čestim paničnim izbacivanjem lopte.");
+    $fact.setRecommendationText("Krilni igrači moraju da se vraćaju dublje i vrše dupliranje (2 na 1) na bokovima. Razmotrite izmenu umornog beka.");
+    $fact.setSeverity("MEDIUM");
+    System.out.println(">>> [DROOLS] Okinuto: Bokovi (Domaći)");
+end
+
+rule "20. Pucanje po bokovima / Mnogo kornera (Gosti)"
+    salience 65
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(homeCorners >= 10)
+then
+    $fact.setAnalysisText("Protivnik je izveo " + $stats.getHomeCorners() + " kornera. Bekovi gube duele '1 na 1' na bokovima, što rezultira čestim paničnim izbacivanjem lopte.");
+    $fact.setRecommendationText("Krilni igrači moraju da se vraćaju dublje i vrše dupliranje (2 na 1) na bokovima. Razmotrite izmenu umornog beka.");
+    $fact.setSeverity("MEDIUM");
+    System.out.println(">>> [DROOLS] Okinuto: Bokovi (Gosti)");
+end
+
+
+rule "21. Ekstremna nedisciplina i prekidanje igre (Domaći)"
+    salience 50
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(homeFouls >= 24)
+then
+    $fact.setAnalysisText("Tim je dostigao kumulativnih " + $stats.getHomeFouls() + " faulova. Preterana agresivnost može rezultirati crvenim kartonom ili penalom u ključnom trenutku.");
+    $fact.setRecommendationText("Naredite igračima da stoje na nogama u opasnoj zoni. Striktna instrukcija 'Bez uklizavanja' u krugu od 25 metara od gola.");
+    $fact.setSeverity("HIGH");
+    System.out.println(">>> [DROOLS] Okinuto: Nedisciplina (Domaći)");
+end
+
+rule "22. Ekstremna nedisciplina i prekidanje igre (Gosti)"
+    salience 50
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(awayFouls >= 24)
+then
+    $fact.setAnalysisText("Tim je dostigao kumulativnih " + $stats.getAwayFouls() + " faulova. Preterana agresivnost može rezultirati crvenim kartonom ili penalom u ključnom trenutku.");
+    $fact.setRecommendationText("Naredite igračima da stoje na nogama u opasnoj zoni. Striktna instrukcija 'Bez uklizavanja' u krugu od 25 metara od gola.");
+    $fact.setSeverity("HIGH");
+    System.out.println(">>> [DROOLS] Okinuto: Nedisciplina (Gosti)");
+end
+
+rule "23. Timska pasivnost u presingu (Domaći)"
+    salience 45
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(homeFouls <= 4, awayPossession > 60.0)
+then
+    $fact.setAnalysisText("Tim je napravio samo " + $stats.getHomeFouls() + " faulova dok protivnik kontroliše meč (" + $stats.getAwayPossession() + "% poseda). Agresivnost je na nuli.");
+    $fact.setRecommendationText("Ekipa je prepasivna. Naložite veznom redu da uđe oštrije u duel i podigne nivo energije (tzv. taktički faul) kako bi se presekao ritam protivnika.");
+    $fact.setSeverity("MEDIUM");
+    System.out.println(">>> [DROOLS] Okinuto: Pasivnost (Domaći)");
+end
+
+rule "24. Timska pasivnost u presingu (Gosti)"
+    salience 45
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(awayFouls <= 4, homePossession > 60.0)
+then
+    $fact.setAnalysisText("Tim je napravio samo " + $stats.getAwayFouls() + " faulova dok protivnik kontroliše meč (" + $stats.getHomePossession() + "% poseda). Agresivnost je na nuli.");
+    $fact.setRecommendationText("Ekipa je prepasivna. Naložite veznom redu da uđe oštrije u duel i podigne nivo energije (tzv. taktički faul) kako bi se presekao ritam protivnika.");
+    $fact.setSeverity("MEDIUM");
+    System.out.println(">>> [DROOLS] Okinuto: Pasivnost (Gosti)");
+end
+
+
+rule "25. Očajan učinak iz prekida (Domaći)"
+    salience 30
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(homeCorners >= 8, homeGoals == 0)
+then
+    $fact.setAnalysisText("Izveli ste " + $stats.getHomeCorners() + " kornera ali niste postigli nijedan gol. Šabloni za prekide ne funkcionišu.");
+    $fact.setRecommendationText("Promenite izvođača kornera ili zatražite kratka dodavanja iz kornera umesto direktnih centaršuteva u gužvu.");
+    $fact.setSeverity("LOW");
+    System.out.println(">>> [DROOLS] Okinuto: Prekidi (Domaći)");
+end
+
+rule "26. Očajan učinak iz prekida (Gosti)"
+    salience 30
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(awayCorners >= 8, awayGoals == 0)
+then
+    $fact.setAnalysisText("Izveli ste " + $stats.getAwayCorners() + " kornera ali niste postigli nijedan gol. Šabloni za prekide ne funkcionišu.");
+    $fact.setRecommendationText("Promenite izvođača kornera ili zatražite kratka dodavanja iz kornera umesto direktnih centaršuteva u gužvu.");
+    $fact.setSeverity("LOW");
+    System.out.println(">>> [DROOLS] Okinuto: Prekidi (Gosti)");
+end
+
+rule "27. Fenomenalan posed, loša odbrana (Domaći)"
+    salience 25
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(homePossession >= 60.0, awayGoals >= 2)
+then
+    $fact.setAnalysisText("Imate inicijativu (" + $stats.getHomePossession() + "% poseda), ali gubite utakmicu. Odbrana trpi snažne kontranapade.");
+    $fact.setRecommendationText("Zadržite jednog defanzivnog veznog povučenog prilikom izgradnje napada (tzv. rest-defence) kako bi sprečio kontre.");
+    $fact.setSeverity("MEDIUM");
+    System.out.println(">>> [DROOLS] Okinuto: Ranjivost na kontre (Domaći)");
+end
+
+rule "28. Fenomenalan posed, loša odbrana (Gosti)"
+    salience 25
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(awayPossession >= 60.0, homeGoals >= 2)
+then
+    $fact.setAnalysisText("Imate inicijativu (" + $stats.getAwayPossession() + "% poseda), ali gubite utakmicu. Odbrana trpi snažne kontranapade.");
+    $fact.setRecommendationText("Zadržite jednog defanzivnog veznog povučenog prilikom izgradnje napada (tzv. rest-defence) kako bi sprečio kontre.");
+    $fact.setSeverity("MEDIUM");
+    System.out.println(">>> [DROOLS] Okinuto: Ranjivost na kontre (Gosti)");
+end
+
+
+rule "29. Zaboravljeni igrač na klupi - Defanzivni potencijal (Domaći)"
+    salience 20
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(awayShots > 10, homeGoals > awayGoals) // Vodimo, ali nas stiskaju
+    $app: AppearanceGraph(clubId == $mojId, matchRole == "BENCH", rating > 6.5) // Neki defanzivac/igrač koji ranije imao dobru ocenu u sezoni (ako učitavaš globalne rejtinge) ili prosto postoji
+then
+    $fact.setAnalysisText("Tim vodi, ali trpi veliki broj šuteva. Potrebno je zatvoriti utakmicu.");
+    $fact.setRecommendationText("Razmotrite ubacivanje svežeg defanzivnog igrača sa klupe da 'zaključa' vezni red i sačuva rezultat.");
+    $fact.setSeverity("LOW");
+    System.out.println(">>> [DROOLS] Okinuto: Zatvaranje utakmice (Domaći)");
+end
+
+rule "30. Zaboravljeni igrač na klupi - Defanzivni potencijal (Gosti)"
+    salience 20
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(homeShots > 10, awayGoals > homeGoals)
+then
+    $fact.setAnalysisText("Tim vodi, ali trpi veliki broj šuteva. Potrebno je zatvoriti utakmicu.");
+    $fact.setRecommendationText("Razmotrite ubacivanje svežeg defanzivnog igrača sa klupe da 'zaključa' vezni red i sačuva rezultat.");
+    $fact.setSeverity("LOW");
+    System.out.println(">>> [DROOLS] Okinuto: Zatvaranje utakmice (Gosti)");
+end
+
+
+rule "31. Tempirana bomba - Agresivan igrač bez kartona (Domaći)"
+    salience 108
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $app: AppearanceGraph(clubId == $mojId, matchRole == "STARTING_XI", fouls >= 4, yellowCards == 0)
+then
+    $fact.setAnalysisText("Igrač je napravio čak " + $app.getFouls() + " faulova, a još uvek nema žuti karton. Sudija ga sigurno ima na meti.");
+    $fact.setRecommendationText("Obavezno upozorite igrača da smiri agresivnost. Sledeći prekršaj je garantovan karton.");
+    $fact.setSeverity("HIGH");
+    System.out.println(">>> [DROOLS] Okinuto: Tempirana bomba bez kartona (Domaći)");
+end
+
+rule "32. Tempirana bomba - Agresivan igrač bez kartona (Gosti)"
+    salience 108
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $app: AppearanceGraph(clubId == $mojId, matchRole == "STARTING_XI", fouls >= 4, yellowCards == 0)
+then
+    $fact.setAnalysisText("Igrač je napravio čak " + $app.getFouls() + " faulova, a još uvek nema žuti karton. Sudija ga sigurno ima na meti.");
+    $fact.setRecommendationText("Obavezno upozorite igrača da smiri agresivnost. Sledeći prekršaj je garantovan karton.");
+    $fact.setSeverity("HIGH");
+    System.out.println(">>> [DROOLS] Okinuto: Tempirana bomba bez kartona (Gosti)");
+end
+
+
+rule "33. Kritičan umor opterećenog igrača (Domaći)"
+    salience 97
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $app: AppearanceGraph(clubId == $mojId, matchRole == "STARTING_XI", minutesPlayed > 70, yellowCards > 0, rating < 6.0)
+then
+    $fact.setAnalysisText("Igrač sa žutim kartonom pokazuje ozbiljne znake pada energije u završnici meča (Ocena: " + $app.getRating() + "). Umor drastično povećava šansu za zakašneli start.");
+    $fact.setRecommendationText("Idealno vreme za izmenu. Osvežite ekipu i eliminišite rizik od dobijanja drugog žutog kartona iz nehata.");
+    $fact.setSeverity("HIGH");
+    System.out.println(">>> [DROOLS] Okinuto: Zamor materijala (Domaći)");
+end
+
+rule "34. Kritičan umor opterećenog igrača (Gosti)"
+    salience 97
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $app: AppearanceGraph(clubId == $mojId, matchRole == "STARTING_XI", minutesPlayed > 70, yellowCards > 0, rating < 6.0)
+then
+    $fact.setAnalysisText("Igrač sa žutim kartonom pokazuje ozbiljne znake pada energije u završnici meča (Ocena: " + $app.getRating() + "). Umor drastično povećava šansu za zakašneli start.");
+    $fact.setRecommendationText("Idealno vreme za izmenu. Osvežite ekipu i eliminišite rizik od dobijanja drugog žutog kartona iz nehata.");
+    $fact.setSeverity("HIGH");
+    System.out.println(">>> [DROOLS] Okinuto: Zamor materijala (Gosti)");
+end
+
+
+rule "35. Jurcanje u prazno / Neefikasan presing (Domaći)"
+    salience 88
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(homeFouls > 14, awayPossession > 65.0)
+then
+    $fact.setAnalysisText("Ekipa troši ogromnu energiju i pravi faulove (" + $stats.getHomeFouls() + "), ali protivnik i dalje kontroliše " + $stats.getAwayPossession() + "% poseda.");
+    $fact.setRecommendationText("Presing je neusaglašen i igrači ispadaju iz formacije. Spustite defanzivni blok i zgusnite sredinu umesto pojedinačnog iskakanja.");
+    $fact.setSeverity("HIGH");
+    System.out.println(">>> [DROOLS] Okinuto: Neefikasan presing (Domaći)");
+end
+
+rule "36. Jurcanje u prazno / Neefikasan presing (Gosti)"
+    salience 88
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(awayFouls > 14, homePossession > 65.0)
+then
+    $fact.setAnalysisText("Ekipa troši ogromnu energiju i pravi faulove (" + $stats.getAwayFouls() + "), ali protivnik i dalje kontroliše " + $stats.getHomePossession() + "% poseda.");
+    $fact.setRecommendationText("Presing je neusaglašen i igrači ispadaju iz formacije. Spustite defanzivni blok i zgusnite sredinu umesto pojedinačnog iskakanja.");
+    $fact.setSeverity("HIGH");
+    System.out.println(">>> [DROOLS] Okinuto: Neefikasan presing (Gosti)");
+end
+
+
+rule "37. Katastrofalne greške u odbrani (Domaći)"
+    salience 82
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(awayShots <= 5, awayGoals >= 2)
+then
+    $fact.setAnalysisText("Protivnik je uputio samo " + $stats.getAwayShots() + " šuteva, ali je postigao " + $stats.getAwayGoals() + " gola. Poslednja linija ili golman prave kardinalne greške.");
+    $fact.setRecommendationText("Neophodno je smiriti odbranu. Prebacite fokus na sigurna izbacivanja lopte umesto zidanja napada iz zadnje linije.");
+    $fact.setSeverity("CRITICAL");
+    System.out.println(">>> [DROOLS] Okinuto: Jeftini golovi (Domaći)");
+end
+
+rule "38. Katastrofalne greške u odbrani (Gosti)"
+    salience 82
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $stats: TeamStatisticGraph(homeShots <= 5, homeGoals >= 2)
+then
+    $fact.setAnalysisText("Protivnik je uputio samo " + $stats.getHomeShots() + " šuteva, ali je postigao " + $stats.getHomeGoals() + " gola. Poslednja linija ili golman prave kardinalne greške.");
+    $fact.setRecommendationText("Neophodno je smiriti odbranu. Prebacite fokus na sigurna izbacivanja lopte umesto zidanja napada iz zadnje linije.");
+    $fact.setSeverity("CRITICAL");
+    System.out.println(">>> [DROOLS] Okinuto: Jeftini golovi (Gosti)");
+end
+
+
+rule "39. Igrač bez ikakvog učinka (Domaći)"
+    salience 78
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(homeClub != null, homeClub.id != null, homeClub.id.equals($mojId))
+    $app: AppearanceGraph(clubId == $mojId, matchRole == "STARTING_XI", minutesPlayed > 60, goals == 0, assists == 0, passingAccuracy > 0, passingAccuracy < 55.0)
+then
+    $fact.setAnalysisText("Igrač iz prve postave je više od 60 minuta na terenu bez golgeterskog učinka i sa lošom tačnošću pasova (" + $app.getPassingAccuracy() + "%). Totalno je odsečen iz igre.");
+    $fact.setRecommendationText("Protivnik ga je potpuno markirao ili igrač ima loš dan. Zamenite ga igračem sličnog profila kako bi uneli dinamiku.");
+    $fact.setSeverity("MEDIUM");
+    System.out.println(">>> [DROOLS] Okinuto: Nevidljivi igrač (Domaći)");
+end
+
+rule "40. Igrač bez ikakvog učinka (Gosti)"
+    salience 78
+when
+    $fact: TacticalAnalysisDTO(analysisText == null, $mojId: teamId)
+    $game: GameGraph(awayClub != null, awayClub.id != null, awayClub.id.equals($mojId))
+    $app: AppearanceGraph(clubId == $mojId, matchRole == "STARTING_XI", minutesPlayed > 60, goals == 0, assists == 0, passingAccuracy > 0, passingAccuracy < 55.0)
+then
+    $fact.setAnalysisText("Igrač iz prve postave je više od 60 minuta na terenu bez golgeterskog učinka i sa lošom tačnošću pasova (" + $app.getPassingAccuracy() + "%). Totalno je odsečen iz igre.");
+    $fact.setRecommendationText("Protivnik ga je potpuno markirao ili igrač ima loš dan. Zamenite ga igračem sličnog profila kako bi uneli dinamiku.");
+    $fact.setSeverity("MEDIUM");
+    System.out.println(">>> [DROOLS] Okinuto: Nevidljivi igrač (Gosti)");
 end

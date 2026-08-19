@@ -22,4 +22,7 @@ export class AppearanceService {
   saveLineup(gameId: number, clubId: number, lineup: Appearance[]): Observable<any> {
     return this.http.post(`${this.apiUrl}/game/${gameId}/lineup?clubId=${clubId}`, lineup);
   }
+  updateAppearance(id: number, appearance: Appearance): Observable<Appearance> {
+    return this.http.put<Appearance>(`${this.apiUrl}/${id}`, appearance);
+  }
 }

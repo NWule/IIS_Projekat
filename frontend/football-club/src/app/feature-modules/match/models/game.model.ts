@@ -2,6 +2,6 @@ export interface Game {
   id?: number;
   homeClubId: number;
   awayClubId: number;
-  dateTime: string; 
+  matchDate: string; 
   status: 'UPCOMING' | 'LIVE' | 'FINISHED';
 }

@@ -23,12 +23,29 @@
     🎯 <strong>Režim dodavanja je aktivan!</strong> Izaberite igrača koji <strong>prima</strong> loptu.
   </div>
 
+  <div *ngIf="isSubMode" class="sub-alert-banner">
+    🔄 <strong>Režim izmene je aktivan!</strong> Izaberite igrača sa klupe koji ulazi u igru.
+  </div>
+
   <div class="live-grid">
     
     <div class="team-column">
       <h3>{{ homeClub?.name }}</h3>
+      
+      <h4 class="roster-title">Prva postava</h4>
       <div class="players-stack">
-        <div *ngFor="let p of homeLineup" 
+        <div *ngFor="let p of homeStartingXI" 
+             class="live-player-card"
+             [class.active-selected]="selectedPlayer?.id === p.id"
+             (click)="selectPlayer(p)">
+          <span class="player-jersey">#{{ p.playsForId }}</span>
+          <span class="player-fullname">{{ p.playerName }} {{ p.playerSurname }}</span>
+        </div>
+      </div>
+
+      <h4 class="roster-title">Klupa</h4>
+      <div class="players-stack bench-stack">
+        <div *ngFor="let p of homeBench" 
              class="live-player-card"
              [class.active-selected]="selectedPlayer?.id === p.id"
              (click)="selectPlayer(p)">
@@ -50,15 +67,17 @@
         </ng-template>
 
         <div class="buttons-grid">
-          <button class="action-btn goal" [disabled]="!selectedPlayer || isPassMode" (click)="triggerStandardEvent('GOAL')">⚽ GOL</button>
-          <button class="action-btn shot" [disabled]="!selectedPlayer || isPassMode" (click)="triggerStandardEvent('SHOT')">🏹 Šut</button>
-          <button class="action-btn target" [disabled]="!selectedPlayer || isPassMode" (click)="triggerStandardEvent('SHOT_ON_TARGET')">🎯 Šut u okvir</button>
-          <button class="action-btn pass" [disabled]="!selectedPlayer || isPassMode" (click)="activatePassMode()">➡️ PAS (Dodavanje)</button>
-          <button class="action-btn foul" [disabled]="!selectedPlayer || isPassMode" (click)="triggerStandardEvent('FOUL')">🚫 Faul</button>
-          <button class="action-btn corner" [disabled]="!selectedPlayer || isPassMode" (click)="triggerStandardEvent('CORNER')">🚩 Korner</button>
-          <button class="action-btn offside" [disabled]="!selectedPlayer || isPassMode" (click)="triggerStandardEvent('OFFSIDE')">👁️ Ofsajd</button>
-          <button class="action-btn yellow" [disabled]="!selectedPlayer || isPassMode" (click)="triggerStandardEvent('YELLOW_CARD')">🟨 Žuti karton</button>
-          <button class="action-btn red" [disabled]="!selectedPlayer || isPassMode" (click)="triggerStandardEvent('RED_CARD')">🟥 Crveni karton</button>
+          <button class="action-btn goal" [disabled]="!selectedPlayer || isPassMode || isSubMode" (click)="triggerStandardEvent('GOAL')">⚽ GOL</button>
+          <button class="action-btn shot" [disabled]="!selectedPlayer || isPassMode || isSubMode" (click)="triggerStandardEvent('SHOT')">🏹 Šut</button>
+          <button class="action-btn target" [disabled]="!selectedPlayer || isPassMode || isSubMode" (click)="triggerStandardEvent('SHOT_ON_TARGET')">🎯 Šut u okvir</button>
+          <button class="action-btn pass" [disabled]="!selectedPlayer || isPassMode || isSubMode" (click)="activatePassMode()">➡️ PAS (Dodavanje)</button>
+          <button class="action-btn foul" [disabled]="!selectedPlayer || isPassMode || isSubMode" (click)="triggerStandardEvent('FOUL')">🚫 Faul</button>
+          <button class="action-btn corner" [disabled]="!selectedPlayer || isPassMode || isSubMode" (click)="triggerStandardEvent('CORNER')">🚩 Korner</button>
+          <button class="action-btn offside" [disabled]="!selectedPlayer || isPassMode || isSubMode" (click)="triggerStandardEvent('OFFSIDE')">👁️ Ofsajd</button>
+          <button class="action-btn yellow" [disabled]="!selectedPlayer || isPassMode || isSubMode" (click)="triggerStandardEvent('YELLOW_CARD')">🟨 Žuti karton</button>
+          <button class="action-btn red" [disabled]="!selectedPlayer || isPassMode || isSubMode" (click)="triggerStandardEvent('RED_CARD')">🟥 Crveni karton</button>
+          
+          <button class="action-btn sub" [disabled]="!selectedPlayer || isPassMode || isSubMode" (click)="activateSubMode()">🔄 Izmena</button>
         </div>
 
         <button class="btn-finish-match" (click)="finishMatch()">
@@ -69,8 +88,21 @@
 
     <div class="team-column">
       <h3>{{ awayClub?.name }}</h3>
+      
+      <h4 class="roster-title">Prva postava</h4>
       <div class="players-stack">
-        <div *ngFor="let p of awayLineup" 
+        <div *ngFor="let p of awayStartingXI" 
+             class="live-player-card"
+             [class.active-selected]="selectedPlayer?.id === p.id"
+             (click)="selectPlayer(p)">
+          <span class="player-jersey">#{{ p.playsForId }}</span>
+          <span class="player-fullname">{{ p.playerName }} {{ p.playerSurname }}</span>
+        </div>
+      </div>
+
+      <h4 class="roster-title">Klupa</h4>
+      <div class="players-stack bench-stack">
+        <div *ngFor="let p of awayBench" 
              class="live-player-card"
              [class.active-selected]="selectedPlayer?.id === p.id"
              (click)="selectPlayer(p)">

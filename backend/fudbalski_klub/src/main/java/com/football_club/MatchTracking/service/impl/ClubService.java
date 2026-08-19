@@ -8,10 +8,12 @@ import com.football_club.MatchTracking.model.Club;
 import com.football_club.MatchTracking.repository.jpa.ClubRepository;
 import com.football_club.MatchTracking.repository.graph.ClubGraphRepository;
 import com.football_club.MatchTracking.service.ICLubService;
+import com.football_club.MatchTracking.service.IFileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +24,7 @@ public class ClubService implements ICLubService {
     private final ClubRepository clubRepository;
     private final ClubGraphRepository clubGraphRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final IFileStorageService fileStorageService;
 
     @Override
     @Transactional("transactionManager")
@@ -33,6 +36,8 @@ public class ClubService implements ICLubService {
         Club club = new Club();
         club.setName(clubDTO.getName());
         club.setLocation(clubDTO.getLocation());
+        club.setImagePath(clubDTO.getImagePath());
+
         Club savedClub = clubRepository.save(club);
 
         eventPublisher.publishEvent(new ClubCreatedEvent(
@@ -76,6 +81,9 @@ public class ClubService implements ICLubService {
         club.setDraws(clubDTO.getDraws());
         club.setGoalsScored(clubDTO.getGoalsScored());
         club.setGoalsConceded(clubDTO.getGoalsConceded());
+        if (clubDTO.getImagePath() != null) {
+            club.setImagePath(clubDTO.getImagePath());
+        }
 
         Club updatedClub = clubRepository.save(club);
 
@@ -113,6 +121,19 @@ public class ClubService implements ICLubService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional("transactionManager")
+    public ClubDTO uploadClubImage(int id, MultipartFile file) {
+        Club club = clubRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Club not found with id: " + id));
+
+        String imagePath = fileStorageService.storeFile(file, "clubs");
+
+        club.setImagePath(imagePath);
+        Club updatedClub = clubRepository.save(club);
+
+        return mapToDTO(updatedClub);
+    }
+
     private ClubDTO mapToDTO(Club club) {
         return ClubDTO.builder()
                 .id(club.getId())
@@ -123,6 +144,7 @@ public class ClubService implements ICLubService {
                 .draws(club.getDraws())
                 .goalsScored(club.getGoalsScored())
                 .goalsConceded(club.getGoalsConceded())
+                .imagePath(club.getImagePath())
                 .build();
     }
 }

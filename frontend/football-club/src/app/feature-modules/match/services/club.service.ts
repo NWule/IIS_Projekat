@@ -44,4 +44,8 @@ export class ClubService {
   getMyClub(): Observable<Club> {
     return this.http.get<Club>(`${this.apiUrl}/my`);
   }
+  
+  uploadClubImage(clubId: number, formData: FormData): Observable<Club> {
+    return this.http.post<Club>(`${this.apiUrl}/${clubId}/image`, formData);
+  }
 }

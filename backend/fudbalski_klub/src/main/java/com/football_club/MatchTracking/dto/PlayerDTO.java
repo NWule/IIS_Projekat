@@ -11,4 +11,5 @@ public class PlayerDTO {
     private String surname;
     private LocalDate dateOfBirth;
     private PlayerPosition playerPosition;
+    private String imagePath;
 }

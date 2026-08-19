@@ -29,8 +29,10 @@ export class LiveMatchCoachComponent implements OnInit, OnDestroy {
   homeClub!: Club;
   awayClub!: Club;
 
-  homeLineup: Appearance[] = [];
-  awayLineup: Appearance[] = [];
+  homeStartingXI: Appearance[] = [];
+  homeBench: Appearance[] = [];
+  awayStartingXI: Appearance[] = [];
+  awayBench: Appearance[] = [];
   
   statistics: TeamStatistic | null = null;
   ruleBasedRecommendations: any[] = [];
@@ -77,8 +79,16 @@ export class LiveMatchCoachComponent implements OnInit, OnDestroy {
       next: ({ homeClub, awayClub, appearances, stats }) => {
         this.homeClub = homeClub;
         this.awayClub = awayClub;
-        this.homeLineup = appearances.filter(p => p.clubId === this.game.homeClubId);
-        this.awayLineup = appearances.filter(p => p.clubId === this.game.awayClubId);
+
+        const homeApps = appearances.filter(p => p.clubId === this.game.homeClubId);
+        const awayApps = appearances.filter(p => p.clubId === this.game.awayClubId);
+
+        this.homeStartingXI = homeApps.filter(p => p.matchRole === 'STARTING_XI');
+        this.homeBench = homeApps.filter(p => p.matchRole === 'BENCH');
+        
+        this.awayStartingXI = awayApps.filter(p => p.matchRole === 'STARTING_XI');
+        this.awayBench = awayApps.filter(p => p.matchRole === 'BENCH');
+
         this.statistics = stats;
         this.isLoading = false;
         
@@ -111,6 +121,10 @@ export class LiveMatchCoachComponent implements OnInit, OnDestroy {
           this.statistics = JSON.parse(message.body);
         }
       });
+
+      this.stompClient?.subscribe(`/topic/game/${this.gameId}/appearances`, () => {
+        this.reloadAppearancesQuietly();
+      });
     };
 
     this.stompClient.activate();
@@ -127,6 +141,22 @@ export class LiveMatchCoachComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Greška pri polling-u taktičkih preporuka:', err);
       }
+    });
+  }
+
+  private reloadAppearancesQuietly(): void {
+    this.appearanceService.getAppearancesByGame(this.gameId).subscribe({
+      next: (appearances) => {
+        const homeApps = appearances.filter(p => p.clubId === this.game.homeClubId);
+        const awayApps = appearances.filter(p => p.clubId === this.game.awayClubId);
+
+        this.homeStartingXI = homeApps.filter(p => p.matchRole === 'STARTING_XI');
+        this.homeBench = homeApps.filter(p => p.matchRole === 'BENCH');
+        
+        this.awayStartingXI = awayApps.filter(p => p.matchRole === 'STARTING_XI');
+        this.awayBench = awayApps.filter(p => p.matchRole === 'BENCH');
+      },
+      error: (err) => console.error('Greška pri učitavanju izmene preko WS:', err)
     });
   }
 }

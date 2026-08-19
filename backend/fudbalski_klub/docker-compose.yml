@@ -65,9 +65,13 @@ services:
       SPRING_NEO4J_URI: bolt://neo4j-db:7687
       INFLUXDB_URL: http://influx-db:8086
       INFLUXDB_TOKEN: MOJ_SUPER_TAJNI_INFLUXDB_TOKEN_KOJI_PROSTIRE_DO_BAZE
+      FILE_UPLOAD_DIR: /app/uploads/images
+    volumes:
+      - app_images:/app/uploads/images
 
 volumes:
   postgres_data:
   neo4j_data:
   influxdb_data:
   pgadmin_data:
+  app_images:

@@ -17,10 +17,13 @@
     
     <div class="player-profile-card">
       <div class="player-photo-placeholder">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="big-placeholder-icon">
+        <img *ngIf="playerImageUrl" [src]="playerImageUrl" alt="Profilna slika" class="real-player-photo">
+
+        <svg *ngIf="!playerImageUrl" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="big-placeholder-icon">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
+
       </div>
 
       <div class="info-list">

@@ -15,6 +15,38 @@ h1 {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  gap: 20px;
+  flex-wrap: wrap; 
+}
+
+.search-wrapper {
+  position: relative;
+  margin-bottom: 0;
+  flex: 1; 
+  max-width: 400px;
+}
+
+.search-wrapper input {
+  padding: 10px 40px 10px 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  width: 100%; 
+  font-size: 14px;
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+@media (max-width: 768px) {
+  .search-wrapper {
+    max-width: 100%;
+    width: 100%;
+  }
 }
 
 .match-table {

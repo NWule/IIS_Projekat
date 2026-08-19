@@ -6,6 +6,7 @@ export interface Player {
   surname: string;
   dateOfBirth: string;
   playerPosition?: string;
+  imagePath?: string;
 }
 
 export interface PlaysFor {
@@ -19,6 +20,7 @@ export interface PlaysFor {
   contractStart: string;
   contractEnd: string;
   playerPosition?: string;
+  imagePath?: string;
 }
 
 export enum SearchType {

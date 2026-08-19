@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../infrastructure/auth/auth.service';
+import { environment } from 'src/env/environment';
 
 @Component({
   selector: 'app-club-list',
@@ -108,5 +109,16 @@ export class ClubListComponent implements OnInit {
       if (b.id === this.myClubId) return 1;
       return 0;
     });
+  }
+
+  getClubImageUrl(imagePath?: string): string | null {
+    if (!imagePath) return null;
+    
+    let baseUrl = environment.apiHost.replace('/api/', '/').replace('api/', '');
+    if (!baseUrl.endsWith('/')) {
+      baseUrl += '/';
+    }
+    
+    return baseUrl + 'images' + imagePath;
   }
 }
