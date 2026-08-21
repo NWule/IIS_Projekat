@@ -24,4 +24,16 @@ public class LiveMatchController {
                     .body("Greška na backendu: " + e.getMessage() + (e.getCause() != null ? " | Uzrok: " + e.getCause().getMessage() : ""));
         }
     }
+
+    @PutMapping("/game/{gameId}/end")
+    public ResponseEntity<String> endMatch(@PathVariable Long gameId) {
+        try {
+            liveMatchService.endLiveMatch(gameId);
+            return ResponseEntity.ok("Utakmica je uspešno završena i upisana u bazu.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Greška pri završetku utakmice: " + e.getMessage());
+        }
+    }
 }

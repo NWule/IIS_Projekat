@@ -19,4 +19,10 @@ export class MatchEventService {
       { responseType: 'text' } 
     );
   }
+
+  endLiveMatch(gameId: number): Observable<string> {
+    return this.http.put(
+      `${this.baseUrl}/game/${gameId}/end`, {}, { responseType: 'text' } 
+    );
+  }
 }

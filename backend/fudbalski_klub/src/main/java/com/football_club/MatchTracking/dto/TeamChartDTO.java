@@ -15,4 +15,10 @@ public class TeamChartDTO {
     private LocalDateTime matchDate;
     private int goals;
     private double passSuccessRate;
+
+    private int shots;
+    private int shotsOnTarget;
+    private int fouls;
+    private int corners;
+    private int offsides;
 }

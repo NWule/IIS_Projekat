@@ -23,6 +23,6 @@ export interface TeamStatistic {
   homeOffsides: number;
   awayOffsides: number;
   
-  homePassAccuracy: number;
-  awayPassAccuracy: number;
+  homePassSuccessRate: number;
+  awayPassSuccessRate: number;
 }

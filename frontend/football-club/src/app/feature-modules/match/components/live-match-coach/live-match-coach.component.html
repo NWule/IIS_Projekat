@@ -24,12 +24,26 @@
           
           <h5 class="coach-sub-heading">Prva postava</h5>
           <div class="coach-player-row" *ngFor="let p of homeStartingXI">
-            <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
+            <div class="player-identity">
+              <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
+            </div>
+            <div class="live-rating" 
+                 [class.good]="p.rating >= 7.5" 
+                 [class.bad]="p.rating < 5.5">
+              {{ p.rating ? (p.rating | number:'1.1-1') : '6.0' }}
+            </div>
           </div>
 
           <h5 class="coach-sub-heading bench-spacing">Klupa</h5>
           <div class="coach-player-row coach-bench-row" *ngFor="let p of homeBench">
-            <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
+            <div class="player-identity">
+              <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
+            </div>
+            <div class="live-rating" 
+                 [class.good]="p.rating >= 7.5" 
+                 [class.bad]="p.rating < 5.5">
+              {{ p.rating ? (p.rating | number:'1.1-1') : '6.0' }}
+            </div>
           </div>
         </div>
         
@@ -38,12 +52,26 @@
           
           <h5 class="coach-sub-heading">Prva postava</h5>
           <div class="coach-player-row" *ngFor="let p of awayStartingXI">
-            <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
+            <div class="player-identity">
+              <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
+            </div>
+            <div class="live-rating" 
+                 [class.good]="p.rating >= 7.5" 
+                 [class.bad]="p.rating < 5.5">
+              {{ p.rating ? (p.rating | number:'1.1-1') : '6.0' }}
+            </div>
           </div>
 
           <h5 class="coach-sub-heading bench-spacing">Klupa</h5>
           <div class="coach-player-row coach-bench-row" *ngFor="let p of awayBench">
-            <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
+            <div class="player-identity">
+              <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
+            </div>
+            <div class="live-rating" 
+                 [class.good]="p.rating >= 7.5" 
+                 [class.bad]="p.rating < 5.5">
+              {{ p.rating ? (p.rating | number:'1.1-1') : '6.0' }}
+            </div>
           </div>
         </div>
       </div>
@@ -112,9 +140,9 @@
               <td class="stat-val">{{ statistics?.awayOffsides ?? 0 }}</td>
             </tr>
             <tr>
-              <td class="stat-val">{{ statistics?.homePassAccuracy ?? 0 }}%</td>
+              <td class="stat-val">{{ statistics?.homePassSuccessRate ?? 0 }}%</td>
               <td class="stat-label">Uspešnost dodavanja</td>
-              <td class="stat-val">{{ statistics?.awayPassAccuracy ?? 0 }}%</td>
+              <td class="stat-val">{{ statistics?.awayPassSuccessRate ?? 0 }}%</td>
             </tr>
           </tbody>
         </table>
