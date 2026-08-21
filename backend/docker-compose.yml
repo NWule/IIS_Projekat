@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: postgres-fudbal
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: football_club
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d football_club" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  pgAdmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=123
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+  neo4j-db:
+    image: neo4j:5.26.27-community
+    container_name: neo4j-fudbal
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/password
+    volumes:
+      - neo4j_data:/data
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  influx-db:
+    image: influxdb:2.7-alpine
+    container_name: influx-fudbal
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=vule_admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=NEKA_JAKO_SIGURNA_SIFRA_123
+      - DOCKER_INFLUXDB_INIT_ORG=moj-fudbalski-klub
+      - DOCKER_INFLUXDB_INIT_BUCKET=match-tracking
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=MOJ_SUPER_TAJNI_INFLUXDB_TOKEN_KOJI_PROSTIRE_DO_BAZE
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    healthcheck:
+      test: [ "CMD-SHELL", "influx ping || exit 1" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  app:
+    build: ./fudbalski_klub
+    container_name: fudbalski-klub-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      neo4j-db:
+        condition: service_healthy
+      influx-db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/football_club
+      SPRING_NEO4J_URI: bolt://neo4j-db:7687
+      INFLUXDB_URL: http://influx-db:8086
+      INFLUXDB_TOKEN: MOJ_SUPER_TAJNI_INFLUXDB_TOKEN_KOJI_PROSTIRE_DO_BAZE
+      FILE_UPLOAD_DIR: /app/uploads/images
+    volumes:
+      - app_images:/app/uploads/images
+
+volumes:
+  postgres_data:
+  neo4j_data:
+  influxdb_data:
+  pgadmin_data:
+  app_images:
