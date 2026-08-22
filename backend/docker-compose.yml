@@ -86,7 +86,9 @@ services:
       start_period: 5s
 
   app:
-    build: ./fudbalski_klub
+    build:
+      context: .
+      dockerfile: fudbalski_klub/Dockerfile
     container_name: fudbalski-klub-backend
     ports:
       - "8080:8080"
