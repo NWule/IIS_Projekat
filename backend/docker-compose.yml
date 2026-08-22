@@ -105,6 +105,7 @@ services:
       INFLUXDB_URL: http://influx-db:8086
       INFLUXDB_TOKEN: MOJ_SUPER_TAJNI_INFLUXDB_TOKEN_KOJI_PROSTIRE_DO_BAZE
       FILE_UPLOAD_DIR: /app/uploads/images
+      FOOTBALL_AI_SERVICE_BASE_URL: http://ai-rest-api:8000
     volumes:
       - app_images:/app/uploads/images
 
