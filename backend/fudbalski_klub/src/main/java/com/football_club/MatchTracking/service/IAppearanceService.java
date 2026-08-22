@@ -2,7 +2,9 @@ package com.football_club.MatchTracking.service;
 
 import com.football_club.MatchTracking.dto.AppearanceDTO;
 import com.football_club.MatchTracking.dto.GameLineupResponseDTO;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface IAppearanceService {
@@ -20,4 +22,6 @@ public interface IAppearanceService {
     void deleteAppearance(Long id);
 
     GameLineupResponseDTO saveLineup(Long gameId, Long clubId, List<AppearanceDTO> lineupDTOs);
+
+    List<AppearanceDTO> parseLineupFromPdf(MultipartFile file, Integer clubId) throws IOException;
 }

@@ -10,6 +10,16 @@
     </div>
   </div>
 
+  <div class="pdf-upload-section" *ngIf="currentStep === 'opponent-club'">
+    <h4>Ubrzajte unos: Automatsko učitavanje protivničkog sastava iz PDF-a</h4>
+    <div class="upload-controls">
+      <input type="file" (change)="onFileSelected($event)" accept=".pdf" [disabled]="isUploading">
+      <button class="btn-upload" (click)="uploadPdfLineup()" [disabled]="!selectedFile || isUploading">
+        {{ isUploading ? 'Analiziram PDF...' : '📄 Učitaj PDF' }}
+      </button>
+    </div>
+  </div>
+
   <div class="layout-grid">
     <div class="pitch-section">
       <div class="formation-selector">

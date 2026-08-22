@@ -10,9 +10,6 @@ import com.football_club.MatchTracking.model.Game;
 import com.football_club.MatchTracking.model.PlaysFor;
 import com.football_club.MatchTracking.model.enums.GameStatus;
 import com.football_club.MatchTracking.model.enums.MatchRole;
-import com.football_club.MatchTracking.model.graph.AppearanceGraph;
-import com.football_club.MatchTracking.model.graph.GameGraph;
-import com.football_club.MatchTracking.model.graph.PlayerGraph;
 import com.football_club.MatchTracking.repository.jpa.AppearanceRepository;
 import com.football_club.MatchTracking.repository.jpa.GameRepository;
 import com.football_club.MatchTracking.repository.jpa.PlaysForRepository;
@@ -24,6 +21,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.text.Normalizer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -203,17 +205,62 @@ public class AppearanceService implements IAppearanceService {
         return new GameLineupResponseDTO(startingXi, bench);
     }
 
-    //private void mapStatsToGraph(Appearance source, AppearanceGraph target) {
-    //    target.setMatchRole(source.getMatchRole() != null ? source.getMatchRole().name() : null);
-    //    target.setMinutesPlayed(source.getMinutesPlayed());
-    //    target.setGoals(source.getGoals());
-    //    target.setAssists(source.getAssists());
-    //    target.setFouls(source.getFouls());
-    //    target.setYellowCards(source.getYellowCards());
-    //    target.setRedCard(source.isRedCard());
-    //    target.setRating(source.getRating());
-    //    target.setPassingAccuracy(source.getPassingAccuracy());
-    //}
+    @Override
+    public List<AppearanceDTO> parseLineupFromPdf(MultipartFile file, Integer clubId) throws IOException {
+
+        List<PlaysFor> roster = playsForRepository.findByClubId(clubId);
+
+        String pdfText = "";
+        try (PDDocument document = PDDocument.load(file.getInputStream())) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            pdfText = stripper.getText(document);
+        }
+
+        String[] lines = pdfText.split("\\r?\\n");
+        List<AppearanceDTO> recognizedPlayers = new ArrayList<>();
+        int matchedCount = 0;
+
+        for (String line : lines) {
+            String normalizedLine = normalizeString(line);
+
+            for (PlaysFor contract : roster) {
+                if (recognizedPlayers.stream().anyMatch(p -> p.getPlaysForId().equals(contract.getId()))) {
+                    continue;
+                }
+
+                String normalizedSurname = normalizeString(contract.getPlayer().getSurname());
+                String jerseyStr = String.valueOf(contract.getJerseyNumber());
+
+                if (normalizedLine.contains(normalizedSurname) || normalizedLine.matches(".*\\b" + jerseyStr + "\\b.*")) {
+
+                    AppearanceDTO dto = AppearanceDTO.builder()
+                            .playsForId(contract.getId())
+                            .playerName(contract.getPlayer().getName())
+                            .playerSurname(contract.getPlayer().getSurname())
+                            .clubId(clubId)
+                            .build();
+
+                    matchedCount++;
+                    if (matchedCount <= 11) {
+                        dto.setMatchRole("STARTING_XI");
+                    } else {
+                        dto.setMatchRole("BENCH");
+                    }
+
+                    recognizedPlayers.add(dto);
+                    break;
+                }
+            }
+        }
+        return recognizedPlayers;
+    }
+
+    private String normalizeString(String input) {
+        if (input == null) return "";
+        String normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
+        normalized = normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        return normalized.toLowerCase().trim();
+    }
 
     private AppearanceDTO mapToDTO(Appearance appearance) {
         return AppearanceDTO.builder()
