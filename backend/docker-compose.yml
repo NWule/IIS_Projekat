@@ -70,6 +70,21 @@ services:
       retries: 5
       start_period: 10s
 
+  ai-rest-api:
+    build:
+      context: ./fk_ai_service
+    container_name: fk_llm_rest_api
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
   app:
     build: ./fudbalski_klub
     container_name: fudbalski-klub-backend
