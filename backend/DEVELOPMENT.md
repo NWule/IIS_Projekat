@@ -53,7 +53,13 @@ public class ScoutingService {
 }
 ```
 
-### 4. Adding new response DTOs for API-Football client
+### 4. Creating a new API-Football API key
+
+1. Got to [their site](https://www.api-football.com/) and create your account.
+2. Once you're logged in, go to their [My Access page](https://dashboard.api-football.com/profile?access).
+3. In the top right corner, you will find your API key.
+
+### 5. Adding new response DTOs for API-Football client
 
 1. Go to the [Documentation](https://www.api-football.com/documentation-v3#tag/Timezone) for API Football and find the endpoint you want to use.
 2. Find the status code 200 response samples and copy the JSON response.
@@ -61,7 +67,7 @@ public class ScoutingService {
 4. Run `.\mwnw clean compile` to recompile the project, and the new JSON response class should be available in `target/generated-sources/jsonschema2pojo`
 5. You can now use the new JSON response class in your code.
 
-### 5. Adding new endpoints for API-Football client
+### 6. Adding new endpoints for API-Football client
 
 1. Go to the [Documentation](https://www.api-football.com/documentation-v3#tag/Timezone) for API Football and find the endpoint you want to use.
 2. Copy the endpoint URL.
