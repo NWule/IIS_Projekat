@@ -1,4 +1,4 @@
-package com.football_club.Clients;
+package com.football_club.Clients.config;
 
 import com.football_club.client.ApiClient;
 import com.football_club.client.JSON;
