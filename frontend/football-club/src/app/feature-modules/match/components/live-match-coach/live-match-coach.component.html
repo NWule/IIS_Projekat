@@ -15,63 +15,32 @@
 
   <div class="dashboard-layout">
     
+    <!-- 1. LEVA KOLONA: Domaćin i Preporuke -->
     <div class="left-sidebar-area">
-      
-      <div class="lineups-vertical-stack">
+      <div class="lineup-box">
+        <h4>Sastav domaćina</h4>
         
-        <div class="lineup-box">
-          <h4>Sastav domaćina</h4>
-          
-          <h5 class="coach-sub-heading">Prva postava</h5>
-          <div class="coach-player-row" *ngFor="let p of homeStartingXI">
-            <div class="player-identity">
-              <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
-            </div>
-            <div class="live-rating" 
-                 [class.good]="p.rating >= 7.5" 
-                 [class.bad]="p.rating < 5.5">
-              {{ p.rating ? (p.rating | number:'1.1-1') : '6.0' }}
-            </div>
+        <h5 class="coach-sub-heading">Prva postava</h5>
+        <div class="coach-player-row" *ngFor="let p of homeStartingXI">
+          <div class="player-identity">
+            <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
           </div>
-
-          <h5 class="coach-sub-heading bench-spacing">Klupa</h5>
-          <div class="coach-player-row coach-bench-row" *ngFor="let p of homeBench">
-            <div class="player-identity">
-              <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
-            </div>
-            <div class="live-rating" 
-                 [class.good]="p.rating >= 7.5" 
-                 [class.bad]="p.rating < 5.5">
-              {{ p.rating ? (p.rating | number:'1.1-1') : '6.0' }}
-            </div>
+          <div class="live-rating" 
+               [class.good]="p.rating >= 7.5" 
+               [class.bad]="p.rating < 5.5">
+            {{ p.rating ? (p.rating | number:'1.1-1') : '6.0' }}
           </div>
         </div>
-        
-        <div class="lineup-box">
-          <h4>Sastav gosta</h4>
-          
-          <h5 class="coach-sub-heading">Prva postava</h5>
-          <div class="coach-player-row" *ngFor="let p of awayStartingXI">
-            <div class="player-identity">
-              <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
-            </div>
-            <div class="live-rating" 
-                 [class.good]="p.rating >= 7.5" 
-                 [class.bad]="p.rating < 5.5">
-              {{ p.rating ? (p.rating | number:'1.1-1') : '6.0' }}
-            </div>
-          </div>
 
-          <h5 class="coach-sub-heading bench-spacing">Klupa</h5>
-          <div class="coach-player-row coach-bench-row" *ngFor="let p of awayBench">
-            <div class="player-identity">
-              <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
-            </div>
-            <div class="live-rating" 
-                 [class.good]="p.rating >= 7.5" 
-                 [class.bad]="p.rating < 5.5">
-              {{ p.rating ? (p.rating | number:'1.1-1') : '6.0' }}
-            </div>
+        <h5 class="coach-sub-heading bench-spacing">Klupa</h5>
+        <div class="coach-player-row coach-bench-row" *ngFor="let p of homeBench">
+          <div class="player-identity">
+            <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
+          </div>
+          <div class="live-rating" 
+               [class.good]="p.rating >= 7.5" 
+               [class.bad]="p.rating < 5.5">
+            {{ p.rating ? (p.rating | number:'1.1-1') : '6.0' }}
           </div>
         </div>
       </div>
@@ -98,11 +67,10 @@
           </div>
         </div>
       </div>
+    </div> <!-- KRAJ LEVE KOLONE -->
 
-    </div>
-
+    <!-- 2. SREDNJA KOLONA: Statistika -->
     <div class="main-monitoring-area">
-      
       <div class="stats-card">
         <h3>Statistički parametri meča</h3>
         <table class="live-comparison-table">
@@ -147,8 +115,38 @@
           </tbody>
         </table>
       </div>
+    </div> <!-- KRAJ SREDNJE KOLONE -->
 
-    </div>
+    <!-- 3. DESNA KOLONA: Protivnik -->
+    <div class="right-sidebar-area">
+      <div class="lineup-box">
+        <h4>Sastav gosta</h4>
+        
+        <h5 class="coach-sub-heading">Prva postava</h5>
+        <div class="coach-player-row" *ngFor="let p of awayStartingXI">
+          <div class="player-identity">
+            <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
+          </div>
+          <div class="live-rating" 
+               [class.good]="p.rating >= 7.5" 
+               [class.bad]="p.rating < 5.5">
+            {{ p.rating ? (p.rating | number:'1.1-1') : '6.0' }}
+          </div>
+        </div>
+
+        <h5 class="coach-sub-heading bench-spacing">Klupa</h5>
+        <div class="coach-player-row coach-bench-row" *ngFor="let p of awayBench">
+          <div class="player-identity">
+            <span class="jrs">#{{ p.playsForId }}</span> {{ p.playerName }} {{ p.playerSurname }}
+          </div>
+          <div class="live-rating" 
+               [class.good]="p.rating >= 7.5" 
+               [class.bad]="p.rating < 5.5">
+            {{ p.rating ? (p.rating | number:'1.1-1') : '6.0' }}
+          </div>
+        </div>
+      </div>
+    </div> 
 
   </div>
 </div>

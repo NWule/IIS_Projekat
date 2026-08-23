@@ -115,8 +115,8 @@ export class MatchEntryComponent implements OnInit {
             awayFouls: Number(formValue.awayFouls),
             homeOffsides: Number(formValue.homeOffsides),
             awayOffsides: Number(formValue.awayOffsides),
-            homePassAccuracy: Number(formValue.homePassAccuracy),
-            awayPassAccuracy: Number(formValue.awayPassAccuracy)
+            homePassSuccessRate: Number(formValue.homePassAccuracy),
+            awayPassSuccessRate: Number(formValue.awayPassAccuracy)
           };
 
           return this.statisticService.saveFinalStatistic(statisticPayload);
