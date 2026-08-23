@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -117,5 +118,19 @@ public class AppearanceController {
 
         GameLineupResponseDTO savedLineup = appearanceService.saveLineup(gameId, clubId, lineupDTOs);
         return ResponseEntity.ok(savedLineup);
+    }
+
+    @PostMapping("/upload-pdf/{clubId}")
+    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'STATISTICIAN', 'ADMIN')")
+    public ResponseEntity<List<AppearanceDTO>> uploadLineupPdf(
+            @RequestParam("file") MultipartFile file,
+            @PathVariable Integer clubId) {
+        try {
+            List<AppearanceDTO> parsedPlayers = appearanceService.parseLineupFromPdf(file, clubId);
+            return ResponseEntity.ok(parsedPlayers);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

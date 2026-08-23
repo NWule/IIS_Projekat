@@ -106,6 +106,11 @@ public class TeamStatisticService implements ITeamStatisticService {
                     .matchDate(stat.getGame().getMatchDate())
                     .goals(isHome ? stat.getHomeGoals() : stat.getAwayGoals())
                     .passSuccessRate(isHome ? stat.getHomePassSuccessRate() : stat.getAwayPassSuccessRate())
+                    .shots(isHome ? stat.getHomeShots() : stat.getAwayShots())
+                    .shotsOnTarget(isHome ? stat.getHomeShotsOnTarget() : stat.getAwayShotsOnTarget())
+                    .fouls(isHome ? stat.getHomeFouls() : stat.getAwayFouls())
+                    .corners(isHome ? stat.getHomeCorners() : stat.getAwayCorners())
+                    .offsides(isHome ? stat.getHomeOffsides() : stat.getAwayOffsides())
                     .build();
         }).toList();
     }

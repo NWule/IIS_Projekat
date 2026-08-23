@@ -32,6 +32,9 @@ export class MatchPreparationComponent implements OnInit {
   startingLineup: PlaysFor[] = [];
   bench: PlaysFor[] = [];
 
+  selectedFile: File | null = null;
+  isUploading = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -71,6 +74,48 @@ export class MatchPreparationComponent implements OnInit {
       error: (err) => {
         console.error('Greška pri učitavanju podataka:', err);
         this.isLoading = false;
+      }
+    });
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    }
+  }
+
+  uploadPdfLineup(): void {
+    if (!this.selectedFile || !this.opponentClub.id) return;
+    
+    this.isUploading = true;
+    this.appearanceService.uploadLineupPdf(this.selectedFile, this.opponentClub.id).subscribe({
+      next: (parsedAppearances) => {
+        this.roster = [...this.roster, ...this.startingLineup, ...this.bench];
+        this.startingLineup = [];
+        this.bench = [];
+
+        parsedAppearances.forEach(app => {
+          const index = this.roster.findIndex(p => p.id === app.playsForId);
+          if (index !== -1) {
+            const player = this.roster[index];
+            if (app.matchRole === 'STARTING_XI') {
+              this.startingLineup.push(player);
+            } else {
+              this.bench.push(player);
+            }
+            this.roster.splice(index, 1);
+          }
+        });
+        
+        this.isUploading = false;
+        this.selectedFile = null;
+        alert('Protivnički sastav je uspešno analiziran i raspoređen! Pregledajte i potvrdite.');
+      },
+      error: (err) => {
+        console.error('Greška pri parsiranju PDF-a:', err);
+        this.isUploading = false;
+        alert('Došlo je do greške pri obradi PDF fajla.');
       }
     });
   }

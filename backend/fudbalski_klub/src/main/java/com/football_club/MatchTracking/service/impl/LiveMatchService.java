@@ -164,8 +164,8 @@ public class LiveMatchService {
 
                 if (cId.equals(targetClubId)) {
                     long value = Long.parseLong(String.valueOf(record.getValue()));
-                    if ("PASS_SUCCESS".equals(eventType)) success = value;
-                    if ("PASS_FAIL".equals(eventType)) fail = value;
+                    if ("PASS_SUCCESS".equals(eventType)) success += value;
+                    if ("PASS_FAIL".equals(eventType)) fail += value;
                 }
             }
         }
@@ -190,8 +190,8 @@ public class LiveMatchService {
                 if (record.getValue() == null) continue;
                 String eventType = String.valueOf(record.getValueByKey("eventType"));
                 long value = Long.parseLong(String.valueOf(record.getValue()));
-                if ("PASS_SUCCESS".equals(eventType)) success = value;
-                if ("PASS_FAIL".equals(eventType)) fail = value;
+                if ("PASS_SUCCESS".equals(eventType)) success += value;
+                if ("PASS_FAIL".equals(eventType)) fail += value;
             }
         }
 
@@ -218,8 +218,8 @@ public class LiveMatchService {
                 if (record.getValue() == null) continue;
                 String eventType = String.valueOf(record.getValueByKey("eventType"));
                 long value = Long.parseLong(String.valueOf(record.getValue()));
-                if ("PASS_SUCCESS".equals(eventType)) successPasses = value;
-                if ("PASS_FAIL".equals(eventType)) failPasses = value;
+                if ("PASS_SUCCESS".equals(eventType)) successPasses += value;
+                if ("PASS_FAIL".equals(eventType)) failPasses += value;
             }
         }
 
@@ -230,6 +230,17 @@ public class LiveMatchService {
         if (finalRating < 1.0) finalRating = 1.0;
 
         app.setRating(Math.round(finalRating * 10.0) / 10.0);
+    }
+
+    @Transactional
+    public void endLiveMatch(Long gameId) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new RuntimeException("Utakmica nije pronađena"));
+
+        game.setStatus(com.football_club.MatchTracking.model.enums.GameStatus.PLAYED);
+        gameRepository.save(game);
+
+        messagingTemplate.convertAndSend("/topic/game/" + gameId + "/status", "PLAYED");
     }
 
 

@@ -25,4 +25,10 @@ export class AppearanceService {
   updateAppearance(id: number, appearance: Appearance): Observable<Appearance> {
     return this.http.put<Appearance>(`${this.apiUrl}/${id}`, appearance);
   }
+
+  uploadLineupPdf(file: File, clubId: number): Observable<Appearance[]> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<Appearance[]>(`${this.apiUrl}/upload-pdf/${clubId}`, formData);
+  }
 }

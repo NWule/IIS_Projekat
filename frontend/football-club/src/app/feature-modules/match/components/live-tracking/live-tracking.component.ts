@@ -253,7 +253,16 @@ export class LiveTrackingComponent implements OnInit, OnDestroy {
   finishMatch(): void {
     if (confirm('Da li ste sigurni da želite da završite praćenje ove utakmice?')) {
       this.stopTimer();
-      this.router.navigate(['/match-details', this.gameId]);
+      this.matchEventService.endLiveMatch(this.gameId).subscribe({
+        next: (responseMessage) => {
+          alert(responseMessage);
+          this.router.navigate(['/match-details', this.gameId]);
+        },
+        error: (err) => {
+          console.error('Greška pri završetku utakmice:', err);
+          alert('Došlo je do greške na serveru pri završetku meča.');
+        }
+      });
     }
   }
 }

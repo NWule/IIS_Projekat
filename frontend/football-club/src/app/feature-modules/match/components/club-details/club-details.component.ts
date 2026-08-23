@@ -29,6 +29,9 @@ export class ClubDetailsComponent implements OnInit {
 
   clubImageUrl: string | null = null;
 
+  rawChartData: any[] = [];
+  selectedMetric: string = 'goals';
+
   public showChart: boolean = false;
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [
@@ -192,20 +195,50 @@ export class ClubDetailsComponent implements OnInit {
     });
   }
 
-  private loadChartData(clubId: number): void {
+ private loadChartData(clubId: number): void {
     this.teamStatService.getClubChartData(clubId).subscribe({
       next: (data: any[]) => {
         if (data && data.length > 0) {
+          this.rawChartData = data; 
           this.lineChartData.labels = data.map(item => new Date(item.matchDate).toLocaleDateString('sr-RS'));
-          this.lineChartData.datasets[0].data = data.map(item => item.goals);
-          this.lineChartData.datasets[1].data = data.map(item => item.passSuccessRate);
           
-          this.lineChartData = { ...this.lineChartData };
+          this.lineChartData.datasets[1].data = data.map(item => item.passSuccessRate); 
+          
+          this.updateChart(); 
+          
           this.showChart = true;
         }
       },
       error: (err) => console.error('Greška pri učitavanju analitike tima:', err)
     });
+  }
+
+  updateChart(): void {
+    if (!this.rawChartData.length) return;
+
+    let newData: number[] = [];
+    let newLabel: string = '';
+
+    switch(this.selectedMetric) {
+        case 'goals': newData = this.rawChartData.map(d => d.goals); newLabel = 'Golovi'; break;
+        case 'shots': newData = this.rawChartData.map(d => d.shots); newLabel = 'Šutevi'; break;
+        case 'shotsOnTarget': newData = this.rawChartData.map(d => d.shotsOnTarget); newLabel = 'Šutevi u okvir'; break;
+        case 'corners': newData = this.rawChartData.map(d => d.corners); newLabel = 'Korneri'; break;
+        case 'fouls': newData = this.rawChartData.map(d => d.fouls); newLabel = 'Prekršaji'; break;
+        case 'offsides': newData = this.rawChartData.map(d => d.offsides); newLabel = 'Ofsajdi'; break;
+    }
+
+    this.lineChartData.datasets[0].data = newData;
+    this.lineChartData.datasets[0].label = newLabel;
+    
+    if (this.lineChartOptions && this.lineChartOptions.scales) {
+        const yAxis: any = this.lineChartOptions.scales['y-axis-1'];
+        if (yAxis && yAxis.title) {
+            yAxis.title.text = 'Broj (' + newLabel.toLowerCase() + ')';
+        }
+    }
+
+    this.lineChartData = { ...this.lineChartData };
   }
 
 
