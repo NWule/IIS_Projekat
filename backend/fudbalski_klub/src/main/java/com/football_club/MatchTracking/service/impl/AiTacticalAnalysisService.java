@@ -1,8 +1,8 @@
 package com.football_club.MatchTracking.service.impl;
 
-import com.football_club.MatchTracking.dto.MatchTimelineIntervalDTO;
-import com.football_club.MatchTracking.dto.TacticalAnalysisRequestDTO;
-import com.football_club.MatchTracking.dto.TacticalAnalysisResponseDTO;
+import com.football_club.Clients.LLMClient;
+import com.football_club.client.model.MatchTimelineInterval;
+import com.football_club.client.model.TacticalAnalysisRequest;
 import com.football_club.MatchTracking.model.Game;
 import com.football_club.MatchTracking.model.TeamStatistic;
 import com.football_club.MatchTracking.model.graph.AppearanceGraph;
@@ -17,10 +17,9 @@ import com.football_club.MatchTracking.repository.graph.TacticalAnalysisReposito
 import com.football_club.MatchTracking.service.IAiTacticalAnalysisService;
 import com.influxdb.query.FluxTable;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -29,30 +28,29 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 public class AiTacticalAnalysisService implements IAiTacticalAnalysisService {
+
     private final GameRepository gameRepository;
     private final GameGraphRepository gameGraphRepository;
     private final TeamStatisticRepository teamStatisticRepository;
     private final AppearanceGraphRepository appearanceGraphRepository;
     private final TacticalAnalysisRepository tacticalAnalysisRepository;
     private final MatchEventRepository matchEventRepository;
-    private final RestTemplate restTemplate;
 
-    @Value("${ai.microservice.url:http://localhost:8000/api/v1/tactical/generate}")
-    private String pythonAiUrl;
+    private final LLMClient llmClient;
 
+    @Override
     public String generateMatchReport(Long gameId) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new RuntimeException("Utakmica nije pronađena"));
 
-        CompletableFuture<Map<String, Double>> expectedStatsFuture = CompletableFuture.supplyAsync(() -> fetchExpectedStats(gameId));
-        CompletableFuture<Map<String, Double>> actualStatsFuture = CompletableFuture.supplyAsync(() -> fetchActualStats(gameId));
+        CompletableFuture<Map<String, BigDecimal>> expectedStatsFuture = CompletableFuture.supplyAsync(() -> fetchExpectedStats(gameId));
+        CompletableFuture<Map<String, BigDecimal>> actualStatsFuture = CompletableFuture.supplyAsync(() -> fetchActualStats(gameId));
         CompletableFuture<List<AppearanceGraph>> appearancesFuture = CompletableFuture.supplyAsync(() -> appearanceGraphRepository.findByGameGraphId(gameId));
         CompletableFuture<List<TacticalAnalysisGraph>> anomaliesFuture = CompletableFuture.supplyAsync(() -> tacticalAnalysisRepository.findByGameGraphId(gameId));
-        CompletableFuture<List<MatchTimelineIntervalDTO>> timelineFuture = CompletableFuture.supplyAsync(() -> fetchInfluxTimeline(gameId, game));
+        CompletableFuture<List<MatchTimelineInterval>> timelineFuture = CompletableFuture.supplyAsync(() -> fetchInfluxTimeline(gameId, game));
 
         CompletableFuture.allOf(expectedStatsFuture, actualStatsFuture, appearancesFuture, anomaliesFuture, timelineFuture).join();
 
@@ -78,54 +76,48 @@ public class AiTacticalAnalysisService implements IAiTacticalAnalysisService {
 
             String matchTitle = game.getHomeClub().getName() + " vs " + game.getAwayClub().getName();
 
-            TacticalAnalysisRequestDTO payload = TacticalAnalysisRequestDTO.builder()
-                    .matchTitle(matchTitle)
-                    .expectedStats(expectedStatsFuture.get())
-                    .actualStats(actualStatsFuture.get())
-                    .topPerformers(topPerformers)
-                    .underperformers(underperformers)
-                    .matchTimeline(timelineFuture.get())
-                    .tacticalAnomalies(formattedAnomalies)
-                    .build();
+            // Pakovanje podataka u generisani DTO
+            TacticalAnalysisRequest payload = new TacticalAnalysisRequest();
+            payload.setMatchTitle(matchTitle);
+            payload.setExpectedStats(expectedStatsFuture.get());
+            payload.setActualStats(actualStatsFuture.get());
+            payload.setTopPerformers(topPerformers);
+            payload.setUnderperformers(underperformers);
+            payload.setMatchTimeline(timelineFuture.get());
+            payload.setTacticalAnomalies(formattedAnomalies);
 
-            TacticalAnalysisResponseDTO response = restTemplate.postForObject(pythonAiUrl, payload, TacticalAnalysisResponseDTO.class);
-
-            return response != null ? response.getReport() : "Greška u AI servisu.";
+            return llmClient.generateTacticalReport(payload).getReport();
 
         } catch (Exception e) {
             throw new RuntimeException("Greška prilikom agregacije i slanja podataka AI mikroservisu: " + e.getMessage());
         }
     }
 
-    private Map<String, Double> fetchExpectedStats(Long gameId) {
+    private Map<String, BigDecimal> fetchExpectedStats(Long gameId) {
         GameGraph gameGraph = gameGraphRepository.findById(gameId).orElse(null);
-        Map<String, Double> stats = new HashMap<>();
+        Map<String, BigDecimal> stats = new HashMap<>();
         if (gameGraph != null) {
-            stats.put("Expected Home Goals", gameGraph.getExpectedHomeGoals());
-            stats.put("Expected Away Goals", gameGraph.getExpectedAwayGoals());
-            stats.put("Expected Home Pass Rate", gameGraph.getExpectedHomePassSuccessRate());
-            stats.put("Expected Away Pass Rate", gameGraph.getExpectedAwayPassSuccessRate());
-            stats.put("Expected Home Shots", gameGraph.getExpectedHomeShots());
-            stats.put("Expected Away Shots", gameGraph.getExpectedAwayShots());
+            stats.put("Expected Home Goals", BigDecimal.valueOf(gameGraph.getExpectedHomeGoals() != null ? gameGraph.getExpectedHomeGoals() : 0.0));
+            stats.put("Expected Away Goals", BigDecimal.valueOf(gameGraph.getExpectedAwayGoals() != null ? gameGraph.getExpectedAwayGoals() : 0.0));
+            stats.put("Expected Home Pass Rate", BigDecimal.valueOf(gameGraph.getExpectedHomePassSuccessRate() != null ? gameGraph.getExpectedHomePassSuccessRate() : 0.0));
+            stats.put("Expected Away Pass Rate", BigDecimal.valueOf(gameGraph.getExpectedAwayPassSuccessRate() != null ? gameGraph.getExpectedAwayPassSuccessRate() : 0.0));
         }
         return stats;
     }
 
-    private Map<String, Double> fetchActualStats(Long gameId) {
+    private Map<String, BigDecimal> fetchActualStats(Long gameId) {
         TeamStatistic ts = teamStatisticRepository.findByGameId(gameId).orElse(null);
-        Map<String, Double> stats = new HashMap<>();
+        Map<String, BigDecimal> stats = new HashMap<>();
         if (ts != null) {
-            stats.put("Actual Home Goals", (double) ts.getHomeGoals());
-            stats.put("Actual Away Goals", (double) ts.getAwayGoals());
-            stats.put("Actual Home Pass Rate", ts.getHomePassSuccessRate());
-            stats.put("Actual Away Pass Rate", ts.getAwayPassSuccessRate());
-            stats.put("Actual Home Shots", (double) ts.getHomeShots());
-            stats.put("Actual Away Shots", (double) ts.getAwayShots());
+            stats.put("Actual Home Goals", BigDecimal.valueOf(ts.getHomeGoals()));
+            stats.put("Actual Away Goals", BigDecimal.valueOf(ts.getAwayGoals()));
+            stats.put("Actual Home Pass Rate", BigDecimal.valueOf(ts.getHomePassSuccessRate()));
+            stats.put("Actual Away Pass Rate", BigDecimal.valueOf(ts.getAwayPassSuccessRate()));
         }
         return stats;
     }
 
-    private List<MatchTimelineIntervalDTO> fetchInfluxTimeline(Long gameId, Game game) {
+    private List<MatchTimelineInterval> fetchInfluxTimeline(Long gameId, Game game) {
         List<FluxTable> tables = matchEventRepository.getTimelineEventsForGame(gameId);
 
         int[] homeEvents = new int[6];
@@ -143,7 +135,6 @@ public class AiTacticalAnalysisService implements IAiTacticalAnalysisService {
 
                 if (eventType.equals("SHOT") || eventType.equals("SHOT_ON_TARGET") || eventType.equals("CORNER") || eventType.equals("GOAL")) {
                     int bucketIndex = Math.min(minute / 15, 5);
-
                     if (clubId.equals(homeClubId)) {
                         homeEvents[bucketIndex]++;
                     } else {
@@ -154,7 +145,7 @@ public class AiTacticalAnalysisService implements IAiTacticalAnalysisService {
         }
 
         String[] intervals = {"0-15 min", "16-30 min", "31-45+ min", "46-60 min", "61-75 min", "76-90+ min"};
-        List<MatchTimelineIntervalDTO> timeline = new ArrayList<>();
+        List<MatchTimelineInterval> timeline = new ArrayList<>();
 
         for (int i = 0; i < 6; i++) {
             int home = homeEvents[i];
@@ -168,7 +159,13 @@ public class AiTacticalAnalysisService implements IAiTacticalAnalysisService {
             else momentum = "Ujednačena borba, igra na sredini terena.";
 
             String description = String.format("%s (Domaćin ofanzivne akcije: %d | Gost ofanzivne akcije: %d)", momentum, home, away);
-            timeline.add(new MatchTimelineIntervalDTO(intervals[i], description, home + away));
+
+            MatchTimelineInterval intervalData = new MatchTimelineInterval();
+            intervalData.setInterval(intervals[i]);
+            intervalData.setMomentumDescription(description);
+            intervalData.setKeyEventsCount(home + away);
+
+            timeline.add(intervalData);
         }
 
         return timeline;

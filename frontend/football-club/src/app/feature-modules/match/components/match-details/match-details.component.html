@@ -44,6 +44,9 @@
       <button [class.active]="activeTab === 'performances'" (click)="activeTab = 'performances'">
         Performanse igrača
       </button>
+      <button *ngIf="canGenerateReport" [class.active]="activeTab === 'ai-analysis'" (click)="activeTab = 'ai-analysis'">
+        🤖 AI Analiza
+      </button>
     </div>
 
     <div *ngIf="activeTab === 'statistics'">
@@ -138,6 +141,27 @@
           <button class="btn-add" *ngIf="isStatistician && !isHomeClub" (click)="goToAddPerformance()">
             + Dodaj performansu
           </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="activeTab === 'ai-analysis'" class="ai-tab-content">
+      <div class="ai-header" *ngIf="!aiReportContent && !isGeneratingAi">
+        <p>Generišite dubinsku taktičku analizu meča koristeći Veštačku Inteligenciju. Sistem će ukrstiti očekivanu statistiku, InfluxDB momentum i Drools anomalije.</p>
+        <button class="btn-ai-generate" (click)="generateAiReport()">
+          ✨ Generiši AI Izveštaj
+        </button>
+      </div>
+
+      <div class="ai-loading" *ngIf="isGeneratingAi">
+        <div class="spinner">⚙️</div>
+        <p>AI agregira podatke i piše izveštaj, ovo može potrajati nekoliko sekundi...</p>
+      </div>
+
+      <div class="ai-report-box" *ngIf="aiReportContent && !isGeneratingAi">
+        <button class="btn-submit" style="margin-bottom: 20px;" (click)="generateAiReport()">🔄 Regeneriši izveštaj</button>
+        <div class="ai-report-text">
+          {{ aiReportContent }}
         </div>
       </div>
     </div>

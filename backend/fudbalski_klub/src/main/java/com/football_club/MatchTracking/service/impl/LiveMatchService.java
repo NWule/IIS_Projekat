@@ -138,8 +138,18 @@ public class LiveMatchService {
             case "YELLOW_CARD":
                 app.setYellowCards(app.getYellowCards() + 1);
                 break;
+            case "SUB_IN":
+                app.setMinutesPlayed(-dto.getMatchMinute());
+                break;
+            case "SUB_OUT":
             case "RED_CARD":
-                app.setRedCard(true);
+                if (app.getMinutesPlayed() <= 0) {
+                    app.setMinutesPlayed(app.getMinutesPlayed() + dto.getMatchMinute());
+                }
+
+                if (dto.getEventType().equals("RED_CARD")) {
+                    app.setRedCard(true);
+                }
                 break;
             case "PASS_SUCCESS":
             case "PASS_FAIL":
@@ -239,6 +249,21 @@ public class LiveMatchService {
 
         game.setStatus(com.football_club.MatchTracking.model.enums.GameStatus.PLAYED);
         gameRepository.save(game);
+
+        List<Appearance> appearances = appearanceRepository.findAppearancesWithPlayerInfoByGameId(gameId);
+        for (Appearance app : appearances) {
+
+            if ("STARTING_XI".equals(String.valueOf(app.getMatchRole()))) {
+                if (app.getMinutesPlayed() == 0 && !app.isRedCard()) {
+                    app.setMinutesPlayed(90);
+                }
+            } else if ("BENCH".equals(String.valueOf(app.getMatchRole()))) {
+                if (app.getMinutesPlayed() < 0) {
+                    app.setMinutesPlayed(app.getMinutesPlayed() + 90);
+                }
+            }
+        }
+        appearanceRepository.saveAll(appearances);
 
         messagingTemplate.convertAndSend("/topic/game/" + gameId + "/status", "PLAYED");
     }

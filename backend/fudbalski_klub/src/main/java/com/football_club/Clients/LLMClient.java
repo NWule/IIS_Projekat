@@ -29,4 +29,15 @@ public class LLMClient {
             throw new RuntimeException("Scouting AI Service error [Code " + e.getCode() + "]: " + e.getMessage(), e);
         }
     }
+
+    public TacticalAnalysisResponse generateTacticalReport(TacticalAnalysisRequest request) {
+        try {
+            return defaultApi.generateTacticalAnalysisApiV1TacticalGeneratePost(request);
+        } catch (ApiException e) {
+            if (e.getCause() != null) {
+                e.getCause().printStackTrace();
+            }
+            throw new RuntimeException("Tactical AI Service error [Code " + e.getCode() + "]: " + e.getMessage(), e);
+        }
+    }
 }

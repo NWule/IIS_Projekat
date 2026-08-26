@@ -171,7 +171,7 @@ export class LiveTrackingComponent implements OnInit, OnDestroy {
     this.isPassMode = false; 
   }
 
-  private handleSubstitutionExecution(playerOut: Appearance, playerIn: Appearance): void {
+ private handleSubstitutionExecution(playerOut: Appearance, playerIn: Appearance): void {
     playerOut.matchRole = 'BENCH';
     playerIn.matchRole = 'STARTING_XI';
 
@@ -187,18 +187,10 @@ export class LiveTrackingComponent implements OnInit, OnDestroy {
       this.awayBench.push(playerOut);
     }
 
-    forkJoin([
-      this.appearanceService.updateAppearance(playerOut.id!, playerOut),
-      this.appearanceService.updateAppearance(playerIn.id!, playerIn)
-    ]).subscribe({
-      next: () => {
-        alert('Izmena je uspešno evidentirana i upisana u bazu!');
-      },
-      error: (err) => {
-        console.error('Greška pri čuvanju izmene:', err);
-        alert('Greška na serveru prilikom čuvanja izmene. Osvežite stranicu.');
-      }
-    });
+    this.sendEventToBackend(playerOut, 'SUB_OUT');
+    this.sendEventToBackend(playerIn, 'SUB_IN');
+
+    alert('Izmena je evidentirana. Minuti će se automatski obračunati na kraju meča.');
 
     this.isSubMode = false;
     this.selectedPlayer = null;
