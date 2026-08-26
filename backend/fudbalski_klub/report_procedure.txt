@@ -1,0 +1,74 @@
+CREATE OR REPLACE FUNCTION get_advanced_match_report(p_game_id BIGINT)
+RETURNS TABLE (
+    ime_prezime VARCHAR,
+    uloga VARCHAR,
+    minuti INT,
+    golovi INT,
+    asistencije INT,
+    ocena NUMERIC,
+    preciznost_dodavanja NUMERIC, -- NOVA KOLONA
+    odstupanje_od_proseka NUMERIC,
+    disciplinski_rizik INT
+) AS $$
+DECLARE
+    rec RECORD;
+    v_prosek_kluba NUMERIC;
+    v_trenutni_rizik INT;
+BEGIN
+    FOR rec IN 
+        SELECT 
+            (p.name || ' ' || p.surname) AS full_name,
+            a.match_role,
+            a.minutes_played,
+            a.goals,
+            a.assists,
+            a.rating,
+            a.fouls,
+            a.yellow_cards,
+            a.red_card,
+            a.passing_accuracy, -- IZVLAČIMO NOVU METRIKU
+            pf.club_id
+        FROM appearances a
+        JOIN plays_for pf ON a.plays_for_id = pf.id
+        JOIN players p ON pf.player_id = p.id
+        WHERE a.game_id = p_game_id
+    LOOP
+        -- Prosek kluba
+        SELECT COALESCE(AVG(a2.rating), 0) INTO v_prosek_kluba
+        FROM appearances a2
+        JOIN plays_for pf2 ON a2.plays_for_id = pf2.id
+        WHERE a2.game_id = p_game_id AND pf2.club_id = rec.club_id AND a2.rating > 0;
+
+        -- Odstupanje
+        IF rec.minutes_played > 0 THEN
+            odstupanje_od_proseka := CAST((rec.rating - v_prosek_kluba) * (rec.minutes_played / 90.0) AS NUMERIC(10,2));
+        ELSE
+            odstupanje_od_proseka := 0.00;
+        END IF;
+
+        -- Rizik
+        v_trenutni_rizik := 0;
+        IF rec.yellow_cards > 0 THEN v_trenutni_rizik := v_trenutni_rizik + (rec.yellow_cards * 3); END IF;
+        IF rec.red_card = true THEN v_trenutni_rizik := v_trenutni_rizik + 10; END IF;
+        IF rec.fouls <= 3 THEN
+            v_trenutni_rizik := v_trenutni_rizik + rec.fouls;
+        ELSIF rec.fouls > 3 THEN
+            v_trenutni_rizik := v_trenutni_rizik + 3 + ((rec.fouls - 3) * 2);
+        END IF;
+
+        -- Mapiranje u izlazne kolone
+        ime_prezime := rec.full_name::VARCHAR;
+        uloga := rec.match_role::VARCHAR;
+        minuti := rec.minutes_played;
+        golovi := rec.goals;
+        asistencije := rec.assists;
+        ocena := rec.rating::NUMERIC;
+        preciznost_dodavanja := rec.passing_accuracy::NUMERIC; -- MAPIRANJE NOVE KOLONE
+        disciplinski_rizik := v_trenutni_rizik;
+
+        RETURN NEXT;
+    END LOOP;
+
+    RETURN;
+END;
+$$ LANGUAGE plpgsql;

@@ -12,11 +12,12 @@ WORKDIR /app
 
 COPY fudbalski_klub/pom.xml .
 
-COPY --from=schema-extractor /python-app/openapi.json ./src/main/resources/openapi.json
+
 
 RUN mvn dependency:go-offline -B
 
 COPY fudbalski_klub/src ./src
+COPY --from=schema-extractor /python-app/openapi.json ./src/main/resources/openapi.json
 RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:17-jdk-jammy

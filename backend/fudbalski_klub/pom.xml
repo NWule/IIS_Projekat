@@ -203,6 +203,8 @@
 				<version>7.4.0</version>
 				<executions>
 					<execution>
+						<id>generate-openapi-client</id>
+						<phase>generate-sources</phase>
 						<goals>
 							<goal>generate</goal>
 						</goals>

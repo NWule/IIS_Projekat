@@ -76,7 +76,6 @@ public class AiTacticalAnalysisService implements IAiTacticalAnalysisService {
 
             String matchTitle = game.getHomeClub().getName() + " vs " + game.getAwayClub().getName();
 
-            // Pakovanje podataka u generisani DTO
             TacticalAnalysisRequest payload = new TacticalAnalysisRequest();
             payload.setMatchTitle(matchTitle);
             payload.setExpectedStats(expectedStatsFuture.get());
@@ -119,16 +118,13 @@ public class AiTacticalAnalysisService implements IAiTacticalAnalysisService {
 
     private List<MatchTimelineInterval> fetchInfluxTimeline(Long gameId, Game game) {
         List<FluxTable> tables = matchEventRepository.getTimelineEventsForGame(gameId);
-
         int[] homeEvents = new int[6];
         int[] awayEvents = new int[6];
-
         String homeClubId = String.valueOf(game.getHomeClub().getId());
 
         for (FluxTable table : tables) {
             for (var record : table.getRecords()) {
                 if (record.getValueByKey("matchMinute") == null || record.getValueByKey("eventType") == null) continue;
-
                 int minute = Integer.parseInt(record.getValueByKey("matchMinute").toString());
                 String clubId = String.valueOf(record.getValueByKey("clubId"));
                 String eventType = String.valueOf(record.getValueByKey("eventType"));
@@ -150,7 +146,6 @@ public class AiTacticalAnalysisService implements IAiTacticalAnalysisService {
         for (int i = 0; i < 6; i++) {
             int home = homeEvents[i];
             int away = awayEvents[i];
-
             if (home == 0 && away == 0) continue;
 
             String momentum;
@@ -164,10 +159,8 @@ public class AiTacticalAnalysisService implements IAiTacticalAnalysisService {
             intervalData.setInterval(intervals[i]);
             intervalData.setMomentumDescription(description);
             intervalData.setKeyEventsCount(home + away);
-
             timeline.add(intervalData);
         }
-
         return timeline;
     }
 }
