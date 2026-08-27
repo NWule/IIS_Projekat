@@ -198,8 +198,8 @@ export class MatchDetailsComponent implements OnInit {
       awayFouls:          [0, [Validators.required, Validators.min(0)]],
       homeOffsides:       [0, [Validators.required, Validators.min(0)]],
       awayOffsides:       [0, [Validators.required, Validators.min(0)]],
-      homePassAccuracy:   [0, [Validators.required, Validators.min(0), Validators.max(100)]],
-      awayPassAccuracy:   [0, [Validators.required, Validators.min(0), Validators.max(100)]]
+      homePassSuccessRate:   [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+      awayPassSuccessRate:   [0, [Validators.required, Validators.min(0), Validators.max(100)]]
     });
   }
 

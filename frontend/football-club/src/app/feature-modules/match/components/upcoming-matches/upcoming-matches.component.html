@@ -3,14 +3,16 @@
   <div class="header-row">
     <h1>Predstojeće utakmice (Raspored)</h1>
 
-    <div class="search-wrapper">
-      <input 
-        type="text" 
-        placeholder="Pretraži po timovima..." 
-        [(ngModel)]="searchQuery" 
-        (input)="onSearchChange(searchQuery)" 
-      />
-      <span class="search-icon">🔍</span>
+    <div class="actions-container">
+      <div class="search-wrapper">
+        <input 
+          type="text" 
+          placeholder="Pretraži po timovima..." 
+          [(ngModel)]="searchQuery" 
+          (input)="onSearchChange(searchQuery)" 
+        />
+        <span class="search-icon">🔍</span>
+      </div>
     </div>
   </div>
   
@@ -20,7 +22,7 @@
         <th>Datum i vreme</th>
         <th>Domaćin</th>
         <th>Gost</th>
-        <th *ngIf="canViewUpcoming">Akcija</th>
+        <th *ngIf="canViewUpcoming"></th>
       </tr>
     </thead>
     <tbody>

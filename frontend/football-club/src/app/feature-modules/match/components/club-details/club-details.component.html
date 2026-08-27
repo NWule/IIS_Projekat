@@ -1,5 +1,3 @@
-
-
 <div class="page-container" *ngIf="!isLoading && club">
   
   <div class="header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -15,46 +13,28 @@
 
   <div class="main-layout">
     
-    <div class="club-stats-column">
+    <!-- Leva kolona sada sadrži samo grb i lokaciju -->
+    <div class="club-info-column">
       <div class="club-logo-placeholder">
-        
         <img *ngIf="clubImageUrl" [src]="clubImageUrl" alt="Grb kluba" class="real-club-photo">
-
         <svg *ngIf="!clubImageUrl" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="big-placeholder-icon">
           <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
           <circle cx="8.5" cy="8.5" r="1.5"></circle>
           <polyline points="21 15 16 10 5 21"></polyline>
         </svg>
-
       </div>
 
-      <div class="stats-list">
-        <div class="stat-row">
-          <span class="stat-label">Pobede</span>
-          <span class="stat-value">{{ club?.wins }}</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Porazi</span>
-          <span class="stat-value">{{ club?.losses }}</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Nerešeno</span>
-          <span class="stat-value">{{ club?.draws }}</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Golovi</span>
-          <span class="stat-value">{{ club?.goalsScored }}</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">Primljeni golovi</span>
-          <span class="stat-value">{{ club?.goalsConceded }}</span>
-        </div>
+      <div class="club-location">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        <span>Novi Sad, Srbija</span>
       </div>
     </div>
 
+    <!-- Desna kolona sa igračima -->
     <div class="players-column">
-      <h2 class="section-title">Igrači</h2>
-
       <div class="players-header-row">
         <h2 class="section-title" style="margin-bottom: 0;">Igrači</h2>
         
@@ -74,7 +54,6 @@
           <div class="player-card" (click)="goToPlayerDetails(item.playerId)" *ngFor="let item of filteredRoster">
             <div class="player-photo-placeholder">
               <img *ngIf="item.imagePath" [src]="getPlayerImageUrl(item.imagePath)" alt="Slika igrača" class="real-roster-photo">
-
               <svg *ngIf="!item.imagePath" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" class="player-icon">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
@@ -91,9 +70,7 @@
           Trenutno nema registrovanih igrača u ovom timu.
         </div>
       </div>
-
     </div>
-
   </div>
 </div>
 

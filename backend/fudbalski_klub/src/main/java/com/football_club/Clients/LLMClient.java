@@ -10,6 +10,7 @@ import com.football_club.client.model.TacticalAnalysisResponse;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import java.net.http.HttpClient;
 
 @Service
 public class LLMClient {
@@ -22,6 +23,12 @@ public class LLMClient {
     @PostConstruct
     public void init() {
         ApiClient apiClient = new ApiClient();
+        apiClient.updateBaseUri(aiServiceUrl);
+
+        apiClient.setHttpClientBuilder(
+                HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1)
+        );
+
         apiClient.updateBaseUri(aiServiceUrl);
 
         this.defaultApi = new DefaultApi(apiClient);
