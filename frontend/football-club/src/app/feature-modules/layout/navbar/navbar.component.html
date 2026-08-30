@@ -22,7 +22,7 @@
       </div>
     </ng-container>
 
-    <ng-container *ngIf="isLoggedIn && isStatistician">
+    <ng-container *ngIf="isLoggedIn && (isHeadCoach || isStatistician)">
       <button class="nav-btn" (click)="router.navigate(['/live-match-finder'])">Utakmica uživo</button>
     </ng-container>
 
