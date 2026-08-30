@@ -2,21 +2,29 @@
   <h1 class="page-title">Unos odigrane utakmice</h1>
 
   <form [formGroup]="matchForm" (ngSubmit)="onSubmit()">
+
+    <div class="selector-group" style="margin-bottom: 30px; align-items: center; text-align: center;">
+      <label>Status utakmice</label>
+      <select formControlName="matchStatus">
+        <option value="FINISHED">Odigrana (Unos statistike)</option>
+        <option value="UPCOMING">Predstojeća (Samo zakazivanje)</option>
+      </select>
+    </div>
     
     <div class="team-selectors">
       <div class="selector-group">
         <label>Domaćin</label>
         <select formControlName="homeClubId">
-          <option [value]="null">Nema kluba</option>
-          <option *ngFor="let club of clubs" [value]="club.id">{{ club.name }}</option>
+          <option [ngValue]="null">Nema kluba</option>
+          <option *ngFor="let club of clubs" [ngValue]="club.id">{{ club.name }}</option>
         </select>
       </div>
 
       <div class="selector-group">
         <label>Gost</label>
         <select formControlName="awayClubId">
-          <option [value]="null">Nema kluba</option>
-          <option *ngFor="let club of clubs" [value]="club.id">{{ club.name }}</option>
+          <option [ngValue]="null">Nema kluba</option>
+          <option *ngFor="let club of clubs" [ngValue]="club.id">{{ club.name }}</option>
         </select>
       </div>
     </div>
@@ -25,7 +33,7 @@
       Domaćin i gost ne mogu biti isti klub!
     </div>
 
-    <div class="statistics-grid">
+    <div class="statistics-grid" *ngIf="matchForm.get('matchStatus')?.value === 'FINISHED'">
       
       <input type="number" formControlName="homeGoals" />
       <div class="stat-label">Golovi</div>

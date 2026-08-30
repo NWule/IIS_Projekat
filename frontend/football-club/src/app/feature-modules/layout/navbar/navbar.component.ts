@@ -11,6 +11,7 @@ import {RoleEnum} from "../../../infrastructure/auth/model/user.model";
 export class NavbarComponent implements OnInit {
   isLoggedIn: boolean = false;
   userRole: RoleEnum | undefined = undefined;
+  clubId: number | undefined = undefined;
 
   constructor(
     private authService: AuthService,
@@ -22,6 +23,7 @@ export class NavbarComponent implements OnInit {
     this.authService.user$.subscribe(user => {
       this.isLoggedIn = !!user;
       this.userRole = user?.role;
+      this.clubId = user?.clubId;
     });
   }
 
@@ -59,7 +61,11 @@ export class NavbarComponent implements OnInit {
         this.userRole === 'ROLE_ASSISTANT_COACH' ||
         this.userRole === 'ROLE_STATISTICIAN'
       ) {
-        this.router.navigate(['/matches']);
+        if (this.clubId) {
+          this.router.navigate(['/club-details', this.clubId]);
+        } else {
+          this.router.navigate(['/clubs']);
+        }
       } else {
         this.router.navigate(['/']);
       }

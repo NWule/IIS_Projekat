@@ -31,6 +31,7 @@ export class MatchEntryComponent implements OnInit {
 
   private initForm(): void {
     this.matchForm = this.fb.group({
+      matchStatus: ['FINISHED', Validators.required],
       homeClubId: [null, Validators.required],
       awayClubId: [null, Validators.required],
       
@@ -60,7 +61,7 @@ export class MatchEntryComponent implements OnInit {
       
       day: ['', [Validators.required, Validators.min(1), Validators.max(31)]],
       month: ['', [Validators.required, Validators.min(1), Validators.max(12)]],
-      year: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(4)]]
+      year: ['', [Validators.required, Validators.min(2000), Validators.max(2100)]]
     }, { validators: this.clubsDifferentValidator });
   }
 
@@ -92,46 +93,58 @@ export class MatchEntryComponent implements OnInit {
         homeClubId: Number(formValue.homeClubId),
         awayClubId: Number(formValue.awayClubId),
         matchDate: isoDateTime,
-        status: 'FINISHED' as const
+        status: formValue.matchStatus 
       };
 
-      this.gameService.createGame(gamePayload).pipe(
-        switchMap((createdGame) => {
-          console.log('Utakmica uspešno kreirana pod ID-jem:', createdGame.id);
+      if (formValue.matchStatus === 'FINISHED') {
+        this.gameService.createGame(gamePayload).pipe(
+          switchMap((createdGame) => {
+            console.log('Utakmica uspešno kreirana pod ID-jem:', createdGame.id);
 
-          const statisticPayload = {
-            gameId: createdGame.id!,
-            homeGoals: Number(formValue.homeGoals),
-            awayGoals: Number(formValue.awayGoals),
-            homeShots: Number(formValue.homeShots),
-            awayShots: Number(formValue.awayShots),
-            homeShotsOnTarget: Number(formValue.homeShotsOnTarget),
-            awayShotsOnTarget: Number(formValue.awayShotsOnTarget),
-            homePossession: Number(formValue.homePossession),
-            awayPossession: Number(formValue.awayPossession),
-            homeCorners: Number(formValue.homeCorners),
-            awayCorners: Number(formValue.awayCorners),
-            homeFouls: Number(formValue.homeFouls),
-            awayFouls: Number(formValue.awayFouls),
-            homeOffsides: Number(formValue.homeOffsides),
-            awayOffsides: Number(formValue.awayOffsides),
-            homePassSuccessRate: Number(formValue.homePassAccuracy),
-            awayPassSuccessRate: Number(formValue.awayPassAccuracy)
-          };
+            const statisticPayload = {
+              gameId: createdGame.id!,
+              homeGoals: Number(formValue.homeGoals),
+              awayGoals: Number(formValue.awayGoals),
+              homeShots: Number(formValue.homeShots),
+              awayShots: Number(formValue.awayShots),
+              homeShotsOnTarget: Number(formValue.homeShotsOnTarget),
+              awayShotsOnTarget: Number(formValue.awayShotsOnTarget),
+              homePossession: Number(formValue.homePossession),
+              awayPossession: Number(formValue.awayPossession),
+              homeCorners: Number(formValue.homeCorners),
+              awayCorners: Number(formValue.awayCorners),
+              homeFouls: Number(formValue.homeFouls),
+              awayFouls: Number(formValue.awayFouls),
+              homeOffsides: Number(formValue.homeOffsides),
+              awayOffsides: Number(formValue.awayOffsides),
+              homePassSuccessRate: Number(formValue.homePassAccuracy),
+              awayPassSuccessRate: Number(formValue.awayPassAccuracy)
+            };
 
-          return this.statisticService.saveFinalStatistic(statisticPayload);
-        })
-      ).subscribe({
-        next: (statRes) => {
-          alert('Utakmica i njena finalna statistika su uspešno sačuvane!');
-          this.matchForm.reset();
-        },
-        error: (err) => {
-          console.error('Greška u toku čuvanja:', err);
-          alert(err.error || 'Došlo je do greške prilikom čuvanja utakmice.');
-        }
-      });
-
+            return this.statisticService.saveFinalStatistic(statisticPayload);
+          })
+        ).subscribe({
+          next: () => {
+            alert('Utakmica i njena finalna statistika su uspešno sačuvane!');
+            this.matchForm.reset({ matchStatus: 'FINISHED' });
+          },
+          error: (err) => {
+            console.error('Greška u toku čuvanja:', err);
+            alert(err.error || 'Došlo je do greške prilikom čuvanja utakmice.');
+          }
+        });
+      } else {
+        this.gameService.createGame(gamePayload).subscribe({
+          next: () => {
+            alert('Predstojeća utakmica je uspešno zakazana!');
+            this.matchForm.reset({ matchStatus: 'UPCOMING' });
+          },
+          error: (err) => {
+            console.error('Greška pri zakazivanju:', err);
+            alert('Došlo je do greške prilikom zakazivanja utakmice.');
+          }
+        });
+      }
     } else {
       this.matchForm.markAllAsTouched();
     }

@@ -4,21 +4,26 @@
   </div>
 
   <div class="navbar-actions">
-    <ng-container *ngIf="isLoggedIn && (userRole === 'ROLE_HEAD_COACH' || userRole === 'ROLE_ASSISTANT_COACH')">
-      <button class="nav-btn" (click)="router.navigate(['/clubs'])">Klubovi</button>
+    <ng-container *ngIf="isLoggedIn && (isHeadCoach || isAssistantCoach)">
+      <button class="nav-btn" (click)="router.navigate(['/clubs'])">Klub i Roster</button>
     </ng-container>
 
-    <ng-container *ngIf="isLoggedIn && (userRole === 'ROLE_HEAD_COACH' || userRole === 'ROLE_ASSISTANT_COACH' || userRole === 'ROLE_STATISTICIAN')">
-      <button class="nav-btn" (click)="router.navigate(['/matches'])">Mečevi</button>
-    </ng-container>
-
-    <ng-container *ngIf="isLoggedIn && (userRole === 'ROLE_HEAD_COACH' || userRole === 'ROLE_STATISTICIAN')">
-      <button class="nav-btn" (click)="router.navigate(['/upcoming-matches'])">Predstojeći mečevi</button>
-      <button class="nav-btn" (click)="router.navigate(['/live-match-finder'])">Utakmica uživo</button>
-    </ng-container>
-
-    <ng-container *ngIf="isLoggedIn && userRole === 'ROLE_ASSISTANT_COACH'">
+    <ng-container *ngIf="isLoggedIn && isAssistantCoach">
       <button class="nav-btn" (click)="router.navigate(['/add-player'])">Dodavanje igrača</button>
+    </ng-container>
+
+    <ng-container *ngIf="isLoggedIn && (isHeadCoach || isAssistantCoach || isStatistician)">
+      <div class="dropdown">
+        <button class="nav-btn">Mečevi ▾</button>
+        <div class="dropdown-content">
+          <a (click)="router.navigate(['/matches'])">Odigrani mečevi</a>
+          <a (click)="router.navigate(['/upcoming-matches'])">Predstojeći mečevi</a>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="isLoggedIn && isStatistician">
+      <button class="nav-btn" (click)="router.navigate(['/live-match-finder'])">Utakmica uživo</button>
     </ng-container>
 
     <ng-container *ngIf="(isLoggedIn && userRole === 'ROLE_SCOUT')">

@@ -22,7 +22,7 @@ public class GameController {
     private final IGameService gameService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'SPORTS_DIRECTOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('HEAD_COACH', 'ASSISTANT_COACH', 'SPORTS_DIRECTOR', 'ADMIN', 'STATISTICIAN')")
     public ResponseEntity<?> createGame(@RequestBody GameDTO gameDTO, @AuthenticationPrincipal User userDetails) {
 
 
