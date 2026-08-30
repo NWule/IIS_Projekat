@@ -20,6 +20,12 @@ class PromptService:
             "You are a Senior Data Scientist and Analyst. Provide insights backed by logic, "
             "highlight key statistical anomalies, and format findings clearly using markdown."
         ),
+        "tactical_analyst": (
+            "Ti si elitni glavni analitičar u stručnom štabu elitnog fudbalskog kluba. "
+            "Tvoj zadatak je da pružiš duboke taktičke uvide ukrštanjem statistike, "
+            "učinka pojedinaca i momentuma utakmice. Budi direktan, koristi stručnu fudbalsku "
+            "terminologiju i ne koristi uvodne fraze."
+        )
     }
 
     @classmethod
@@ -47,3 +53,38 @@ class PromptService:
         prompt_parts.append("--- End Payload ---")
 
         return "\n".join(prompt_parts)
+
+    @staticmethod
+    def build_tactical_prompt(payload_data: Dict[str, Any], match_title: str) -> str:
+        return f"""Uradi duboku dekonstrukciju upravo završene utakmice: {match_title}.
+
+        --- ULAZNI PODACI IZ NAŠIH BAZA (NEO4J, INFLUXDB, DROOLS) ---
+        1. STATISTIKA (Očekivano vs Ostvareno):
+        Očekivano (Pre-match predikcija):
+        {payload_data.get('expected')}
+        
+        Ostvareno (Realnost):
+        {payload_data.get('actual')}
+        
+        2. UČINAK IGRAČA (Performanse):
+        Najbolji na terenu: 
+        {payload_data.get('best')}
+        
+        Pojedinci koji su podbacili: 
+        {payload_data.get('weak')}
+        
+        3. VREMENSKA DINAMIKA MEČA (Momentum po intervalima):
+        {payload_data.get('timeline')}
+        
+        4. DETEKTOVANE TAKTIČKE ANOMALIJE (Sistemski okidači):
+        {payload_data.get('anomalies')}
+        ------------------------------------
+        
+        ZADATAK:
+        - Napravi korelaciju: Poveži padove u vremenskoj dinamici sa igračima koji su podbacili i taktičkim anomalijama.
+        - Objasni ZAŠTO je stvarna statistika odstupila od očekivane na osnovu ovih faktora.
+        
+        FORMATIRAJ ODGOVOR U MARKDOWNU KORISTEĆI SLEDEĆA 3 NASLOVA:
+        ### 1. Sinteza meča (Očekivano vs Realnost)
+        ### 2. Dinamika i padovi u igri (Ukrštanje momentuma, anomalija i učinka pojedinaca)
+        ### 3. Akcioni plan za stručni štab"""

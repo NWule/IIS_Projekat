@@ -39,7 +39,11 @@ export class LoginComponent {
               this.authService.user$.value?.role === 'ROLE_ASSISTANT_COACH' ||
               this.authService.user$.value?.role === 'ROLE_STATISTICIAN'
             ) {
-              this.router.navigate(['/search-matches']);
+              if (this.authService.user$.value?.clubId) {
+                this.router.navigate(['/club-details', this.authService.user$.value?.clubId]);
+              } else {
+                this.router.navigate(['/clubs']);
+              }
             }
           else {
             this.router.navigate(['/']); // Redirect to home or dashboard on success

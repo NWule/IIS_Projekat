@@ -44,6 +44,9 @@
       <button [class.active]="activeTab === 'performances'" (click)="activeTab = 'performances'">
         Performanse igrača
       </button>
+      <button *ngIf="canGenerateReport" [class.active]="activeTab === 'ai-analysis'" (click)="activeTab = 'ai-analysis'">
+        🤖 AI Analiza
+      </button>
     </div>
 
     <div *ngIf="activeTab === 'statistics'">
@@ -65,11 +68,11 @@
               { label: 'Korneri', home: 'homeCorners', away: 'awayCorners' },
               { label: 'Faulovi', home: 'homeFouls', away: 'awayFouls' },
               { label: 'Ofsajdi', home: 'homeOffsides', away: 'awayOffsides' },
-              { label: 'Tačnost dodavanja (%)', home: 'homePassAccuracy', away: 'awayPassAccuracy' }
+              { label: 'Tačnost dodavanja (%)', home: 'homePassSuccessRate', away: 'awayPassSuccessRate' }
             ]">
-              <td><input type="number" [formControlName]="row.home" min="0" class="stat-input" /></td>
+              <td><input type="number" [formControlName]="row.home" min="0" step="0.01" class="stat-input" /></td>
               <td>{{ row.label }}</td>
-              <td><input type="number" [formControlName]="row.away" min="0" class="stat-input" /></td>
+              <td><input type="number" [formControlName]="row.away" min="0" step="0.01" class="stat-input" /></td>
             </tr>
           </tbody>
         </table>
@@ -98,18 +101,41 @@
       </div>
 
       <div class="teams-container">
+        <!-- Domaćin -->
         <div class="team-section">
           <h3>{{ homeClub?.name }}</h3>
-
-          <div class="player-row" *ngFor="let p of filteredHomePerformances">
-            <strong>{{ p.playerName }} {{ p.playerSurname }}</strong> &nbsp;|&nbsp;
-            ⏱ {{ p.minutesPlayed }}' &nbsp; ⚽ {{ p.goals }} &nbsp; 🎯 {{ p.assists }} &nbsp;
-            🦵 {{ p.fouls }}
-            <span *ngIf="p.yellowCards > 0"> &nbsp; 🟨 {{ p.yellowCards }}</span>
-            <span *ngIf="p.redCard"> &nbsp; 🟥</span>
-            &nbsp; | &nbsp; {{ p.passingAccuracy }}% dodavanja
-          </div>
           
+          <table class="roster-perf-table" *ngIf="filteredHomePerformances.length > 0">
+            <thead>
+              <tr>
+                <th class="text-left">Igrač</th>
+                <th>Min</th>
+                <th>Gol/Asis</th>
+                <th>Faulovi</th>
+                <th>Kartoni</th>
+                <th>Pas (%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of filteredHomePerformances">
+                <td class="text-left font-bold">{{ p.playerName }} {{ p.playerSurname }}</td>
+                <td><span class="badge badge-neutral">{{ p.minutesPlayed }}'</span></td>
+                <td>
+                  <span class="badge badge-success" *ngIf="p.goals > 0">{{ p.goals }}G</span>
+                  <span class="badge badge-info" *ngIf="p.assists > 0">{{ p.assists }}A</span>
+                  <span class="text-muted" *ngIf="p.goals === 0 && p.assists === 0">-</span>
+                </td>
+                <td>{{ p.fouls }}</td>
+                <td>
+                  <span class="badge badge-warning" *ngIf="p.yellowCards > 0">{{ p.yellowCards }} Ž</span>
+                  <span class="badge badge-danger" *ngIf="p.redCard">C</span>
+                  <span class="text-muted" *ngIf="p.yellowCards === 0 && !p.redCard">-</span>
+                </td>
+                <td><strong>{{ p.passingAccuracy | number:'1.2-2' }}%</strong></td>
+              </tr>
+            </tbody>
+          </table>
+
           <p *ngIf="filteredHomePerformances.length === 0" class="empty-message">
             Nema pronađenih performansi.
           </p>
@@ -119,18 +145,41 @@
           </button>
         </div>
 
+        <!-- Gost -->
         <div class="team-section">
           <h3>{{ awayClub?.name }}</h3>
-
-          <div class="player-row" *ngFor="let p of filteredAwayPerformances">
-            <strong>{{ p.playerName }} {{ p.playerSurname }}</strong> &nbsp;|&nbsp;
-            ⏱ {{ p.minutesPlayed }}' &nbsp; ⚽ {{ p.goals }} &nbsp; 🎯 {{ p.assists }} &nbsp;
-            🦵 {{ p.fouls }}
-            <span *ngIf="p.yellowCards > 0"> &nbsp; 🟨 {{ p.yellowCards }}</span>
-            <span *ngIf="p.redCard"> &nbsp; 🟥</span>
-            &nbsp; | &nbsp; {{ p.passingAccuracy }}% dodavanja
-          </div>
           
+          <table class="roster-perf-table" *ngIf="filteredAwayPerformances.length > 0">
+            <thead>
+              <tr>
+                <th class="text-left">Igrač</th>
+                <th>Min</th>
+                <th>Gol/Asis</th>
+                <th>Faulovi</th>
+                <th>Kartoni</th>
+                <th>Pas (%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of filteredAwayPerformances">
+                <td class="text-left font-bold">{{ p.playerName }} {{ p.playerSurname }}</td>
+                <td><span class="badge badge-neutral">{{ p.minutesPlayed }}'</span></td>
+                <td>
+                  <span class="badge badge-success" *ngIf="p.goals > 0">{{ p.goals }}G</span>
+                  <span class="badge badge-info" *ngIf="p.assists > 0">{{ p.assists }}A</span>
+                  <span class="text-muted" *ngIf="p.goals === 0 && p.assists === 0">-</span>
+                </td>
+                <td>{{ p.fouls }}</td>
+                <td>
+                  <span class="badge badge-warning" *ngIf="p.yellowCards > 0">{{ p.yellowCards }} Ž</span>
+                  <span class="badge badge-danger" *ngIf="p.redCard">C</span>
+                  <span class="text-muted" *ngIf="p.yellowCards === 0 && !p.redCard">-</span>
+                </td>
+                <td><strong>{{ p.passingAccuracy }}%</strong></td>
+              </tr>
+            </tbody>
+          </table>
+
           <p *ngIf="filteredAwayPerformances.length === 0" class="empty-message">
             Nema pronađenih performansi.
           </p>
@@ -138,6 +187,27 @@
           <button class="btn-add" *ngIf="isStatistician && !isHomeClub" (click)="goToAddPerformance()">
             + Dodaj performansu
           </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="activeTab === 'ai-analysis'" class="ai-tab-content">
+      <div class="ai-header" *ngIf="!aiReportContent && !isGeneratingAi">
+        <p>Generišite dubinsku taktičku analizu meča koristeći Veštačku Inteligenciju. Sistem će ukrstiti očekivanu statistiku, InfluxDB momentum i Drools anomalije.</p>
+        <button class="btn-ai-generate" (click)="generateAiReport()">
+          ✨ Generiši AI Izveštaj
+        </button>
+      </div>
+
+      <div class="ai-loading" *ngIf="isGeneratingAi">
+        <div class="spinner">⚙️</div>
+        <p>AI agregira podatke i piše izveštaj, ovo može potrajati nekoliko sekundi...</p>
+      </div>
+
+      <div class="ai-report-box" *ngIf="aiReportContent && !isGeneratingAi">
+        <button class="btn-submit" style="margin-bottom: 20px;" (click)="generateAiReport()">🔄 Regeneriši izveštaj</button>
+        <div class="ai-report-text">
+          <markdown [data]="aiReportContent"></markdown>
         </div>
       </div>
     </div>

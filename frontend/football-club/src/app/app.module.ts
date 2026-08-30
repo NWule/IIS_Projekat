@@ -17,6 +17,7 @@ import { LayoutModule } from './feature-modules/layout/layout.module';
 import { ScoutingPlayerListComponent } from './feature-modules/scouting/components/scouting-player-list/scouting-player-list.component';
 import { ScoutingModule } from './feature-modules/scouting/scouting.module';
 import { NgChartsModule } from 'ng2-charts';
+import { MarkdownModule } from 'ngx-markdown';
 
 export function tokenGetter() {
   return localStorage.getItem('access-token');
@@ -39,6 +40,7 @@ export function tokenGetter() {
     LayoutModule,
     ScoutingModule,
     NgChartsModule,
+    MarkdownModule.forRoot(),
     JwtModule.forRoot({
       config: {
         tokenGetter,

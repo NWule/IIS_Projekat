@@ -24,6 +24,7 @@ import { UpcomingMatchesComponent } from './components/upcoming-matches/upcoming
 import { LiveTrackingComponent } from './components/live-tracking/live-tracking.component';
 import { LiveMatchCoachComponent } from './components/live-match-coach/live-match-coach.component'; 
 import { LiveMatchFinderComponent } from './components/live-match-finder/live-match-finder.component';
+import { MarkdownModule } from 'ngx-markdown';
 
 
 @NgModule({
@@ -49,7 +50,8 @@ import { LiveMatchFinderComponent } from './components/live-match-finder/live-ma
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    NgChartsModule
+    NgChartsModule,
+    MarkdownModule.forRoot(),
   ],
   exports: [
     ClubEntryComponent,

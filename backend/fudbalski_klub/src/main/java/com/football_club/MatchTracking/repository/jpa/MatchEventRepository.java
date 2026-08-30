@@ -50,4 +50,16 @@ public class MatchEventRepository {
 
         return influxDBClient.getQueryApi().query(fluxQuery, org);
     }
+
+    public List<FluxTable> getTimelineEventsForGame(Long gameId) {
+        String fluxQuery = String.format(
+                "from(bucket: \"%s\") " +
+                        "|> range(start: 0) " +
+                        "|> filter(fn: (r) => r._measurement == \"match_events\" and r.gameId == \"%s\") " +
+                        "|> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\") " +
+                        "|> sort(columns: [\"matchMinute\"])", bucket, gameId
+        );
+
+        return influxDBClient.getQueryApi().query(fluxQuery, org);
+    }
 }

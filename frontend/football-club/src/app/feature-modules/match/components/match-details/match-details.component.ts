@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/env/environment';
 
 import { GameService } from '../../services/game.service';
 import { AppearanceService } from '../../services/appearance.service';
@@ -24,7 +26,7 @@ import { Club } from '../../models/club.model';
   styleUrls: ['./match-details.component.css']
 })
 export class MatchDetailsComponent implements OnInit {
-  activeTab: 'statistics' | 'performances' = 'statistics';
+  activeTab: 'statistics' | 'performances' | 'ai-analysis' = 'statistics';
   gameId!: number;
   game!: Game;
   homeClub!: Club;
@@ -55,6 +57,9 @@ export class MatchDetailsComponent implements OnInit {
   filteredHomePerformances: Appearance[] = [];
   filteredAwayPerformances: Appearance[] = [];
 
+  isGeneratingAi = false;
+  aiReportContent: string | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -65,7 +70,8 @@ export class MatchDetailsComponent implements OnInit {
     private contractService: ContractService,
     private clubService: ClubService,
     private authService: AuthService,
-    private reportService: ReportService
+    private reportService: ReportService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -192,8 +198,8 @@ export class MatchDetailsComponent implements OnInit {
       awayFouls:          [0, [Validators.required, Validators.min(0)]],
       homeOffsides:       [0, [Validators.required, Validators.min(0)]],
       awayOffsides:       [0, [Validators.required, Validators.min(0)]],
-      homePassAccuracy:   [0, [Validators.required, Validators.min(0), Validators.max(100)]],
-      awayPassAccuracy:   [0, [Validators.required, Validators.min(0), Validators.max(100)]]
+      homePassSuccessRate:   [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+      awayPassSuccessRate:   [0, [Validators.required, Validators.min(0), Validators.max(100)]]
     });
   }
 
@@ -330,6 +336,25 @@ export class MatchDetailsComponent implements OnInit {
         error: (err) => console.error('Greška pri generisanju izveštaja:', err)
       });
     }
+  }
+
+  generateAiReport(): void {
+    if (!this.canGenerateReport) return;
+    
+    this.isGeneratingAi = true;
+    
+    this.http.post(`${environment.apiHost}ai-analysis/game/${this.gameId}`, {}, { responseType: 'text' })
+      .subscribe({
+        next: (reportText) => {
+          this.aiReportContent = reportText;
+          this.isGeneratingAi = false;
+        },
+        error: (err) => {
+          console.error('Greška pri generisanju AI izveštaja', err);
+          alert('Došlo je do greške prilikom generisanja AI izveštaja. Proverite da li su servisi podignuti.');
+          this.isGeneratingAi = false;
+        }
+      });
   }
 
 }
