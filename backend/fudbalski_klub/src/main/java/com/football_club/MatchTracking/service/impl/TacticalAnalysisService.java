@@ -62,12 +62,20 @@ public class TacticalAnalysisService implements ITacticalAnalysisService {
         kSession.insert(game);
 
         for (AppearanceGraph app : allAppearances) {
+            if (app.getPlayerGraph() != null && app.getPlayerGraph().getClubGraph() != null) {
+                app.setClubId(app.getPlayerGraph().getClubGraph().getId());
+            }
             kSession.insert(app);
         }
         kSession.insert(fact);
 
-        kSession.fireAllRules();
-
+        System.out.println("=== DROOLS DEBUG ===");
+        System.out.println("Target Team ID (mojId): " + targetTeamId);
+        System.out.println("Home Club ID: " + (game.getHomeClub() != null ? game.getHomeClub().getId() : "NULL"));
+        System.out.println("Da li se ID-jevi poklapaju?: " + targetTeamId.equals(game.getHomeClub().getId()));
+        System.out.println("Ocekivani ofsajdi (expOffsides): " + game.getExpectedHomeOffsides());
+        System.out.println("Stvarni ofsajdi: " + stats.getHomeOffsides());
+        System.out.println("Ubacujem objekte u sesiju...");
         int brojOkinutihPravila = kSession.fireAllRules();
         System.out.println(">>> [DROOLS] IZVRŠENO PRAVILA ZA TIM " + targetTeamId + ": " + brojOkinutihPravila);
 

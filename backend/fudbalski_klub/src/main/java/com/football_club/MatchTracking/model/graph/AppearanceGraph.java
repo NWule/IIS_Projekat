@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.annotation.Transient;
 
 @Node
 @Getter
@@ -29,4 +30,7 @@ public class AppearanceGraph {
 
     @Relationship(type = "IN_GAME", direction = Relationship.Direction.OUTGOING)
     private GameGraph gameGraph;
+
+    @Transient
+    private Long clubId;
 }
