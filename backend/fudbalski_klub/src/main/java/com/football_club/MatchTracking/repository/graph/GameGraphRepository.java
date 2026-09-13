@@ -6,17 +6,20 @@ import org.springframework.data.neo4j.repository.query.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+
 @Repository
 public interface GameGraphRepository extends Neo4jRepository<GameGraph, Long> {
 
-    interface ClubFormAverages {
-        Double getAvgGoals();
-        Double getAvgShots();
-        Double getAvgShotsOnTarget();
-        Double getAvgFouls();
-        Double getAvgCorners();
-        Double getAvgOffsides();
-        Double getAvgPassSuccessRate();
+    @lombok.Getter
+    @lombok.Setter
+    class ClubFormAverages {
+        private Double avgGoals;
+        private Double avgShots;
+        private Double avgShotsOnTarget;
+        private Double avgFouls;
+        private Double avgCorners;
+        private Double avgOffsides;
+        private Double avgPassSuccessRate;
     }
 
     @Query("MATCH (c:ClubGraph {id: $clubId})<-[r:HOME_CLUB|AWAY_CLUB]-(g:GameGraph)-[:STATS_FOR_GAME]->(ts:TeamStatisticGraph) " +

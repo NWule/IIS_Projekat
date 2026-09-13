@@ -5,7 +5,7 @@
 
   <div class="navbar-actions">
     <ng-container *ngIf="isLoggedIn && (isHeadCoach || isAssistantCoach)">
-      <button class="nav-btn" (click)="router.navigate(['/clubs'])">Klub i Roster</button>
+      <button class="nav-btn" (click)="router.navigate(['/clubs'])">Klubovi</button>
     </ng-container>
 
     <ng-container *ngIf="isLoggedIn && isAssistantCoach">
